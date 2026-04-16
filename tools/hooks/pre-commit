@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+#
+# tools/hooks/pre-commit — ledger-of-meluhha
+#
+# Activate: tools/hooks/install.sh
+# Tiers:
+#   T0  audit-fsx.sh on staged .fsx files            < 1s
+#   T1  lualatex compile on staged .tex files         ~ 5s
+#   T2  cmake --build build (if configured)           ~ 30s
+#
+# Fail loud. No skip-on-warning. No --no-verify.
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+STAGED=$(git diff --cached --name-only --diff-filter=ACMR)
+
+if [ -z "$STAGED" ]; then
+    echo "pre-commit: no staged files, nothing to verify"
+    exit 0
+fi
+
+echo "── pre-commit ──"
+
+# ─── T0  F# coding standard audit ───────────────────────────────────────
+STAGED_FSX=$(echo "$STAGED" | grep -E '\.fsx$' || true)
+
+if [ -n "$STAGED_FSX" ]; then
+    AUDIT="${REPO_ROOT}/tools/hooks/audit-fsx.sh"
+    if [ ! -x "$AUDIT" ]; then
+        echo "T0: FAIL — audit-fsx.sh not found or not executable"
+        echo "       expected at tools/hooks/audit-fsx.sh"
+        exit 1
+    fi
+    N=$(echo "$STAGED_FSX" | wc -l | tr -d ' ')
+    echo "T0: coding standard audit on ${N} .fsx file(s)"
+    AUDIT_FILES=""
+    while IFS= read -r fsx; do
+        AUDIT_FILES="$AUDIT_FILES $fsx"
+    done <<< "$STAGED_FSX"
+    if ! "$AUDIT" $AUDIT_FILES; then
+        echo "T0: FAIL — coding standard violations"
+        exit 1
+    fi
+    echo "T0: PASS"
+else
+    echo "T0: SKIP (no .fsx files staged)"
+fi
+
+# ─── T1  lualatex compile on staged .tex ─────────────────────────────────
+STAGED_TEX=$(echo "$STAGED" | grep -E '\.tex$' || true)
+
+if [ -n "$STAGED_TEX" ]; then
+    if ! command -v lualatex >/dev/null 2>&1; then
+        echo "T1: FAIL — lualatex not found"
+        echo "       fix: brew install --cask mactex"
+        exit 1
+    fi
+    echo "T1: compile-checking staged .tex files"
+    T1_FAILED=0
+    while IFS= read -r texf; do
+        TEXDIR=$(dirname "$texf")
+        TEXBASE=$(basename "$texf")
+        printf "  %s ... " "$TEXBASE"
+        if lualatex -interaction=nonstopmode -output-directory="$TEXDIR" "$texf" >/tmp/precommit-tex.log 2>&1; then
+            echo "OK"
+        else
+            if grep -q '^!' /tmp/precommit-tex.log; then
+                echo "FAIL"
+                grep '^!' /tmp/precommit-tex.log | head -5
+                T1_FAILED=1
+            else
+                echo "OK (warnings only)"
+            fi
+        fi
+    done <<< "$STAGED_TEX"
+    # Clean LaTeX artifacts from source dir
+    rm -f *.aux *.log *.out *.xmpdata pdfa.xmpi 2>/dev/null
+    rm -rf indus_corpus 2>/dev/null
+    if [ "$T1_FAILED" = "1" ]; then
+        echo "T1: FAIL — TeX compile errors"
+        exit 1
+    fi
+    echo "T1: PASS"
+else
+    echo "T1: SKIP (no .tex files staged)"
+fi
+
+# ─── T2  cmake build (if configured) ────────────────────────────────────
+if [ -d build ] && [ -f build/CMakeCache.txt ]; then
+    echo "T2: cmake --build build"
+    if ! cmake --build build >/tmp/precommit-cmake.log 2>&1; then
+        echo "T2: FAIL — build broken"
+        tail -20 /tmp/precommit-cmake.log
+        exit 1
+    fi
+    echo "T2: PASS"
+else
+    echo "T2: SKIP (build/ not configured — run cmake -S . -B build -DINDUS_VALLEY_DIR=...)"
+fi
+
+echo "── pre-commit: all checks passed ──"

@@ -1,0 +1,26 @@
+# Generated databases — rebuild with cmake --build build
+indus_codebook.db
+indus_corpus.db
+indus_lssc.db
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.xmpdata
+*.synctex*
+pdfa.xmpi
+
+# Alloy output dir
+indus_corpus/
+
+# CMake build dir
+build/
+
+# macOS
+.DS_Store
+
+# PDF — generated from tex, not tracked
+# (ship the tex, not the pdf — Overleaf or cmake --build build --target paper)
+*.pdf
