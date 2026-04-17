@@ -1,0 +1,585 @@
+// The Ledger of Meluhha — Interactive Visualization
+// Third Buyer Advisory LLC | Venugopal 2026
+// TypeScript source — compiled to JS, embedded in HTML
+//
+// Type annotations reveal the data flow:
+//   DB file -> sql.js WASM -> typed queries -> Leaflet map + D3 charts
+
+// === EXTERNAL DECLARATIONS ===================================================
+
+declare const initSqlJs: (config: { locateFile: (f: string) => string }) => Promise<SqlJsStatic>;
+declare const L: any;
+declare const d3: any;
+
+interface SqlJsStatic {
+  Database: new (data: Uint8Array) => SqlJsDatabase;
+}
+
+interface SqlJsDatabase {
+  exec(sql: string): SqlJsResult[];
+}
+
+interface SqlJsResult {
+  columns: string[];
+  values: any[][];
+}
+
+// === DOMAIN TYPES ============================================================
+
+interface Site {
+  readonly id: string;
+  readonly name: string;
+  readonly lat: number;
+  readonly lon: number;
+  readonly type: SiteType;
+  readonly period: string;
+}
+
+type SiteType =
+  | 'ivc-major' | 'ivc-port' | 'ivc-minor' | 'ivc-outpost'
+  | 'tn-supply' | 'meso-dest' | 'gulf-hub' | 'resource';
+
+interface TradeRoute {
+  readonly from: string;
+  readonly via: string | null;
+  readonly to: string | null;
+  readonly commodity: string;
+  readonly color: string;
+  readonly width: number;
+  readonly note: string;
+}
+
+interface Weight {
+  readonly mult: number;
+  readonly g: number;
+  readonly series: 'binary' | 'decimal';
+  readonly app: string;
+}
+
+interface Commodity {
+  readonly sign: string;
+  readonly name: string;
+  readonly route: string;
+  readonly pct: string;
+}
+
+interface DecodedField {
+  readonly label: string;
+  readonly value: string;
+}
+
+// === DATA ====================================================================
+
+const sites: readonly Site[] = [
+  // IVC
+  {id:'mohenjodaro', name:'Mohenjo-daro', lat:27.33, lon:68.14, type:'ivc-major', period:'Mature Harappan'},
+  {id:'harappa', name:'Harappa', lat:30.63, lon:72.87, type:'ivc-major', period:'Mature Harappan'},
+  {id:'lothal', name:'Lothal', lat:22.52, lon:72.25, type:'ivc-port', period:'Mature Harappan'},
+  {id:'kalibangan', name:'Kalibangan', lat:29.47, lon:74.13, type:'ivc-major', period:'Mature Harappan'},
+  {id:'dholavira', name:'Dholavira', lat:23.89, lon:70.21, type:'ivc-major', period:'Mature Harappan'},
+  {id:'rojdi', name:'Rojdi', lat:22.28, lon:71.11, type:'ivc-minor', period:'Late Harappan'},
+  {id:'shortughai', name:'Shortughai', lat:37.08, lon:69.53, type:'ivc-outpost', period:'Mature Harappan'},
+  // Tamil Nadu
+  {id:'kodumanal', name:'Kodumanal', lat:11.10, lon:77.88, type:'tn-supply', period:'Iron Age'},
+  {id:'keeladi', name:'Keeladi', lat:9.88, lon:78.90, type:'tn-supply', period:'Iron Age'},
+  {id:'thulukarpatti', name:'Thulukarpatti', lat:8.82, lon:77.82, type:'tn-supply', period:'Iron Age'},
+  {id:'karur', name:'Karur', lat:10.96, lon:78.08, type:'tn-supply', period:'Iron Age'},
+  {id:'teriruveli', name:'Teriruveli', lat:8.72, lon:78.10, type:'tn-supply', period:'Iron Age'},
+  {id:'adichanallur', name:'Adichanallur', lat:8.68, lon:77.72, type:'tn-supply', period:'Iron Age'},
+  {id:'sivagalai', name:'Sivagalai', lat:8.55, lon:77.85, type:'tn-supply', period:'Iron Age, 3445 BCE'},
+  // Mesopotamia / Gulf
+  {id:'ur', name:'Ur', lat:30.96, lon:46.10, type:'meso-dest', period:'Akkadian'},
+  {id:'kish', name:'Kish', lat:32.55, lon:44.65, type:'meso-dest', period:'Akkadian'},
+  {id:'tell-asmar', name:'Tell Asmar', lat:33.75, lon:44.75, type:'meso-dest', period:'Akkadian'},
+  {id:'susa', name:'Susa', lat:32.19, lon:48.26, type:'meso-dest', period:'Elamite'},
+  {id:'dilmun', name:'Dilmun', lat:26.04, lon:50.55, type:'gulf-hub', period:'Bronze Age'},
+  {id:'magan', name:'Magan', lat:23.61, lon:58.59, type:'gulf-hub', period:'Bronze Age'},
+  // Resource
+  {id:'khetri', name:'Khetri Mines', lat:28.00, lon:75.80, type:'resource', period:'Copper source'},
+] as const;
+
+const tradeRoutes: readonly TradeRoute[] = [
+  // Export: IVC -> Mesopotamia
+  {from:'lothal', via:'dilmun', to:'ur', commodity:'Jar goods', color:'#cc6600', width:8, note:'S-342 = 10% corpus'},
+  {from:'lothal', via:'dilmun', to:'ur', commodity:'Textiles', color:'#8844aa', width:6, note:'Primary bulk export'},
+  {from:'lothal', via:'magan', to:null, commodity:'Copper-bronze', color:'#dd6633', width:5, note:'Khetri to Oman route'},
+  {from:'lothal', via:'dilmun', to:null, commodity:'Carnelian', color:'#cc2222', width:4, note:'Luxury export'},
+  // Supply: Tamil Nadu -> IVC
+  {from:'kodumanal', via:null, to:'lothal', commodity:'Iron', color:'#227744', width:3, note:'Fish sign supply corridor'},
+  {from:'karur', via:null, to:'lothal', commodity:'Iron', color:'#227744', width:3, note:'TN iron-working hub'},
+  {from:'keeladi', via:null, to:'lothal', commodity:'Textiles', color:'#8844aa', width:3, note:'Cotton textile supply'},
+  {from:'thulukarpatti', via:null, to:'lothal', commodity:'Ivory/Shell', color:'#997744', width:2, note:'Southern coast supply'},
+  {from:'teriruveli', via:'magan', to:null, commodity:'Timber', color:'#664422', width:2, note:'Timber to Gulf'},
+  // Internal
+  {from:'harappa', via:null, to:'mohenjodaro', commodity:'Internal', color:'#555555', width:2, note:'Indus corridor'},
+  {from:'khetri', via:null, to:'lothal', commodity:'Copper ore', color:'#dd6633', width:3, note:'Khetri copper mines'},
+  {from:'dholavira', via:null, to:'lothal', commodity:'Internal', color:'#555555', width:1, note:'Gujarat coast'},
+  {from:'shortughai', via:null, to:'harappa', commodity:'Lapis lazuli', color:'#2244aa', width:2, note:'Afghanistan trade post'},
+];
+
+const BASE_UNIT = 0.856;
+
+const weights: readonly Weight[] = [
+  {mult:1, g:BASE_UNIT, series:'binary', app:'Gold dust'},
+  {mult:2, g:BASE_UNIT*2, series:'binary', app:''},
+  {mult:4, g:BASE_UNIT*4, series:'binary', app:'Carnelian'},
+  {mult:8, g:BASE_UNIT*8, series:'binary', app:''},
+  {mult:16, g:BASE_UNIT*16, series:'binary', app:'Copper ref'},
+  {mult:32, g:BASE_UNIT*32, series:'binary', app:''},
+  {mult:64, g:BASE_UNIT*64, series:'binary', app:''},
+  {mult:160, g:137, series:'decimal', app:'Cotton bale'},
+  {mult:500, g:685, series:'decimal', app:'Oil jar'},
+  {mult:1000, g:1370, series:'decimal', app:'Bulk grain'},
+];
+
+const commodities: readonly Commodity[] = [
+  {sign:'S-342', name:'Jar goods', route:'Mesopotamia', pct:'10%'},
+  {sign:'S-218', name:'Iron', route:'TN → North', pct:'—'},
+  {sign:'S-301', name:'Textiles', route:'Mesopotamia', pct:'—'},
+  {sign:'S-184', name:'Copper-bronze', route:'Dilmun/Magan', pct:'—'},
+  {sign:'S-176', name:'Carnelian', route:'Dilmun', pct:'—'},
+  {sign:'S-200', name:'Timber', route:'Magan', pct:'—'},
+  {sign:'S-211', name:'Ivory/Shell', route:'North', pct:'—'},
+  {sign:'S-89', name:'Gold', route:'Mesopotamia', pct:'—'},
+];
+
+// === SITE LOOKUP =============================================================
+
+function findSite(id: string): Site | undefined {
+  return sites.find(s => s.id === id);
+}
+
+function siteRadius(type: SiteType): number {
+  const m: Record<SiteType, number> = {
+    'ivc-major':7, 'ivc-port':8, 'ivc-minor':5, 'ivc-outpost':4,
+    'tn-supply':5, 'meso-dest':6, 'gulf-hub':6, 'resource':4
+  };
+  return m[type];
+}
+
+function siteColor(type: SiteType): string {
+  const m: Record<SiteType, string> = {
+    'ivc-major':'#c4924a', 'ivc-port':'#c4924a', 'ivc-minor':'#c4924a', 'ivc-outpost':'#c4924a',
+    'tn-supply':'#227744', 'meso-dest':'#b5121b', 'gulf-hub':'#8b7355', 'resource':'#dd6633'
+  };
+  return m[type];
+}
+
+function isMajorSite(type: SiteType): boolean {
+  return type === 'ivc-major' || type === 'ivc-port' || type === 'meso-dest';
+}
+
+// === ROUTE GEOMETRY ==========================================================
+
+type LatLon = [number, number]; // [lat, lon]
+
+function curvePoints(a: LatLon, b: LatLon, curvature: number): LatLon[] {
+  const n = 20;
+  const midLat = (a[0] + b[0]) / 2;
+  const midLon = (a[1] + b[1]) / 2;
+  const dLat = b[0] - a[0];
+  const dLon = b[1] - a[1];
+  const offLat = -dLon * curvature;
+  const offLon = dLat * curvature;
+  const cLat = midLat + offLat;
+  const cLon = midLon + offLon;
+
+  const pts: LatLon[] = [];
+  for (let i = 0; i <= n; i++) {
+    const t = i / n;
+    const lat = (1 - t) * (1 - t) * a[0] + 2 * (1 - t) * t * cLat + t * t * b[0];
+    const lon = (1 - t) * (1 - t) * a[1] + 2 * (1 - t) * t * cLon + t * t * b[1];
+    pts.push([lat, lon]);
+  }
+  return pts;
+}
+
+/** Resolve a route to an array of LatLon points.
+ *  BUG FIX: handles all four cases:
+ *    1. from -> to (no via)
+ *    2. from -> via -> to (multi-segment)
+ *    3. from -> via (to is null — route ends at via)
+ *    4. from only (via and to both null — skip)
+ */
+function resolveRoutePoints(route: TradeRoute): LatLon[] | null {
+  const from = findSite(route.from);
+  if (!from) return null;
+
+  const fromLL: LatLon = [from.lat, from.lon];
+
+  // Case 4: nowhere to go
+  if (!route.via && !route.to) return null;
+
+  // Case 1: direct from -> to
+  if (!route.via && route.to) {
+    const to = findSite(route.to);
+    if (!to) return null;
+    return curvePoints(fromLL, [to.lat, to.lon], 0.15);
+  }
+
+  // Case 3: from -> via (to is null, route terminates at via)
+  if (route.via && !route.to) {
+    const via = findSite(route.via);
+    if (!via) return null;
+    return curvePoints(fromLL, [via.lat, via.lon], 0.15);
+  }
+
+  // Case 2: from -> via -> to (multi-segment)
+  if (route.via && route.to) {
+    const via = findSite(route.via);
+    const to = findSite(route.to);
+    if (!via || !to) return null;
+    const seg1 = curvePoints(fromLL, [via.lat, via.lon], 0.15);
+    const seg2 = curvePoints([via.lat, via.lon], [to.lat, to.lon], 0.15);
+    return [...seg1, ...seg2];
+  }
+
+  return null;
+}
+
+// === MAP =====================================================================
+
+function renderMap(map: any): void {
+  // Tile layer
+  L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenTopoMap CC-BY-SA &copy; OSM',
+    maxZoom: 17
+  }).addTo(map);
+
+  // Routes FIRST (under sites)
+  tradeRoutes.forEach(route => {
+    const points = resolveRoutePoints(route);
+    if (!points || points.length === 0) return;
+
+    const line = L.polyline(points, {
+      color: route.color,
+      weight: route.width,
+      opacity: 0.8,
+      smoothFactor: 1.5,
+      lineCap: 'round'
+    }).addTo(map);
+
+    line.bindPopup(
+      `<strong>${route.commodity}</strong><br>${route.note}<br>` +
+      `<span style="opacity:0.5">width = ${route.width}px (relative volume)</span>`
+    );
+
+    line.on('mouseover', () => line.setStyle({opacity: 1, weight: route.width + 2}));
+    line.on('mouseout', () => line.setStyle({opacity: 0.8, weight: route.width}));
+  });
+
+  // Sites ON TOP (after routes)
+  sites.forEach(site => {
+    const r = siteRadius(site.type);
+    const col = siteColor(site.type);
+
+    const marker = L.circleMarker([site.lat, site.lon], {
+      radius: r,
+      fillColor: col,
+      fillOpacity: 0.85,
+      color: col,
+      weight: 1.5,
+      opacity: 0.5
+    }).addTo(map);
+
+    marker.bindPopup(
+      `<strong>${site.name}</strong><br>${site.period}<br>` +
+      `<span style="opacity:0.5">${site.lat.toFixed(2)}°N, ${site.lon.toFixed(2)}°E</span>`
+    );
+
+    const labelClass = 'site-label' + (isMajorSite(site.type) ? ' site-label-major' : '');
+    const dir = site.lon > 65 ? 'right' as const : 'left' as const;
+    const off: [number, number] = site.lon > 65 ? [10, 0] : [-10, 0];
+
+    marker.bindTooltip(site.name, {
+      permanent: true,
+      direction: dir,
+      offset: off,
+      className: labelClass
+    });
+  });
+
+  // Legend
+  const legend = L.control({position: 'bottomleft'});
+  legend.onAdd = (): HTMLElement => {
+    const div = L.DomUtil.create('div');
+    div.style.cssText = 'background:rgba(15,12,7,0.8);padding:8px 12px;border:1px solid rgba(196,146,74,0.2);font-family:JetBrains Mono,monospace;font-size:9px;color:rgba(240,230,208,0.5);';
+    div.innerHTML =
+      '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">' +
+      '<div style="width:40px;height:8px;background:#cc6600;border-radius:2px;opacity:0.8"></div> width ∝ trade volume</div>' +
+      '<div style="font-size:8px;opacity:0.4">● IVC  ● TN supply  ● Mesopotamia  ● Gulf</div>';
+    return div;
+  };
+  legend.addTo(map);
+}
+
+// === DB QUERIES ==============================================================
+
+function queryScalar(db: SqlJsDatabase, sql: string): any {
+  const r = db.exec(sql);
+  if (r.length > 0 && r[0].values.length > 0) return r[0].values[0][0];
+  return null;
+}
+
+function queryRows(db: SqlJsDatabase, sql: string): any[][] {
+  const r = db.exec(sql);
+  if (r.length > 0) return r[0].values;
+  return [];
+}
+
+// === SEAL CARDS ==============================================================
+
+function renderSealCards(db: SqlJsDatabase): void {
+  const container = document.getElementById('seal-cards');
+  if (!container) return;
+
+  const sealIds = ['M-52A', 'M-148A'] as const;
+
+  for (const sealId of sealIds) {
+    let signs: string[] = [];
+    let desc = '';
+
+    try {
+      const rows = queryRows(db, `SELECT signs, description FROM cisi_inscription WHERE id='${sealId}'`);
+      if (rows.length > 0) {
+        signs = JSON.parse(rows[0][0] as string);
+        desc = (rows[0][1] as string) || '';
+      }
+    } catch {}
+
+    // Resolve through concordance + codebook
+    let commName = '—';
+    let routeName = 'domestic';
+    let resolved = 0;
+
+    for (const p of signs) {
+      try {
+        const c = queryRows(db, `SELECT mahadevan_ids FROM sign_concordance WHERE parpola_id='${p}'`);
+        if (c.length === 0) continue;
+        const mIds: string[] = JSON.parse(c[0][0] as string);
+        if (mIds.length === 0) continue;
+        const mNum = parseInt(mIds[0].replace('M', '').replace(/^0+/, '') || '0');
+
+        const s = queryRows(db, `SELECT role, ref_code FROM sign_role WHERE sign_id=${mNum}`);
+        if (s.length === 0) continue;
+
+        const role = s[0][0] as string;
+        const refCode = s[0][1] as string | null;
+        resolved++;
+
+        if (role === 'commodity' && refCode) {
+          const cr = queryRows(db, `SELECT label FROM commodity WHERE code='${refCode}'`);
+          if (cr.length > 0) commName = cr[0][0] as string;
+        }
+        if (role === 'terminal' && refCode) {
+          const rr = queryRows(db, `SELECT label, destination FROM route WHERE code='${refCode}'`);
+          if (rr.length > 0) routeName = `${rr[0][0]} → ${rr[0][1]}`;
+        }
+      } catch {}
+    }
+
+    const card = document.createElement('div');
+    card.className = 'seal-card';
+    card.innerHTML = `
+      <div class="seal-id">${sealId} · ${desc}</div>
+      <div class="field-row"><span class="field-label">SIGNS</span><span class="field-value sign">${signs.join(' ')}</span></div>
+      <div class="field-row"><span class="field-label">F2 COMMODITY</span><span class="field-value">${commName}</span></div>
+      <div class="field-row"><span class="field-label">F5 ROUTE</span><span class="field-value">${routeName}</span></div>
+      <div class="field-row"><span class="field-label">DECODED</span><span class="field-value sign">${resolved}/${signs.length} signs</span></div>
+      <div class="tag-line">${commName} / ${routeName}</div>`;
+    container.appendChild(card);
+  }
+}
+
+// === FREQUENCY CHART =========================================================
+
+function renderFreqChart(): void {
+  const data = [
+    {rank:1,cum:10},{rank:5,cum:28},{rank:10,cum:40},{rank:20,cum:55},
+    {rank:40,cum:70},{rank:67,cum:80},{rank:100,cum:90},{rank:120,cum:93}
+  ];
+
+  const svg = d3.select('#freq-chart');
+  const W = 250, H = 140;
+  const m = {top:10, right:10, bottom:25, left:30};
+  const w = W - m.left - m.right;
+  const h = H - m.top - m.bottom;
+  const g = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
+
+  const x = d3.scaleLinear().domain([1, 120]).range([0, w]);
+  const y = d3.scaleLinear().domain([0, 100]).range([h, 0]);
+
+  g.append('g').attr('transform', `translate(0,${h})`).call(d3.axisBottom(x).ticks(5).tickSize(0))
+    .selectAll('text').attr('fill', 'var(--dim)').attr('font-size', '8px');
+  g.append('g').call(d3.axisLeft(y).ticks(4).tickSize(0))
+    .selectAll('text').attr('fill', 'var(--dim)').attr('font-size', '8px');
+  g.selectAll('.domain').attr('stroke', 'var(--faint)');
+
+  const line = d3.line().x((d: any) => x(d.rank)).y((d: any) => y(d.cum)).curve(d3.curveMonotoneX);
+  g.append('path').datum(data).attr('d', line).attr('fill', 'none').attr('stroke', 'var(--clay)').attr('stroke-width', 2);
+  data.forEach(d => g.append('circle').attr('cx', x(d.rank)).attr('cy', y(d.cum)).attr('r', 2.5).attr('fill', 'var(--clay)'));
+
+  // 80% threshold
+  g.append('line').attr('x1', x(67)).attr('y1', y(0)).attr('x2', x(67)).attr('y2', y(80))
+    .attr('stroke', 'var(--tba-red)').attr('stroke-dasharray', '4,3').attr('stroke-width', 1);
+  g.append('line').attr('x1', x(1)).attr('y1', y(80)).attr('x2', x(67)).attr('y2', y(80))
+    .attr('stroke', 'var(--tba-red)').attr('stroke-dasharray', '4,3').attr('stroke-width', 1);
+  g.append('text').attr('x', x(67) + 3).attr('y', y(80) - 3)
+    .attr('font-family', 'JetBrains Mono').attr('font-size', '7px').attr('fill', 'var(--tba-red)').text('67 signs = 80%');
+}
+
+// === WEIGHT BARS =============================================================
+
+function renderWeightBars(): void {
+  const container = document.getElementById('weight-bars');
+  if (!container) return;
+
+  const maxG = 1370;
+  weights.forEach(w => {
+    const pct = Math.max(3, (Math.log(w.g + 1) / Math.log(maxG + 1)) * 100);
+    const row = document.createElement('div');
+    row.className = 'weight-row';
+    row.innerHTML = `
+      <span class="weight-label">×${w.mult}</span>
+      <div class="weight-bar ${w.series}" style="width:${pct}%"></div>
+      <span class="weight-grams">${w.g < 100 ? w.g.toFixed(2) : w.g.toFixed(0)}g${w.app ? ' ' + w.app : ''}</span>`;
+    container.appendChild(row);
+  });
+}
+
+// === COMMODITY TABLE =========================================================
+
+function renderCommTable(): void {
+  const table = document.getElementById('comm-table');
+  if (!table) return;
+
+  commodities.forEach(c => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${c.sign}</td><td>${c.name}</td><td>${c.route}</td>`;
+    table.appendChild(tr);
+  });
+}
+
+// === DATING ==================================================================
+
+function renderDating(db: SqlJsDatabase): void {
+  const container = document.getElementById('dating-content');
+  if (!container) return;
+
+  try {
+    const rows = queryRows(db,
+      `SELECT rs.site_name, rm.cal_bce_mid, rm.method
+       FROM radiometric_measurement rm
+       JOIN radiometric_sample rsp ON rsp.sample_id = rm.sample_id
+       JOIN radiometric_site rs ON rs.site_id = rsp.site_id
+       ORDER BY rm.cal_bce_mid DESC LIMIT 5`);
+
+    if (rows.length > 0) {
+      container.innerHTML = rows.map(row =>
+        `<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--faint)">` +
+        `<span style="font-family:JetBrains Mono;font-size:9px;color:var(--dim)">${row[0]}</span>` +
+        `<span style="font-family:JetBrains Mono;font-size:10px;color:var(--clay)">${row[1]} BCE</span>` +
+        `<span style="font-family:JetBrains Mono;font-size:8px;color:var(--dim)">${row[2]}</span></div>`
+      ).join('');
+    }
+  } catch {
+    container.innerHTML = '<span style="font-family:JetBrains Mono;font-size:9px;color:var(--dim)">No radiometric data</span>';
+  }
+}
+
+// === MAIN ====================================================================
+
+function renderDashboard(db: SqlJsDatabase): void {
+  // Map needs the container visible and sized before init
+  const mapEl = document.getElementById('map') as HTMLElement;
+  const map = L.map(mapEl, {
+    center: [22, 62],
+    zoom: 4,
+    minZoom: 3,
+    maxZoom: 8,
+    zoomControl: true
+  });
+
+  // Force Leaflet to recalculate size after dashboard becomes visible
+  setTimeout(() => map.invalidateSize(), 100);
+
+  renderMap(map);
+  renderSealCards(db);
+  renderFreqChart();
+  renderWeightBars();
+  renderCommTable();
+  renderDating(db);
+}
+
+// === DROP ZONE ===============================================================
+
+async function handleFile(file: File): Promise<void> {
+  const buf = await file.arrayBuffer();
+  const SQL = await initSqlJs({
+    locateFile: (f: string) => `https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/${f}`
+  });
+  const db = SQL.Database ? new SQL.Database(new Uint8Array(buf)) : (SQL as any).Database(new Uint8Array(buf));
+
+  const landing = document.getElementById('landing') as HTMLElement;
+  const dashboard = document.getElementById('dashboard') as HTMLElement;
+
+  landing.style.opacity = '0';
+  setTimeout(() => {
+    landing.style.display = 'none';
+    dashboard.style.display = 'block';
+    renderDashboard(db as unknown as SqlJsDatabase);
+  }, 600);
+}
+
+function setupDropZone(): void {
+  const dropZone = document.getElementById('drop-zone') as HTMLElement;
+
+  ['dragenter', 'dragover'].forEach(e =>
+    dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('dragover'); }));
+  ['dragleave', 'drop'].forEach(e =>
+    dropZone.addEventListener(e, () => dropZone.classList.remove('dragover')));
+
+  dropZone.addEventListener('drop', async (ev: DragEvent) => {
+    ev.preventDefault();
+    const file = ev.dataTransfer?.files[0];
+    if (file) await handleFile(file);
+  });
+
+  dropZone.addEventListener('click', () => {
+    const inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = '.db';
+    inp.onchange = async () => {
+      const file = inp.files?.[0];
+      if (file) await handleFile(file);
+    };
+    inp.click();
+  });
+}
+
+// === THEME ===================================================================
+
+function setupTheme(): void {
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const theme = (btn as HTMLElement).dataset.t!;
+      document.documentElement.setAttribute('data-theme', theme);
+      document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      localStorage.setItem('ledger-theme', theme);
+    });
+  });
+
+  const saved = localStorage.getItem('ledger-theme');
+  if (saved) {
+    document.documentElement.setAttribute('data-theme', saved);
+    document.querySelectorAll('.theme-btn').forEach(b => {
+      b.classList.toggle('active', (b as HTMLElement).dataset.t === saved);
+    });
+  }
+}
+
+// === INIT ====================================================================
+
+setupDropZone();
+setupTheme();
