@@ -43,6 +43,20 @@ sig MorphologicalParallel {
     sourceB: one Source
 }
 
+-- sign_concordance: maps between numbering systems (Parpola, Mahadevan, Wells)
+-- A Parpola sign may map to 0+ Mahadevan signs and 0+ Wells signs
+sig SignConcordance {
+    parpolaSign: one BaseSign,
+    mahadevans: set BaseSign
+}
+
+-- cisi_inscriptions: real seal inscriptions from the CISI corpus
+-- Each has an ordered sequence of signs and belongs to one source
+sig CisiInscription {
+    signs: seq BaseSign,
+    inscriptionSource: one Source
+}
+
 -- === FACTS (schema constraints) ===
 
 -- F1: Every artefact's source must match its site's source
@@ -81,7 +95,25 @@ fact parallelSourceConsistency {
             mp.sourceB = mp.signB.parent.source)
 }
 
--- F6: BaseSign IDs unique within a source (modeled by Alloy's
+-- F6: Concordance maps within a single numbering system's source
+--     parpolaSign must be from the CISI/Parpola source
+--     mahadevans must all be from the Mahadevan source
+fact concordanceSourceSeparation {
+    all sc: SignConcordance |
+        all m: sc.mahadevans | m.source != sc.parpolaSign.source
+}
+
+-- F7: No duplicate concordance entries for the same Parpola sign
+fact concordanceUnique {
+    all disj c1, c2: SignConcordance | c1.parpolaSign != c2.parpolaSign
+}
+
+-- F8: Every CISI inscription sign must be a valid BaseSign
+fact cisiSignsExist {
+    all ci: CisiInscription | ci.signs.elems in BaseSign
+}
+
+-- F9: BaseSign IDs unique within a source (modeled by Alloy's
 --     atom identity — two BaseSign atoms are always distinct)
 --     In SQL: PRIMARY KEY (source, sign_id). Alloy handles this
 --     by construction.
@@ -137,6 +169,22 @@ assert noSelfParallel {
     all mp: MorphologicalParallel | mp.signA != mp.signB
 }
 
+-- A10: Concordance maps cross source boundaries
+assert concordanceCrossesSources {
+    all sc: SignConcordance |
+        all m: sc.mahadevans | m.source != sc.parpolaSign.source
+}
+
+-- A11: No duplicate concordance for the same Parpola sign
+assert concordanceNoDuplicates {
+    all disj c1, c2: SignConcordance | c1.parpolaSign != c2.parpolaSign
+}
+
+-- A12: CISI inscription signs are valid
+assert cisiSignsValid {
+    all ci: CisiInscription | ci.signs.elems in BaseSign
+}
+
 -- === CHECKS ===
 
 check artefactHasOneSite for 6
@@ -148,16 +196,21 @@ check noPositionCollision for 6
 check occurrenceSignExists for 6
 check formInheritsSource for 6
 check noSelfParallel for 6
+check concordanceCrossesSources for 6
+check concordanceNoDuplicates for 6
+check cisiSignsValid for 6
 
 -- === EXPLORATION ===
 
 -- Generate a small valid instance to sanity-check the model
 run showExample {
-    #Source = 2
+    #Source = 3
     #Site >= 2
     #Artefact >= 3
-    #BaseSign >= 4
+    #BaseSign >= 6
     #SignForm >= 2
     #SignOccurrence >= 4
     #MorphologicalParallel >= 1
+    #SignConcordance >= 2
+    #CisiInscription >= 1
 } for 6

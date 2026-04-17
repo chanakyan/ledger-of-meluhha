@@ -127,6 +127,21 @@ CREATE TABLE morphological_parallel (
     confidence  TEXT CHECK(confidence IN ('exact','near','possible')),
     note        TEXT,
     CHECK(sign_a_src != sign_b_src)
+) STRICT;
+
+CREATE TABLE sign_concordance (
+    parpola_id    TEXT PRIMARY KEY,
+    description   TEXT,
+    mahadevan_ids TEXT,
+    wells_ids     TEXT
+) STRICT;
+
+CREATE TABLE cisi_inscription (
+    id          TEXT PRIMARY KEY,
+    description TEXT,
+    signs       TEXT NOT NULL,
+    sign_count  INTEGER NOT NULL,
+    source_code TEXT NOT NULL DEFAULT 'CISI' REFERENCES source(code)
 ) STRICT
 """
 
@@ -216,6 +231,8 @@ let sources = [|
       Year = 2011;       Note = "Ramasamy & Abokrtsk, converted to logogram IDs by Kee2u project" }
     { Code = "MAHADEVAN"; Name = "Mahadevan Concordance / EBUDS / ICIT"
       Year = 1977;       Note = "~417 signs, ~4000 objects, ~4791 texts" }
+    { Code = "CISI";     Name = "CISI corpus via mayig/indus-valley-script-corpus"
+      Year = 1987;       Note = "Joshi & Parpola, digitized by mayig. 179 Mohenjo-daro inscriptions, Parpola sign IDs" }
 |]
 
 // === TN SITES (key sites from RS publications) ===============================
@@ -383,6 +400,53 @@ if Directory.Exists histDir then
 else
     printfn "  base_sign (MAHADEVAN): SKIP (no Histograms2 dir)"
 
+// --- CISI data from ~/data/indus_valley.db ---
+let ivDbPath = Path.Combine(
+    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+    "data/indus_valley.db")
+
+if File.Exists ivDbPath then
+    use ivCon = new SqliteConnection(sprintf "Data Source=%s;Mode=ReadOnly" ivDbPath)
+    ivCon.Open()
+
+    // concordance
+    let mutable concCount = 0
+    use concCmd = new SqliteCommand(
+        "SELECT parpola_id, description, mahadevan_ids, wells_ids FROM sign_concordance", ivCon)
+    use concRdr = concCmd.ExecuteReader()
+    while concRdr.Read() do
+        use ins = new SqliteCommand(
+            "INSERT OR IGNORE INTO sign_concordance VALUES (@p,@d,@m,@w)", con, tx)
+        ins.Parameters.AddWithValue("@p", concRdr.GetString 0) |> ignore
+        ins.Parameters.AddWithValue("@d", if concRdr.IsDBNull 1 then box System.DBNull.Value else box (concRdr.GetString 1)) |> ignore
+        ins.Parameters.AddWithValue("@m", if concRdr.IsDBNull 2 then box System.DBNull.Value else box (concRdr.GetString 2)) |> ignore
+        ins.Parameters.AddWithValue("@w", if concRdr.IsDBNull 3 then box System.DBNull.Value else box (concRdr.GetString 3)) |> ignore
+        ins.ExecuteNonQuery() |> ignore
+        concCount <- concCount + 1
+    concRdr.Close()
+    printfn "  sign_concordance: %d rows (from %s)" concCount ivDbPath
+
+    // CISI inscriptions
+    let mutable cisiCount = 0
+    use cisiCmd = new SqliteCommand(
+        "SELECT inscription_id, description, signs, sign_count FROM cisi_inscriptions", ivCon)
+    use cisiRdr = cisiCmd.ExecuteReader()
+    while cisiRdr.Read() do
+        use ins = new SqliteCommand(
+            "INSERT OR IGNORE INTO cisi_inscription VALUES (@i,@d,@s,@c,'CISI')", con, tx)
+        ins.Parameters.AddWithValue("@i", cisiRdr.GetString 0) |> ignore
+        ins.Parameters.AddWithValue("@d", if cisiRdr.IsDBNull 1 then box System.DBNull.Value else box (cisiRdr.GetString 1)) |> ignore
+        ins.Parameters.AddWithValue("@s", cisiRdr.GetString 2) |> ignore
+        ins.Parameters.AddWithValue("@c", cisiRdr.GetInt32 3) |> ignore
+        ins.ExecuteNonQuery() |> ignore
+        cisiCount <- cisiCount + 1
+    cisiRdr.Close()
+    printfn "  cisi_inscription: %d rows (from %s)" cisiCount ivDbPath
+
+    ivCon.Close()
+else
+    printfn "  CISI: SKIP (%s not found)" ivDbPath
+
 tx.Commit()
 con.Close()
 
@@ -404,6 +468,8 @@ printfn "  sign_form        : %d" (count "sign_form")
 printfn "  sign_occurrence  : %d" (count "sign_occurrence")
 printfn "  inscription      : %d" (count "inscription")
 printfn "  morphological_parallel: %d" (count "morphological_parallel")
+printfn "  sign_concordance : %d" (count "sign_concordance")
+printfn "  cisi_inscription : %d" (count "cisi_inscription")
 
 // sign breakdown by source
 printfn ""
