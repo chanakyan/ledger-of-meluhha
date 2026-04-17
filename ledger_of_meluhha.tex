@@ -623,10 +623,12 @@ We have been trying to read the shipping labels as poetry.
 
 Two seals have now been decoded from real CISI data through an
 Alloy-verified schema into a metrological codebook.
-Both produce jar goods. One produces a Mesopotamia route marker.
+M-67A produces jar goods (S-342). M-52A produces ivory/shell
+(S-211) with a Dilmun route terminal (S-060).
 Neither result is circular --- the sign sequences come from the
-published CISI corpus, the concordance maps on shape, and the
-codebook was fixed before the decode was run.
+published CISI corpus, the codebook was fixed before the decode
+was run, and sign roles are keyed on Parpola numbers without
+any concordance indirection.
 
 Eighteen more parallels are ready to decode.
 The infrastructure is built, verified, and reproducible.
@@ -708,6 +710,32 @@ CREATE TABLE cisi_inscription (
 \end{verbatim}
 }
 
+\subsection{Codebook schema}
+
+The metrological codebook (\texttt{indus\_codebook.db}) maps Parpola
+sign numbers to semantic roles. It is seeded by
+\texttt{indus\_seed\_codebook.fsx} and contains seven tables.
+
+{\small
+\begin{verbatim}
+sign_role       28 rows  sign_id (Parpola) -> role + ref_code
+commodity        8 rows  code -> label (JAR GOODS, IRON, etc.)
+route            5 rows  code -> label + destination
+weight_tier     11 rows  multiplier -> grams + series
+quantity_code    6 rows  sign_id -> multiplier
+merchant_mark    5 rows  code -> label (UNICORN GUILD, etc.)
+positional_rule  3 rows  position -> default_role
+\end{verbatim}
+}
+
+\noindent
+Sign roles divide into five categories: \texttt{commodity} (8~signs),
+\texttt{terminal} (5~signs), \texttt{weight} (7~signs),
+\texttt{quantity} (6~signs), and \texttt{structural} (2~signs).
+The codebook is embedded in the interactive visualisation as
+JavaScript \texttt{Map} constants to avoid requiring a second file
+upload.
+
 \subsection{Alloy validation report}
 
 Twelve assertions checked at scope~6. All UNSAT (zero
@@ -744,10 +772,15 @@ All data and code are deposited under CC~BY~4.0:
 \texttt{indus\_lssc.db} (LSSC analysis),
 five F\# scripts (\texttt{.fsx}),
 Alloy specification, CMakeLists.txt,
+the interactive dashboard (\texttt{ledger-of-meluhha.html}),
 and this paper.
 Any reader with \texttt{sqlite3} can query every claim.
 Any reader with \texttt{dotnet fsi} can reproduce every
 computation.
+The interactive dashboard requires only a modern browser ---
+drop \texttt{indus\_corpus.db} onto the page to render the
+full trade network, decode two seals live, and filter routes
+by commodity.
 
 %%% ===================================================================
 \clearpage
@@ -797,10 +830,10 @@ Mesopotamia.}
 
 We decoded two real seals from a published digital corpus ---
 not by guessing, but by following a chain of database lookups.
-Both produced ``jar goods'' as the commodity. One produced
-``Mesopotamia'' as the destination.
-The commodity assignment comes from an independent shape-matching
-database that does not know about our hypothesis.
+One produced ``jar goods'' as the commodity (M-67A).
+The other produced ``ivory/shell'' with a Dilmun route terminal (M-52A).
+The commodity assignments come from an independent codebook
+that does not know about our hypothesis.
 
 18~more seals are ready to decode when the data becomes available.
 

@@ -259,7 +259,7 @@ Confidence level drives opacity on map.
 ledger_of_meluhha_tba_2026.zip:
 
 
-indus_accounting.tex — paper source, 900 lines
+ledger_of_meluhha.tex — paper source, 857 lines
 citations.lua — 14 sources, smartcite registry
 Program.fs — F# decoder, discriminated union type system
 Script.fsx — runnable with dotnet fsi

@@ -1,9 +1,28 @@
 // The Ledger of Meluhha — Interactive Visualization
 // Third Buyer Advisory LLC | Venugopal 2026
-// TypeScript source — compiled to JS, embedded in HTML
+// TypeScript source — compiled to JS, embedded inline in ledger-of-meluhha.html
 //
-// Type annotations reveal the data flow:
-//   DB file -> sql.js WASM -> typed queries -> Leaflet map + D3 charts
+// Architecture
+// ------------
+// Single-page dashboard for the Indus Valley metrological accounting hypothesis.
+// User drops indus_corpus.db (SQLite, built by indus_ingest_corpus.fsx) onto a
+// landing page. sql.js WASM loads the DB in-browser; the dashboard renders:
+//
+//   1. Leaflet map — 22 archaeological sites, 13 trade route polylines
+//   2. Seal cards — live decode of CISI seals via Parpola sign -> codebook lookup
+//   3. D3 frequency chart — cumulative sign distribution (67 signs = 80%)
+//   4. Weight bars — binary/decimal weight tiers (base unit 0.856 g)
+//   5. Commodity manifest — clickable table; highlights matching map routes
+//   6. Radiometric dating — top-5 calibrated dates from corpus DB
+//
+// Data sources
+// ------------
+// - Sites, routes, weights, commodities: hardcoded (static reference data)
+// - Codebook (signRoleMap, commodityMap, routeMap): embedded from indus_codebook.db
+//   to avoid requiring a second file drop. Keyed on Parpola sign numbers.
+// - Seal inscriptions + concordance: queried live from the dropped corpus DB
+//
+// Build: npx tsc -p src/tsconfig.json  ->  dist/ledger.js  ->  paste into HTML
 
 // === EXTERNAL DECLARATIONS ===================================================
 
@@ -128,6 +147,7 @@ const weights: readonly Weight[] = [
   {mult:32, g:BASE_UNIT*32, series:'binary', app:''},
   {mult:64, g:BASE_UNIT*64, series:'binary', app:''},
   {mult:160, g:137, series:'decimal', app:'Cotton bale'},
+  {mult:200, g:171.2, series:'decimal', app:''},
   {mult:500, g:685, series:'decimal', app:'Oil jar'},
   {mult:1000, g:1370, series:'decimal', app:'Bulk grain'},
 ];
@@ -229,6 +249,8 @@ function isMajorSite(type: SiteType): boolean {
 
 type LatLon = [number, number]; // [lat, lon]
 
+/** Quadratic Bezier curve between two lat/lon points.
+ *  Curvature > 0 bows left (from a's perspective), < 0 bows right. */
 function curvePoints(a: LatLon, b: LatLon, curvature: number): LatLon[] {
   const n = 20;
   const midLat = (a[0] + b[0]) / 2;
@@ -302,6 +324,9 @@ interface RouteLine {
 
 const routeLines: RouteLine[] = [];
 
+/** Render OpenTopoMap tiles, 13 trade route polylines, 22 site markers,
+ *  and a volume legend. Routes render first (z-order under sites).
+ *  Polyline refs are stored in routeLines[] for commodity filtering. */
 function renderMap(map: any): void {
   // Tile layer
   L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
@@ -405,11 +430,15 @@ function queryRows(db: SqlJsDatabase, sql: string): any[][] {
 
 // === SEAL CARDS ==============================================================
 
+/** Decode two CISI seals from the corpus DB. Resolution chain:
+ *  1. cisi_inscription -> Parpola sign list (from corpus DB)
+ *  2. Parpola number -> signRoleMap (embedded codebook)
+ *  3. role=commodity -> commodityMap, role=terminal -> routeMap */
 function renderSealCards(db: SqlJsDatabase): void {
   const container = document.getElementById('seal-cards');
   if (!container) return;
 
-  const sealIds = ['M-52A', 'M-148A'] as const;
+  const sealIds = ['M-67A', 'M-52A'] as const;
 
   for (const sealId of sealIds) {
     let signs: string[] = [];
@@ -518,6 +547,7 @@ function renderWeightBars(): void {
 
 let selectedCommodity: string | null = null;
 
+/** Dim non-matching trade routes to 15% opacity; null clears filter. */
 function highlightCommodity(name: string | null): void {
   selectedCommodity = name;
   routeLines.forEach(({line, route}) => {
@@ -597,6 +627,7 @@ function renderDashboard(db: SqlJsDatabase): void {
 
 // === DROP ZONE ===============================================================
 
+/** Load a dropped .db file via sql.js WASM, fade out landing, render dashboard. */
 async function handleFile(file: File): Promise<void> {
   const buf = await file.arrayBuffer();
   const SQL = await initSqlJs({

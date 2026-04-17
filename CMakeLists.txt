@@ -113,7 +113,7 @@ endif()
 if(NOT LUALATEX)
     message(FATAL_ERROR
         "MISSING: lualatex\n"
-        "  The paper (indus_accounting.tex) requires LuaLaTeX.\n"
+        "  The paper (ledger_of_meluhha.tex) requires LuaLaTeX.\n"
         "  Fix: brew install --cask mactex   (full TeX Live)\n"
         "    or: brew install texlive         (minimal)\n"
         "  Verify: lualatex --version")
@@ -260,10 +260,10 @@ add_custom_target(verify
 # ─── Target: paper ───────────────────────────────────────────────────────────
 
 add_custom_target(paper
-    COMMAND ${LUALATEX} -interaction=nonstopmode -shell-escape indus_accounting.tex
-    COMMAND ${LUALATEX} -interaction=nonstopmode -shell-escape indus_accounting.tex
+    COMMAND ${LUALATEX} -interaction=nonstopmode -shell-escape ledger_of_meluhha.tex
+    COMMAND ${LUALATEX} -interaction=nonstopmode -shell-escape ledger_of_meluhha.tex
     WORKING_DIRECTORY ${SRC}
-    COMMENT "Compiling indus_accounting.pdf (2 passes)")
+    COMMENT "Compiling ledger_of_meluhha.pdf (2 passes)")
 
 add_custom_target(readme
     COMMAND ${LUALATEX} -interaction=nonstopmode README.tex
@@ -285,10 +285,10 @@ add_custom_target(clean-db
 
 add_custom_target(clean-tex
     COMMAND ${CMAKE_COMMAND} -E rm -f
-        ${SRC}/indus_accounting.aux
-        ${SRC}/indus_accounting.log
-        ${SRC}/indus_accounting.out
-        ${SRC}/indus_accounting.xmpdata
+        ${SRC}/ledger_of_meluhha.aux
+        ${SRC}/ledger_of_meluhha.log
+        ${SRC}/ledger_of_meluhha.out
+        ${SRC}/ledger_of_meluhha.xmpdata
         ${SRC}/README.aux
         ${SRC}/README.log
         ${SRC}/README.out
@@ -304,11 +304,11 @@ add_custom_target(clean-all
         ${SRC}/indus_codebook.db
         ${SRC}/indus_corpus.db
         ${SRC}/indus_lssc.db
-        ${SRC}/indus_accounting.aux
-        ${SRC}/indus_accounting.log
-        ${SRC}/indus_accounting.out
-        ${SRC}/indus_accounting.xmpdata
-        ${SRC}/indus_accounting.pdf
+        ${SRC}/ledger_of_meluhha.aux
+        ${SRC}/ledger_of_meluhha.log
+        ${SRC}/ledger_of_meluhha.out
+        ${SRC}/ledger_of_meluhha.xmpdata
+        ${SRC}/ledger_of_meluhha.pdf
         ${SRC}/README.aux
         ${SRC}/README.log
         ${SRC}/README.out
