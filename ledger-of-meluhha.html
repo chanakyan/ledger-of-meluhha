@@ -7,7 +7,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-wasm.js"></script>
 <script src="https://d3js.org/d3.v7.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 /* --- Theme: Clay (default, dark) --- */
 :root, [data-theme="clay"] {
@@ -157,6 +158,17 @@ header .meta { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(
 footer { position:relative; z-index:10; border-top:1px solid rgba(196,146,74,0.1); padding:12px 24px; margin-top:24px;
   font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--dim); display:flex; justify-content:space-between; }
 
+/* --- Leaflet overrides --- */
+.leaflet-container { background:var(--water) !important; font-family:'JetBrains Mono',monospace !important; }
+.leaflet-control-zoom a { background:var(--bg) !important; color:var(--sand) !important; border-color:var(--faint) !important; }
+.leaflet-control-attribution { background:rgba(15,12,7,0.7) !important; color:var(--dim) !important; font-size:8px !important; }
+.leaflet-control-attribution a { color:var(--clay) !important; }
+.site-label { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--sand); text-shadow:0 0 4px var(--bg), 0 0 8px var(--bg); white-space:nowrap; }
+.site-label-major { font-size:10px; font-weight:500; }
+.leaflet-popup-content-wrapper { background:var(--bg) !important; color:var(--sand) !important; border:1px solid rgba(196,146,74,0.3) !important; border-radius:2px !important; }
+.leaflet-popup-tip { background:var(--bg) !important; }
+.leaflet-popup-content { font-family:'JetBrains Mono',monospace !important; font-size:10px !important; margin:8px 12px !important; }
+
 /* --- Responsive --- */
 @media (max-width:900px) { .dash-grid { grid-template-columns:1fr; } }
 </style>
@@ -200,7 +212,7 @@ footer { position:relative; z-index:10; border-top:1px solid rgba(196,146,74,0.1
     <!-- CENTER: map -->
     <div class="center">
       <div class="map-period">c. 2600–1900 BCE &middot; BRONZE AGE TRADE NETWORK</div>
-      <svg id="map"></svg>
+      <div id="map" style="width:100%;height:100%;min-height:500px;background:var(--water);"></div>
       <div class="tooltip" id="tooltip"></div>
     </div>
 
@@ -349,282 +361,128 @@ function renderDashboard(db) {
   renderDating(db);
 }
 
-// --- Map ---
-async function renderMap() {
-  const svg = d3.select('#map');
-  const container = svg.node().parentElement;
-  const W = container.clientWidth;
-  const H = container.clientHeight || 600;
-  svg.attr('viewBox', `0 0 ${W} ${H}`);
-
-  // Water background
-  svg.append('rect').attr('width',W).attr('height',H).attr('fill','var(--water)').attr('class','water-bg');
-
-  // Projection: Mercator centered on IVC trade zone (Afghanistan to Tamil Nadu to Mesopotamia)
-  const proj = d3.geoMercator()
-    .center([62, 22])
-    .scale(W * 1.6)
-    .translate([W/2, H/2]);
-
-  const geoPath = d3.geoPath().projection(proj);
-
-  // Load Natural Earth 110m countries
-  try {
-    const world = await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
-    const land = topojson.feature(world, world.objects.countries);
-    const borders = topojson.mesh(world, world.objects.countries, (a,b) => a !== b);
-
-    svg.append('g').attr('class','land')
-      .selectAll('path')
-      .data(land.features)
-      .join('path')
-        .attr('d', geoPath)
-        .attr('fill', 'var(--land)')
-        .attr('stroke', 'var(--land-stroke)')
-        .attr('stroke-width', 0.5);
-
-    // Country borders subtle
-    svg.append('path')
-      .datum(borders)
-      .attr('d', geoPath)
-      .attr('fill', 'none')
-      .attr('stroke', 'var(--land-stroke)')
-      .attr('stroke-width', 0.3);
-
-    // Graticule
-    const graticule = d3.geoGraticule().step([10, 10]);
-    svg.append('path')
-      .datum(graticule())
-      .attr('d', geoPath)
-      .attr('fill', 'none')
-      .attr('stroke', 'var(--faint)')
-      .attr('stroke-width', 0.3);
-
-  } catch(e) {
-    console.log('Country data unavailable, rendering sites only');
-  }
-
-  // Rivers — Natural Earth 110m
-  try {
-    const rivers = await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/rivers-110m.json');
-    if (rivers && rivers.objects) {
-      const riverFeatures = topojson.feature(rivers, rivers.objects.rivers || Object.values(rivers.objects)[0]);
-      svg.append('g').attr('class','rivers')
-        .selectAll('path')
-        .data(riverFeatures.features || [riverFeatures])
-        .join('path')
-          .attr('d', geoPath)
-          .attr('fill', 'none')
-          .attr('stroke', 'rgba(80,120,180,0.25)')
-          .attr('stroke-width', 0.8);
-    }
-  } catch(e) {
-    console.log('River data unavailable');
-  }
-
-  // Key rivers drawn manually for the trade zone (Indus, Ganges, Tigris, Euphrates)
-  const riverPaths = [
-    // Indus — approximate course
-    {name:'Indus', pts:[[76.5,35.5],[74,33],[71,30],[69,27],[68,25],[67.5,24]], color:'rgba(80,130,200,0.3)', width:2.5},
-    // Ghaggar-Hakra (ancient Sarasvati)
-    {name:'Ghaggar', pts:[[76,31],[74,29],[72,28],[70,27]], color:'rgba(80,130,200,0.15)', width:1.5},
-    // Tigris-Euphrates
-    {name:'Euphrates', pts:[[38,38],[40,36],[43,34],[44,33],[46,31.5]], color:'rgba(80,130,200,0.3)', width:2},
-    {name:'Tigris', pts:[[43,38],[44,36],[45,34],[46,32]], color:'rgba(80,130,200,0.25)', width:1.8},
-    // Narmada (Gujarat trade route)
-    {name:'Narmada', pts:[[81,22.5],[78,22],[75,21.5],[73,21.6]], color:'rgba(80,130,200,0.2)', width:1.2},
-    // Kaveri (Tamil Nadu)
-    {name:'Kaveri', pts:[[79,12.5],[78,11.5],[77,11],[76.5,10.5]], color:'rgba(80,130,200,0.2)', width:1},
-    // Vaigai (Keeladi)
-    {name:'Vaigai', pts:[[78.5,10.5],[78,10],[77.5,9.8]], color:'rgba(80,130,200,0.15)', width:0.8},
-  ];
-
-  const riverG = svg.append('g').attr('class','manual-rivers');
-  const riverLine = d3.line().x(d => proj(d)[0]).y(d => proj(d)[1]).curve(d3.curveBasis);
-
-  riverPaths.forEach(r => {
-    const pts = r.pts.map(p => [p[0], p[1]]);
-    riverG.append('path')
-      .attr('d', riverLine(pts))
-      .attr('fill', 'none')
-      .attr('stroke', r.color)
-      .attr('stroke-width', r.width)
-      .attr('stroke-linecap', 'round');
-
-    // River label at midpoint
-    const mid = pts[Math.floor(pts.length/2)];
-    const [mx, my] = proj(mid);
-    if (mx > 0 && mx < W && my > 0 && my < H) {
-      riverG.append('text')
-        .attr('x', mx).attr('y', my - 4)
-        .attr('text-anchor', 'middle')
-        .attr('font-family', 'Cormorant Garamond, serif')
-        .attr('font-style', 'italic')
-        .attr('font-size', '7px')
-        .attr('fill', 'rgba(80,130,200,0.3)')
-        .text(r.name);
-    }
+// --- Map (Leaflet + real tiles) ---
+function renderMap() {
+  const map = L.map('map', {
+    center: [22, 62],
+    zoom: 4,
+    minZoom: 3,
+    maxZoom: 8,
+    zoomControl: true,
+    attributionControl: true
   });
 
-  // Sea labels — Cormorant italic, very dim, placed on water
-  const seas = [
-    {name:'Arabian Sea', lon:64, lat:17, size:'11px', rot:-15},
-    {name:'Persian Gulf', lon:51, lat:27, size:'8px', rot:-30},
-    {name:'Gulf of Oman', lon:58, lat:24, size:'7px', rot:-20},
-    {name:'Bay of Bengal', lon:85, lat:14, size:'9px', rot:0},
-    {name:'Indian Ocean', lon:72, lat:8, size:'10px', rot:0},
-    {name:'Gulf of Kutch', lon:69.5, lat:22.8, size:'6px', rot:-10},
-    {name:'Gulf of Khambhat', lon:72.5, lat:21, size:'6px', rot:-60},
-  ];
+  // Stadia Stamen Terrain for real geography (terrain, rivers, labels built in)
+  L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://stadiamaps.com/">Stadia</a> &copy; <a href="https://stamen.com/">Stamen</a> &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://openstreetmap.org/">OSM</a>',
+    maxZoom: 18
+  }).addTo(map);
 
-  const seaG = svg.append('g').attr('class','sea-labels');
-  seas.forEach(s => {
-    const [sx, sy] = proj([s.lon, s.lat]);
-    if (sx > 0 && sx < W && sy > 0 && sy < H) {
-      seaG.append('text')
-        .attr('x', sx).attr('y', sy)
-        .attr('text-anchor', 'middle')
-        .attr('font-family', 'Cormorant Garamond, serif')
-        .attr('font-style', 'italic')
-        .attr('font-size', s.size)
-        .attr('fill', 'rgba(80,120,180,0.18)')
-        .attr('letter-spacing', '3px')
-        .attr('transform', `rotate(${s.rot},${sx},${sy})`)
-        .text(s.name);
-    }
-  });
+  // Site markers
+  const sizeMap = {'ivc-major':7,'ivc-port':8,'ivc-minor':5,'ivc-outpost':4,
+    'tn-supply':5,'meso-dest':6,'gulf-hub':6,'resource':4};
+  const colorMap = {'ivc-major':'#c4924a','ivc-port':'#c4924a','ivc-minor':'#c4924a','ivc-outpost':'#c4924a',
+    'tn-supply':'#5a8a5a','meso-dest':'#b5121b','gulf-hub':'#8b7355','resource':'#b87333'};
 
-  const tooltip = document.getElementById('tooltip');
-
-  // Site positions
-  const siteMap = {};
+  const siteMarkers = {};
   sites.forEach(s => {
-    const [x,y] = proj([s.lon, s.lat]);
-    siteMap[s.id] = {x, y, ...s};
+    const r = sizeMap[s.type] || 5;
+    const col = colorMap[s.type] || '#c4924a';
+
+    const marker = L.circleMarker([s.lat, s.lon], {
+      radius: r,
+      fillColor: col,
+      fillOpacity: 0.85,
+      color: col,
+      weight: 1.5,
+      opacity: 0.5
+    }).addTo(map);
+
+    marker.bindPopup(
+      `<strong>${s.name}</strong><br>${s.period}<br><span style="opacity:0.5">${s.lat.toFixed(2)}°N, ${s.lon.toFixed(2)}°E</span>`,
+      {className: ''}
+    );
+
+    // Direct label
+    const isMajor = s.type.includes('major') || s.type === 'ivc-port' || s.type === 'meso-dest';
+    const label = L.tooltip({
+      permanent: true,
+      direction: s.lon > 65 ? 'right' : 'left',
+      offset: [s.lon > 65 ? 10 : -10, 0],
+      className: 'site-label' + (isMajor ? ' site-label-major' : '')
+    }).setContent(s.name);
+    marker.bindTooltip(label);
+
+    siteMarkers[s.id] = marker;
   });
 
-  // Draw routes as curved paths
-  const routeG = svg.append('g').attr('class','routes');
-
+  // Trade routes as Leaflet polylines (curved via intermediate points)
   routes.forEach(r => {
-    const from = siteMap[r.from];
-    let to = r.to ? siteMap[r.to] : (r.via ? siteMap[r.via] : null);
+    const from = sites.find(s => s.id === r.from);
+    const to = r.to ? sites.find(s => s.id === r.to) : (r.via ? sites.find(s => s.id === r.via) : null);
     if (!from || !to) return;
 
-    // Multi-segment: from -> via -> to
-    if (r.via && r.to && siteMap[r.via]) {
-      const via = siteMap[r.via];
-      // Segment 1: from -> via
-      drawRoute(routeG, from, via, r, tooltip);
-      // Segment 2: via -> to
-      drawRoute(routeG, via, siteMap[r.to], r, tooltip);
+    const points = [];
+    if (r.via && r.to) {
+      const via = sites.find(s => s.id === r.via);
+      if (via) {
+        // from -> via -> to with curve offset
+        points.push(...curvePoints([from.lat,from.lon], [via.lat,via.lon], 0.15));
+        points.push(...curvePoints([via.lat,via.lon], [to.lat,to.lon], 0.15));
+      }
     } else {
-      drawRoute(routeG, from, to, r, tooltip);
+      points.push(...curvePoints([from.lat,from.lon], [to.lat,to.lon], 0.15));
     }
+
+    const line = L.polyline(points, {
+      color: r.color,
+      weight: r.width,
+      opacity: 0.6,
+      smoothFactor: 1.5,
+      lineCap: 'round'
+    }).addTo(map);
+
+    line.bindPopup(
+      `<strong>${r.commodity}</strong><br>${r.note}<br><span style="opacity:0.5">width = ${r.width}px (relative volume)</span>`
+    );
+
+    line.on('mouseover', () => line.setStyle({opacity:0.9, weight: r.width + 2}));
+    line.on('mouseout', () => line.setStyle({opacity:0.6, weight: r.width}));
   });
 
-  // Draw sites with glow
-  const siteG = svg.append('g').attr('class','sites');
-  const sizeMap = {'ivc-major':5, 'ivc-port':6, 'ivc-minor':3.5, 'ivc-outpost':3,
-                   'tn-supply':3.5, 'meso-dest':4.5, 'gulf-hub':4, 'resource':3};
-
-  Object.values(siteMap).forEach(s => {
-    if (s.x < -20 || s.x > W+20 || s.y < -20 || s.y > H+20) return;
-    const r = sizeMap[s.type] || 3.5;
-    const col = siteColor(s.type);
-
-    // Glow
-    siteG.append('circle').attr('cx',s.x).attr('cy',s.y).attr('r',r*2.5)
-      .attr('fill',col).attr('fill-opacity',0.08);
-
-    // Dot
-    siteG.append('circle').attr('cx',s.x).attr('cy',s.y).attr('r',r)
-      .attr('fill',col).attr('fill-opacity',0.85)
-      .attr('stroke',col).attr('stroke-width',0.8).attr('stroke-opacity',0.3)
-      .on('mouseenter', ev => showTip(ev, `<strong>${s.name}</strong><br><span style="opacity:0.6">${s.period}</span><br><span style="opacity:0.4">${s.lat.toFixed(2)}°N, ${s.lon.toFixed(2)}°E</span>`))
-      .on('mouseleave', () => hideTip());
-
-    // Direct label — avoid overlap by positioning based on geography
-    const labelSide = labelPosition(s);
-    siteG.append('text')
-      .attr('x', s.x + labelSide.dx).attr('y', s.y + labelSide.dy)
-      .attr('text-anchor', labelSide.anchor)
-      .attr('font-family', 'JetBrains Mono, monospace')
-      .attr('font-size', s.type.includes('major') || s.type === 'ivc-port' ? '8px' : '7px')
-      .attr('fill', 'var(--dim)')
-      .attr('paint-order', 'stroke')
-      .attr('stroke', 'var(--bg)')
-      .attr('stroke-width', 2)
-      .text(s.name);
-  });
-
-  // Scale bar
-  const scaleY = H - 24;
-  const p1 = proj([60, 20]), p2 = proj([65, 20]);
-  const scalePx = Math.abs(p2[0] - p1[0]);
-  svg.append('line').attr('x1',16).attr('y1',scaleY).attr('x2',16+scalePx).attr('y2',scaleY)
-    .attr('stroke','var(--dim)').attr('stroke-width',1.5);
-  svg.append('line').attr('x1',16).attr('y1',scaleY-4).attr('x2',16).attr('y2',scaleY+4)
-    .attr('stroke','var(--dim)').attr('stroke-width',1);
-  svg.append('line').attr('x1',16+scalePx).attr('y1',scaleY-4).attr('x2',16+scalePx).attr('y2',scaleY+4)
-    .attr('stroke','var(--dim)').attr('stroke-width',1);
-  svg.append('text').attr('x',16+scalePx/2).attr('y',scaleY-6).attr('text-anchor','middle')
-    .attr('font-family','JetBrains Mono').attr('font-size','7px').attr('fill','var(--dim)').text('~550 km');
-
-  // Width calibration
-  svg.append('line').attr('x1',16).attr('y1',scaleY-22).attr('x2',16+50).attr('y2',scaleY-22)
-    .attr('stroke','var(--clay)').attr('stroke-width',8).attr('stroke-opacity',0.4).attr('stroke-linecap','round');
-  svg.append('text').attr('x',72).attr('y',scaleY-19)
-    .attr('font-family','JetBrains Mono').attr('font-size','7px').attr('fill','var(--dim)').text('width ∝ trade volume');
+  // Width calibration control
+  const legend = L.control({position:'bottomleft'});
+  legend.onAdd = () => {
+    const div = L.DomUtil.create('div');
+    div.style.cssText = 'background:rgba(15,12,7,0.8);padding:8px 12px;border:1px solid rgba(196,146,74,0.2);font-family:JetBrains Mono,monospace;font-size:9px;color:rgba(240,230,208,0.5);';
+    div.innerHTML = '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><div style="width:40px;height:8px;background:#c4924a;border-radius:2px;opacity:0.6"></div> width ∝ trade volume</div>'
+      + '<div style="font-size:8px;opacity:0.4">IVC ● TN supply ● Mesopotamia ● Gulf hub</div>';
+    return div;
+  };
+  legend.addTo(map);
 }
 
-function drawRoute(g, from, to, r, tooltip) {
-  const mx = (from.x + to.x)/2;
-  const my = (from.y + to.y)/2;
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
-  const cx = mx - dy*0.18;
-  const cy = my + dx*0.18;
-
-  g.append('path')
-    .attr('d', `M${from.x},${from.y} Q${cx},${cy} ${to.x},${to.y}`)
-    .attr('fill','none')
-    .attr('stroke', r.color)
-    .attr('stroke-width', r.width)
-    .attr('stroke-opacity', 0.55)
-    .attr('stroke-linecap','round')
-    .on('mouseenter', ev => {
-      showTip(ev, `<strong>${r.commodity}</strong><br>${r.note}<br><span style="opacity:0.5">width = ${r.width}px</span>`);
-      d3.select(ev.target).attr('stroke-opacity',0.9).attr('stroke-width', r.width + 2);
-    })
-    .on('mouseleave', ev => {
-      hideTip();
-      d3.select(ev.target).attr('stroke-opacity',0.55).attr('stroke-width', r.width);
-    });
+// Generate curved intermediate points between two latlngs
+function curvePoints(a, b, curvature) {
+  const n = 20;
+  const pts = [];
+  const midLat = (a[0]+b[0])/2;
+  const midLon = (a[1]+b[1])/2;
+  const dLat = b[0]-a[0];
+  const dLon = b[1]-a[1];
+  // Perpendicular offset for curve
+  const offLat = -dLon * curvature;
+  const offLon = dLat * curvature;
+  const cLat = midLat + offLat;
+  const cLon = midLon + offLon;
+  for (let i = 0; i <= n; i++) {
+    const t = i/n;
+    const lat = (1-t)*(1-t)*a[0] + 2*(1-t)*t*cLat + t*t*b[0];
+    const lon = (1-t)*(1-t)*a[1] + 2*(1-t)*t*cLon + t*t*b[1];
+    pts.push([lat, lon]);
+  }
+  return pts;
 }
-
-function siteColor(type) {
-  const m = {'ivc-major':'var(--clay)','ivc-port':'var(--clay)','ivc-minor':'var(--clay)','ivc-outpost':'var(--clay)',
-    'tn-supply':'#5a8a5a','meso-dest':'var(--tba-red)','gulf-hub':'#8b7355','resource':'#b87333'};
-  return m[type] || 'var(--clay)';
-}
-
-function labelPosition(s) {
-  // Place labels to avoid overlap — simple heuristic based on lon/type
-  if (s.type === 'meso-dest') return {dx:-10, dy:3, anchor:'end'};
-  if (s.id === 'lothal') return {dx:10, dy:-6, anchor:'start'};
-  if (s.id === 'dilmun') return {dx:10, dy:3, anchor:'start'};
-  if (s.id === 'magan') return {dx:10, dy:3, anchor:'start'};
-  if (s.type === 'tn-supply') return {dx:8, dy:3, anchor:'start'};
-  if (s.lon > 65) return {dx:9, dy:3, anchor:'start'};
-  return {dx:-9, dy:3, anchor:'end'};
-}
-
-function showTip(ev, html) {
-  const t = document.getElementById('tooltip');
-  t.style.display='block'; t.style.left=ev.pageX+14+'px'; t.style.top=ev.pageY-24+'px'; t.innerHTML=html;
-}
-function hideTip() { document.getElementById('tooltip').style.display='none'; }
 
 // --- Seal cards ---
 function renderSealCards(db) {
