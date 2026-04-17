@@ -357,8 +357,45 @@ async function renderMap() {
   const H = container.clientHeight || 600;
   svg.attr('viewBox', `0 0 ${W} ${H}`);
 
-  // Water background
-  svg.append('rect').attr('width',W).attr('height',H).attr('fill','var(--water)').attr('class','water-bg');
+  // SVG filters for depth
+  const defs = svg.append('defs');
+
+  // Ocean depth gradient (radial, darker at edges)
+  const oceanGrad = defs.append('radialGradient').attr('id','ocean-depth')
+    .attr('cx','50%').attr('cy','45%').attr('r','60%');
+  oceanGrad.append('stop').attr('offset','0%').attr('stop-color','var(--water)').attr('stop-opacity',1);
+  oceanGrad.append('stop').attr('offset','100%').attr('stop-color','#000005').attr('stop-opacity',1);
+
+  // Coastline inner glow
+  defs.append('filter').attr('id','coast-glow').attr('x','-10%').attr('y','-10%').attr('width','120%').attr('height','120%')
+    .append('feGaussianBlur').attr('in','SourceGraphic').attr('stdDeviation','3');
+
+  // Land relief shadow (drop shadow on landmasses)
+  const landShadow = defs.append('filter').attr('id','land-shadow').attr('x','-5%').attr('y','-5%').attr('width','115%').attr('height','115%');
+  landShadow.append('feDropShadow').attr('dx','1').attr('dy','1.5').attr('stdDeviation','2.5')
+    .attr('flood-color','#000000').attr('flood-opacity','0.5');
+
+  // Terrain texture filter
+  const terrainFilter = defs.append('filter').attr('id','terrain-tex');
+  terrainFilter.append('feTurbulence').attr('type','fractalNoise').attr('baseFrequency','0.015')
+    .attr('numOctaves','4').attr('seed','42').attr('result','noise');
+  terrainFilter.append('feColorMatrix').attr('in','noise').attr('type','saturate').attr('values','0').attr('result','grey');
+  terrainFilter.append('feBlend').attr('in','SourceGraphic').attr('in2','grey').attr('mode','soft-light');
+
+  // Vignette
+  const vigGrad = defs.append('radialGradient').attr('id','vignette')
+    .attr('cx','50%').attr('cy','50%').attr('r','55%');
+  vigGrad.append('stop').attr('offset','60%').attr('stop-color','transparent');
+  vigGrad.append('stop').attr('offset','100%').attr('stop-color','rgba(0,0,0,0.6)');
+
+  // Shallow water (continental shelf)
+  const shelfGrad = defs.append('linearGradient').attr('id','shelf-tint')
+    .attr('x1','0%').attr('y1','0%').attr('x2','0%').attr('y2','100%');
+  shelfGrad.append('stop').attr('offset','0%').attr('stop-color','rgba(30,50,80,0.08)');
+  shelfGrad.append('stop').attr('offset','100%').attr('stop-color','rgba(10,20,40,0.02)');
+
+  // Water background with depth gradient
+  svg.append('rect').attr('width',W).attr('height',H).attr('fill','url(#ocean-depth)').attr('class','water-bg');
 
   // Projection: Mercator centered on IVC trade zone (Afghanistan to Tamil Nadu to Mesopotamia)
   const proj = d3.geoMercator()
@@ -374,22 +411,43 @@ async function renderMap() {
     const land = topojson.feature(world, world.objects.countries);
     const borders = topojson.mesh(world, world.objects.countries, (a,b) => a !== b);
 
-    svg.append('g').attr('class','land')
+    // Coastline glow layer (blurred land outline = coastal shelf effect)
+    svg.append('g').attr('class','coast-glow').attr('filter','url(#coast-glow)')
+      .selectAll('path')
+      .data(land.features)
+      .join('path')
+        .attr('d', geoPath)
+        .attr('fill', 'none')
+        .attr('stroke', 'rgba(60,90,130,0.15)')
+        .attr('stroke-width', 4);
+
+    // Land with relief shadow + terrain texture
+    svg.append('g').attr('class','land').attr('filter','url(#land-shadow)')
       .selectAll('path')
       .data(land.features)
       .join('path')
         .attr('d', geoPath)
         .attr('fill', 'var(--land)')
         .attr('stroke', 'var(--land-stroke)')
-        .attr('stroke-width', 0.5);
+        .attr('stroke-width', 0.6);
 
-    // Country borders subtle
+    // Terrain texture overlay on land
+    svg.append('g').attr('class','land-texture').attr('filter','url(#terrain-tex)')
+      .selectAll('path')
+      .data(land.features)
+      .join('path')
+        .attr('d', geoPath)
+        .attr('fill', 'rgba(196,146,74,0.03)')
+        .attr('stroke', 'none');
+
+    // Country borders — very subtle
     svg.append('path')
       .datum(borders)
       .attr('d', geoPath)
       .attr('fill', 'none')
       .attr('stroke', 'var(--land-stroke)')
-      .attr('stroke-width', 0.3);
+      .attr('stroke-width', 0.3)
+      .attr('stroke-dasharray', '2,3');
 
     // Graticule
     const graticule = d3.geoGraticule().step([10, 10]);
@@ -576,6 +634,9 @@ async function renderMap() {
     .attr('stroke','var(--clay)').attr('stroke-width',8).attr('stroke-opacity',0.4).attr('stroke-linecap','round');
   svg.append('text').attr('x',72).attr('y',scaleY-19)
     .attr('font-family','JetBrains Mono').attr('font-size','7px').attr('fill','var(--dim)').text('width ∝ trade volume');
+
+  // Vignette overlay — darkens edges, draws eye to center
+  svg.append('rect').attr('width',W).attr('height',H).attr('fill','url(#vignette)').attr('pointer-events','none');
 }
 
 function drawRoute(g, from, to, r, tooltip) {
