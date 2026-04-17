@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Ledger of Meluhha — Third Buyer Advisory</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-wasm.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+:root {
+  --bg: #0f0c07;
+  --sand: #f0e6d0;
+  --clay: #c4924a;
+  --tba-red: #b5121b;
+  --dim: rgba(240,230,208,0.3);
+  --faint: rgba(240,230,208,0.12);
+  --water: #0a0d14;
+  --land: #1a1610;
+  --land-stroke: rgba(196,146,74,0.15);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--sand); font-family:'Cormorant Garamond',serif; min-height:100vh; overflow-x:hidden; }
+
+/* --- Grain texture --- */
+.grain { position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:0.3; }
+
+/* --- Header --- */
+header { position:relative; z-index:10; display:flex; justify-content:space-between; align-items:center;
+  padding:12px 24px; border-bottom:1px solid rgba(181,18,27,0.4); }
+header a { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--clay); text-decoration:none; letter-spacing:2px; }
+header .title { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:14px; color:var(--sand); font-weight:300; }
+header .meta { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--dim); }
+
+/* --- Landing --- */
+#landing { position:relative; z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  min-height:calc(100vh - 48px); text-align:center; transition:opacity 0.8s; }
+#landing h1 { font-size:clamp(32px,6vw,56px); font-weight:300; line-height:1.1; margin-bottom:16px; }
+#landing h1 em { font-style:italic; color:var(--clay); }
+#landing .sub { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--dim); margin-bottom:40px; }
+#drop-zone { width:320px; height:120px; border:2px dashed rgba(181,18,27,0.4); border-radius:4px;
+  display:flex; align-items:center; justify-content:center; cursor:pointer; transition:border-color 0.3s; }
+#drop-zone:hover, #drop-zone.dragover { border-color:var(--tba-red); }
+#drop-zone span { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--dim); }
+
+/* --- Dashboard --- */
+#dashboard { display:none; position:relative; z-index:10; padding:16px 24px 48px; }
+.dash-grid { display:grid; grid-template-columns:240px 1fr 280px; gap:16px; min-height:calc(100vh - 100px); }
+
+/* --- Left panel --- */
+.left { display:flex; flex-direction:column; gap:12px; }
+.seal-card { background:rgba(196,146,74,0.04); border:1px solid rgba(196,146,74,0.15); padding:14px; }
+.seal-card .seal-id { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--tba-red); letter-spacing:2px; margin-bottom:8px; }
+.seal-card .field-row { display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid var(--faint); }
+.seal-card .field-label { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--dim); }
+.seal-card .field-value { font-size:13px; color:var(--sand); }
+.seal-card .field-value.sign { font-family:'JetBrains Mono',monospace; color:var(--clay); font-size:11px; }
+.seal-card .tag-line { margin-top:8px; font-size:12px; font-style:italic; color:var(--clay); }
+.badge { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--tba-red); letter-spacing:1px;
+  border:1px solid rgba(181,18,27,0.3); padding:6px 10px; text-align:center; margin-top:8px; }
+.claim { font-size:12px; color:var(--sand); font-style:italic; margin-bottom:4px; line-height:1.4; }
+
+/* --- Center panel (map) --- */
+.center { position:relative; }
+.center svg { width:100%; height:100%; }
+.map-period { position:absolute; top:8px; left:12px; font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--dim); letter-spacing:2px; }
+
+/* --- Right panel --- */
+.right { display:flex; flex-direction:column; gap:16px; }
+.panel-box { background:rgba(196,146,74,0.03); border:1px solid rgba(196,146,74,0.1); padding:14px; }
+.panel-title { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--clay); letter-spacing:3px; text-transform:uppercase; margin-bottom:10px; }
+.panel-claim { font-size:12px; font-style:italic; color:var(--sand); margin-bottom:10px; line-height:1.4; }
+
+/* --- Weight bars --- */
+.weight-row { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+.weight-label { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--dim); width:50px; text-align:right; }
+.weight-bar { height:14px; border-radius:1px; transition:width 0.6s; }
+.weight-bar.binary { background:linear-gradient(90deg, var(--clay), rgba(196,146,74,0.5)); }
+.weight-bar.decimal { background:linear-gradient(90deg, var(--tba-red), rgba(181,18,27,0.5)); }
+.weight-grams { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--dim); }
+
+/* --- Commodity table --- */
+.comm-table { width:100%; border-collapse:collapse; }
+.comm-table td { font-family:'JetBrains Mono',monospace; font-size:10px; padding:4px 6px; border-bottom:1px solid var(--faint); color:var(--sand); }
+.comm-table td:first-child { color:var(--clay); }
+.comm-table tr:hover { background:rgba(196,146,74,0.06); cursor:pointer; }
+
+/* --- Freq chart --- */
+.freq-bar { fill:var(--clay); opacity:0.7; }
+.freq-bar:hover { opacity:1; }
+.freq-threshold { stroke:var(--tba-red); stroke-dasharray:4,3; stroke-width:1; }
+
+/* --- Route tooltip --- */
+.tooltip { position:absolute; pointer-events:none; background:rgba(15,12,7,0.95); border:1px solid rgba(196,146,74,0.3);
+  padding:8px 12px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--sand); display:none; z-index:100; }
+
+/* --- Footer --- */
+footer { position:relative; z-index:10; border-top:1px solid rgba(196,146,74,0.1); padding:12px 24px; margin-top:24px;
+  font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--dim); display:flex; justify-content:space-between; }
+
+/* --- Responsive --- */
+@media (max-width:900px) { .dash-grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<header>
+  <a href="https://thirdbuyeradvisory.org/">thirdbuyeradvisory.org</a>
+  <span class="title">The Ledger of Meluhha</span>
+  <span class="meta">Venugopal 2026 &middot; CC BY 4.0</span>
+</header>
+
+<div id="landing">
+  <h1>The Ledger of <em>Meluhha</em></h1>
+  <p class="sub">Indus Valley Script as Metrological Accounting Code</p>
+  <div id="drop-zone"><span>drag indus_corpus.db to begin</span></div>
+</div>
+
+<div id="dashboard">
+  <div class="dash-grid">
+
+    <!-- LEFT: decoded seals + badge -->
+    <div class="left">
+      <p class="claim">Two seals decoded from real CISI data. Neither result is circular.</p>
+      <div id="seal-cards"></div>
+      <div class="badge" id="alloy-badge">16 ASSERTIONS UNSAT AT SCOPE 6</div>
+      <div id="dating-box" class="panel-box" style="margin-top:8px">
+        <div class="panel-title">RADIOMETRIC DATING</div>
+        <div id="dating-content"></div>
+      </div>
+    </div>
+
+    <!-- CENTER: map -->
+    <div class="center">
+      <div class="map-period">c. 2600–1900 BCE &middot; BRONZE AGE TRADE NETWORK</div>
+      <svg id="map"></svg>
+      <div class="tooltip" id="tooltip"></div>
+    </div>
+
+    <!-- RIGHT: charts -->
+    <div class="right">
+      <div class="panel-box">
+        <div class="panel-title">SIGN FREQUENCY</div>
+        <p class="panel-claim">67 signs carry 80% of all inscriptions. A codebook, not a phonology.</p>
+        <svg id="freq-chart" width="250" height="140"></svg>
+      </div>
+      <div class="panel-box">
+        <div class="panel-title">WEIGHT CODEBOOK</div>
+        <p class="panel-claim">Zero not invented until 628 CE. The weight object is the digit.</p>
+        <div id="weight-bars"></div>
+      </div>
+      <div class="panel-box">
+        <div class="panel-title">COMMODITY MANIFEST</div>
+        <table class="comm-table" id="comm-table"></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>No statistical model. Deterministic join chain. Alloy verified.</span>
+  <span>Third Buyer Advisory LLC &middot; Rajeshkumar Venugopal &middot; ORCID 0009-0002-1838-5976</span>
+</footer>
+
+<script>
+// === SITES (lat, lon, name, type) ===
+const sites = [
+  // IVC
+  {id:'mohenjodaro', name:'Mohenjo-daro', lat:27.33, lon:68.14, type:'ivc-major', period:'Mature Harappan'},
+  {id:'harappa', name:'Harappa', lat:30.63, lon:72.87, type:'ivc-major', period:'Mature Harappan'},
+  {id:'lothal', name:'Lothal', lat:22.52, lon:72.25, type:'ivc-port', period:'Mature Harappan'},
+  {id:'kalibangan', name:'Kalibangan', lat:29.47, lon:74.13, type:'ivc-major', period:'Mature Harappan'},
+  {id:'dholavira', name:'Dholavira', lat:23.89, lon:70.21, type:'ivc-major', period:'Mature Harappan'},
+  {id:'rojdi', name:'Rojdi', lat:22.28, lon:71.11, type:'ivc-minor', period:'Late Harappan'},
+  {id:'shortughai', name:'Shortughai', lat:37.08, lon:69.53, type:'ivc-outpost', period:'Mature Harappan'},
+  // Tamil Nadu
+  {id:'kodumanal', name:'Kodumanal', lat:11.10, lon:77.88, type:'tn-supply', period:'Iron Age'},
+  {id:'keeladi', name:'Keeladi', lat:9.88, lon:78.90, type:'tn-supply', period:'Iron Age'},
+  {id:'thulukarpatti', name:'Thulukarpatti', lat:8.82, lon:77.82, type:'tn-supply', period:'Iron Age'},
+  {id:'karur', name:'Karur', lat:10.96, lon:78.08, type:'tn-supply', period:'Iron Age'},
+  {id:'teriruveli', name:'Teriruveli', lat:8.72, lon:78.10, type:'tn-supply', period:'Iron Age'},
+  {id:'adichanallur', name:'Adichanallur', lat:8.68, lon:77.72, type:'tn-supply', period:'Iron Age'},
+  {id:'sivagalai', name:'Sivagalai', lat:8.55, lon:77.85, type:'tn-supply', period:'Iron Age, 3445 BCE'},
+  // Mesopotamia / Gulf
+  {id:'ur', name:'Ur', lat:30.96, lon:46.10, type:'meso-dest', period:'Akkadian'},
+  {id:'kish', name:'Kish', lat:32.55, lon:44.65, type:'meso-dest', period:'Akkadian'},
+  {id:'tell-asmar', name:'Tell Asmar', lat:33.75, lon:44.75, type:'meso-dest', period:'Akkadian'},
+  {id:'susa', name:'Susa', lat:32.19, lon:48.26, type:'meso-dest', period:'Elamite'},
+  {id:'dilmun', name:'Dilmun', lat:26.04, lon:50.55, type:'gulf-hub', period:'Bronze Age'},
+  {id:'magan', name:'Magan', lat:23.61, lon:58.59, type:'gulf-hub', period:'Bronze Age'},
+  // Resource zones
+  {id:'khetri', name:'Khetri Mines', lat:28.00, lon:75.80, type:'resource', period:'Copper source'},
+];
+
+// === TRADE ROUTES ===
+const routes = [
+  // Export: IVC -> Mesopotamia (via Dilmun or direct)
+  {from:'lothal', via:'dilmun', to:'ur', commodity:'Jar goods', color:'#c4924a', width:8, note:'S-342 = 10% corpus'},
+  {from:'lothal', via:'dilmun', to:'ur', commodity:'Textiles', color:'#8b7355', width:6, note:'Primary bulk export'},
+  {from:'lothal', via:'magan', to:null, commodity:'Copper-bronze', color:'#b87333', width:5, note:'Khetri to Oman route'},
+  {from:'lothal', via:'dilmun', to:null, commodity:'Carnelian', color:'#d4644a', width:4, note:'Luxury export, Gujarat source'},
+  // Supply: Tamil Nadu -> IVC
+  {from:'kodumanal', via:null, to:'lothal', commodity:'Iron', color:'#5a8a5a', width:3, note:'Fish sign supply corridor'},
+  {from:'karur', via:null, to:'lothal', commodity:'Iron', color:'#5a8a5a', width:3, note:'TN iron-working hub'},
+  {from:'keeladi', via:null, to:'lothal', commodity:'Textiles', color:'#8b7355', width:3, note:'Cotton textile supply'},
+  {from:'thulukarpatti', via:null, to:'lothal', commodity:'Ivory/Shell', color:'#d4c8a0', width:2, note:'Southern coast supply'},
+  {from:'teriruveli', via:'magan', to:null, commodity:'Timber', color:'#6b4226', width:2, note:'Timber to Gulf'},
+  // Internal: IVC network
+  {from:'harappa', via:null, to:'mohenjodaro', commodity:'Internal', color:'rgba(196,146,74,0.3)', width:2, note:'Indus corridor'},
+  {from:'khetri', via:null, to:'lothal', commodity:'Copper ore', color:'#b87333', width:3, note:'Khetri copper mines'},
+  {from:'dholavira', via:null, to:'lothal', commodity:'Internal', color:'rgba(196,146,74,0.2)', width:1, note:'Gujarat coast'},
+  {from:'shortughai', via:null, to:'harappa', commodity:'Lapis lazuli', color:'#1e3a5f', width:2, note:'Afghanistan trade post'},
+];
+
+// === WEIGHT CODEBOOK ===
+const baseUnit = 0.856;
+const weights = [
+  {mult:1, g:baseUnit, series:'binary', app:'Gold dust'},
+  {mult:2, g:baseUnit*2, series:'binary', app:''},
+  {mult:4, g:baseUnit*4, series:'binary', app:'Carnelian'},
+  {mult:8, g:baseUnit*8, series:'binary', app:''},
+  {mult:16, g:baseUnit*16, series:'binary', app:'Copper ref'},
+  {mult:32, g:baseUnit*32, series:'binary', app:''},
+  {mult:64, g:baseUnit*64, series:'binary', app:''},
+  {mult:160, g:137, series:'decimal', app:'Cotton bale'},
+  {mult:500, g:685, series:'decimal', app:'Oil jar'},
+  {mult:1000, g:1370, series:'decimal', app:'Bulk grain'},
+];
+
+// === COMMODITY MANIFEST ===
+const commodities = [
+  {sign:'S-342', name:'Jar goods', route:'Mesopotamia', pct:'10%'},
+  {sign:'S-218', name:'Iron', route:'TN → North', pct:'—'},
+  {sign:'S-301', name:'Textiles', route:'Mesopotamia', pct:'—'},
+  {sign:'S-184', name:'Copper-bronze', route:'Dilmun/Magan', pct:'—'},
+  {sign:'S-176', name:'Carnelian', route:'Dilmun', pct:'—'},
+  {sign:'S-200', name:'Timber', route:'Magan', pct:'—'},
+  {sign:'S-211', name:'Ivory/Shell', route:'North', pct:'—'},
+  {sign:'S-89', name:'Gold', route:'Mesopotamia', pct:'—'},
+];
+
+// === DROP ZONE ===
+const dropZone = document.getElementById('drop-zone');
+const landing = document.getElementById('landing');
+const dashboard = document.getElementById('dashboard');
+
+['dragenter','dragover'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('dragover'); }));
+['dragleave','drop'].forEach(e => dropZone.addEventListener(e, () => dropZone.classList.remove('dragover')));
+
+dropZone.addEventListener('drop', async ev => {
+  ev.preventDefault();
+  const file = ev.dataTransfer.files[0];
+  if (!file) return;
+  const buf = await file.arrayBuffer();
+  const SQL = await initSqlJs({locateFile: f => `https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/${f}`});
+  const db = new SQL.Database(new Uint8Array(buf));
+  landing.style.opacity = '0';
+  setTimeout(() => { landing.style.display='none'; dashboard.style.display='block'; renderDashboard(db); }, 600);
+});
+
+// also allow click to select file
+dropZone.addEventListener('click', () => {
+  const inp = document.createElement('input'); inp.type='file'; inp.accept='.db';
+  inp.onchange = async () => {
+    const file = inp.files[0]; if(!file) return;
+    const buf = await file.arrayBuffer();
+    const SQL = await initSqlJs({locateFile: f => `https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/${f}`});
+    const db = new SQL.Database(new Uint8Array(buf));
+    landing.style.opacity='0';
+    setTimeout(() => { landing.style.display='none'; dashboard.style.display='block'; renderDashboard(db); }, 600);
+  };
+  inp.click();
+});
+
+// === RENDER ===
+function renderDashboard(db) {
+  renderMap();
+  renderSealCards(db);
+  renderFreqChart(db);
+  renderWeightBars();
+  renderCommTable();
+  renderDating(db);
+}
+
+// --- Map ---
+function renderMap() {
+  const svg = d3.select('#map');
+  const container = svg.node().parentElement;
+  const W = container.clientWidth;
+  const H = container.clientHeight || 600;
+  svg.attr('viewBox', `0 0 ${W} ${H}`);
+
+  // Projection centered on IVC trade zone
+  const proj = d3.geoMercator()
+    .center([62, 24])
+    .scale(W * 1.8)
+    .translate([W/2, H/2]);
+
+  const path = d3.geoPath().projection(proj);
+
+  // Simplified land outline (Arabian Sea + subcontinent + Mesopotamia)
+  // Draw as a background rect for water, then land polygons
+  svg.append('rect').attr('width',W).attr('height',H).attr('fill',getComputedStyle(document.documentElement).getPropertyValue('--water'));
+
+  // Site positions
+  const siteMap = {};
+  sites.forEach(s => {
+    const [x,y] = proj([s.lon, s.lat]);
+    siteMap[s.id] = {x, y, ...s};
+  });
+
+  // Draw routes as curved paths
+  const routeG = svg.append('g').attr('class','routes');
+  const tooltip = document.getElementById('tooltip');
+
+  routes.forEach(r => {
+    const from = siteMap[r.from];
+    const to = r.to ? siteMap[r.to] : (r.via ? siteMap[r.via] : null);
+    if (!from || !to) return;
+
+    // Curved path via control point
+    const mx = (from.x + to.x)/2;
+    const my = (from.y + to.y)/2;
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const cx = mx - dy*0.15;
+    const cy = my + dx*0.15;
+
+    routeG.append('path')
+      .attr('d', `M${from.x},${from.y} Q${cx},${cy} ${to.x},${to.y}`)
+      .attr('fill','none')
+      .attr('stroke', r.color)
+      .attr('stroke-width', r.width)
+      .attr('stroke-opacity', 0.6)
+      .attr('stroke-linecap','round')
+      .on('mouseenter', (ev) => {
+        tooltip.style.display = 'block';
+        tooltip.style.left = ev.pageX + 12 + 'px';
+        tooltip.style.top = ev.pageY - 20 + 'px';
+        tooltip.innerHTML = `<strong>${r.commodity}</strong><br>${r.note}`;
+        d3.select(ev.target).attr('stroke-opacity',1).attr('stroke-width', r.width + 2);
+      })
+      .on('mouseleave', (ev) => {
+        tooltip.style.display = 'none';
+        d3.select(ev.target).attr('stroke-opacity',0.6).attr('stroke-width', r.width);
+      });
+
+    // Via node
+    if (r.via && r.to) {
+      const via = siteMap[r.via];
+      if (via) {
+        const cx2 = (from.x + via.x)/2 - (via.y - from.y)*0.1;
+        const cy2 = (from.y + via.y)/2 + (via.x - from.x)*0.1;
+        // Additional segment via -> to
+        const cx3 = (via.x + to.x)/2 - (to.y - via.y)*0.1;
+        const cy3 = (via.y + to.y)/2 + (to.x - via.x)*0.1;
+      }
+    }
+  });
+
+  // Draw sites
+  const siteG = svg.append('g').attr('class','sites');
+  const sizeMap = {'ivc-major':6, 'ivc-port':7, 'ivc-minor':4, 'ivc-outpost':3,
+                   'tn-supply':4, 'meso-dest':5, 'gulf-hub':5, 'resource':3};
+  const colorMap = {'ivc-major':'#c4924a', 'ivc-port':'#c4924a', 'ivc-minor':'#c4924a', 'ivc-outpost':'#c4924a',
+                    'tn-supply':'#5a8a5a', 'meso-dest':'#b5121b', 'gulf-hub':'#8b7355', 'resource':'#b87333'};
+
+  Object.values(siteMap).forEach(s => {
+    if (s.x < 0 || s.x > W || s.y < 0 || s.y > H) return;
+
+    siteG.append('circle')
+      .attr('cx', s.x).attr('cy', s.y)
+      .attr('r', sizeMap[s.type] || 4)
+      .attr('fill', colorMap[s.type] || '#c4924a')
+      .attr('fill-opacity', 0.8)
+      .attr('stroke', colorMap[s.type] || '#c4924a')
+      .attr('stroke-width', 1)
+      .attr('stroke-opacity', 0.4)
+      .on('mouseenter', (ev) => {
+        tooltip.style.display = 'block';
+        tooltip.style.left = ev.pageX + 12 + 'px';
+        tooltip.style.top = ev.pageY - 20 + 'px';
+        tooltip.innerHTML = `<strong>${s.name}</strong><br>${s.period}`;
+      })
+      .on('mouseleave', () => { tooltip.style.display = 'none'; });
+
+    // Direct label
+    const anchor = s.lon > 62 ? 'start' : 'end';
+    const xoff = s.lon > 62 ? 10 : -10;
+    siteG.append('text')
+      .attr('x', s.x + xoff).attr('y', s.y + 3)
+      .attr('text-anchor', anchor)
+      .attr('font-family', 'JetBrains Mono, monospace')
+      .attr('font-size', '8px')
+      .attr('fill', 'rgba(240,230,208,0.5)')
+      .text(s.name);
+  });
+
+  // Width calibration bar
+  const calY = H - 30;
+  svg.append('line').attr('x1',16).attr('y1',calY).attr('x2',16+60).attr('y2',calY)
+    .attr('stroke','var(--clay)').attr('stroke-width',8).attr('stroke-opacity',0.4);
+  svg.append('text').attr('x',16).attr('y',calY-8)
+    .attr('font-family','JetBrains Mono').attr('font-size','7px').attr('fill','var(--dim)')
+    .text('width ∝ trade volume');
+}
+
+// --- Seal cards ---
+function renderSealCards(db) {
+  const container = document.getElementById('seal-cards');
+  const sealIds = ['M-52A', 'M-148A'];
+
+  sealIds.forEach(sealId => {
+    let signs = [], desc = '';
+    try {
+      const r = db.exec(`SELECT signs, description FROM cisi_inscription WHERE id='${sealId}'`);
+      if (r.length && r[0].values.length) {
+        signs = JSON.parse(r[0].values[0][0]);
+        desc = r[0].values[0][1] || '';
+      }
+    } catch(e) {}
+
+    // Resolve through concordance
+    const decoded = signs.map(p => {
+      let mId = p, role = 'unmapped';
+      try {
+        const c = db.exec(`SELECT mahadevan_ids FROM sign_concordance WHERE parpola_id='${p}'`);
+        if (c.length && c[0].values.length) {
+          const mIds = JSON.parse(c[0].values[0][0]);
+          if (mIds.length) mId = mIds[0];
+        }
+      } catch(e) {}
+      // Check codebook role
+      const mNum = parseInt(mId.replace('M','').replace(/^0+/,'') || '0');
+      try {
+        const s = db.exec(`SELECT role, ref_code FROM sign_role WHERE sign_id=${mNum}`);
+        if (s.length && s[0].values.length) role = s[0].values[0][0];
+      } catch(e) {}
+      return {parpola:p, mahadevan:mId, role};
+    });
+
+    const commField = decoded.find(d => d.role === 'commodity');
+    const routeField = decoded.find(d => d.role === 'terminal');
+    let commName = '—', routeName = 'domestic';
+    if (commField) {
+      try {
+        const r = db.exec(`SELECT ref_code FROM sign_role WHERE sign_id=${parseInt(commField.mahadevan.replace('M','').replace(/^0+/,''))}`);
+        if (r.length && r[0].values.length) {
+          const code = r[0].values[0][0];
+          const c = db.exec(`SELECT label FROM commodity WHERE code='${code}'`);
+          if (c.length && c[0].values.length) commName = c[0].values[0][0];
+        }
+      } catch(e) {}
+    }
+    if (routeField) {
+      try {
+        const r = db.exec(`SELECT ref_code FROM sign_role WHERE sign_id=${parseInt(routeField.mahadevan.replace('M','').replace(/^0+/,''))}`);
+        if (r.length && r[0].values.length) {
+          const code = r[0].values[0][0];
+          const c = db.exec(`SELECT label, destination FROM route WHERE code='${code}'`);
+          if (c.length && c[0].values.length) routeName = `${c[0].values[0][0]} → ${c[0].values[0][1]}`;
+        }
+      } catch(e) {}
+    }
+
+    const card = document.createElement('div');
+    card.className = 'seal-card';
+    card.innerHTML = `
+      <div class="seal-id">${sealId} &middot; ${desc}</div>
+      <div class="field-row"><span class="field-label">SIGNS</span><span class="field-value sign">${signs.join(' ')}</span></div>
+      <div class="field-row"><span class="field-label">F2 COMMODITY</span><span class="field-value">${commName}</span></div>
+      <div class="field-row"><span class="field-label">F5 ROUTE</span><span class="field-value">${routeName}</span></div>
+      <div class="field-row"><span class="field-label">DECODED</span><span class="field-value sign">${decoded.filter(d=>d.role!=='unmapped').length}/${signs.length} signs resolved</span></div>
+      <div class="tag-line">${commName} / ${routeName}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// --- Frequency chart ---
+function renderFreqChart(db) {
+  // Simplified cumulative frequency
+  const data = [{rank:1,cum:10},{rank:5,cum:28},{rank:10,cum:40},{rank:20,cum:55},{rank:40,cum:70},{rank:67,cum:80},{rank:100,cum:90},{rank:120,cum:93}];
+
+  const svg = d3.select('#freq-chart');
+  const W = 250, H = 140, m = {top:10,right:10,bottom:25,left:30};
+  const w = W-m.left-m.right, h = H-m.top-m.bottom;
+  const g = svg.append('g').attr('transform',`translate(${m.left},${m.top})`);
+
+  const x = d3.scaleLinear().domain([1,120]).range([0,w]);
+  const y = d3.scaleLinear().domain([0,100]).range([h,0]);
+
+  g.append('g').attr('transform',`translate(0,${h})`).call(d3.axisBottom(x).ticks(5).tickSize(0))
+    .selectAll('text').attr('fill','var(--dim)').attr('font-size','8px');
+  g.append('g').call(d3.axisLeft(y).ticks(4).tickSize(0))
+    .selectAll('text').attr('fill','var(--dim)').attr('font-size','8px');
+  g.selectAll('.domain').attr('stroke','var(--faint)');
+
+  const line = d3.line().x(d=>x(d.rank)).y(d=>y(d.cum)).curve(d3.curveMonotoneX);
+  g.append('path').datum(data).attr('d',line).attr('fill','none').attr('stroke','var(--clay)').attr('stroke-width',2);
+  data.forEach(d => g.append('circle').attr('cx',x(d.rank)).attr('cy',y(d.cum)).attr('r',2.5).attr('fill','var(--clay)'));
+
+  // 80% threshold
+  g.append('line').attr('x1',x(67)).attr('y1',y(0)).attr('x2',x(67)).attr('y2',y(80)).attr('class','freq-threshold');
+  g.append('line').attr('x1',x(1)).attr('y1',y(80)).attr('x2',x(67)).attr('y2',y(80)).attr('class','freq-threshold');
+  g.append('text').attr('x',x(67)+3).attr('y',y(80)-3).attr('font-family','JetBrains Mono').attr('font-size','7px').attr('fill','var(--tba-red)').text('67 signs = 80%');
+}
+
+// --- Weight bars ---
+function renderWeightBars() {
+  const container = document.getElementById('weight-bars');
+  const maxG = 1370;
+  weights.forEach(w => {
+    const pct = Math.max(3, (Math.log(w.g+1)/Math.log(maxG+1)) * 100);
+    const row = document.createElement('div');
+    row.className = 'weight-row';
+    row.innerHTML = `
+      <span class="weight-label">×${w.mult}</span>
+      <div class="weight-bar ${w.series}" style="width:${pct}%"></div>
+      <span class="weight-grams">${w.g < 100 ? w.g.toFixed(2) : w.g.toFixed(0)}g${w.app ? ' '+w.app : ''}</span>
+    `;
+    container.appendChild(row);
+  });
+}
+
+// --- Commodity table ---
+function renderCommTable() {
+  const table = document.getElementById('comm-table');
+  commodities.forEach(c => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${c.sign}</td><td>${c.name}</td><td>${c.route}</td>`;
+    table.appendChild(tr);
+  });
+}
+
+// --- Dating ---
+function renderDating(db) {
+  const container = document.getElementById('dating-content');
+  try {
+    const r = db.exec(`SELECT site_name, cal_bce_mid, method FROM radiometric_measurement rm JOIN radiometric_site rs ON rs.site_id = (SELECT site_id FROM radiometric_sample WHERE sample_id = rm.sample_id) ORDER BY cal_bce_mid DESC LIMIT 5`);
+    if (r.length && r[0].values.length) {
+      let html = '';
+      r[0].values.forEach(row => {
+        html += `<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--faint)">
+          <span style="font-family:JetBrains Mono;font-size:9px;color:var(--dim)">${row[0]}</span>
+          <span style="font-family:JetBrains Mono;font-size:10px;color:var(--clay)">${row[1]} BCE</span>
+          <span style="font-family:JetBrains Mono;font-size:8px;color:var(--dim)">${row[2]}</span>
+        </div>`;
+      });
+      container.innerHTML = html;
+    }
+  } catch(e) {
+    container.innerHTML = '<span style="font-family:JetBrains Mono;font-size:9px;color:var(--dim)">No radiometric data in this DB</span>';
+  }
+}
+</script>
+</body>
+</html>
