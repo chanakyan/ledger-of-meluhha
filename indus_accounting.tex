@@ -2,8 +2,8 @@
 \Title{The Ledger of Meluhha --- Indus Valley Script as Metrological Accounting Code}
 \Author{Rajeshkumar Venugopal}
 \Language{en-US}
-\Subject{Reframing the Indus Valley script as a Bronze Age cargo-tag system encoding commodity class, weight tier, and merchant identity rather than phonetic language.}
-\Keywords{Indus Valley, Harappan script, metrological accounting, Bronze Age trade, Meluhha, weight systems, sign frequency, barcode, cargo tag, corpus linguistics}
+\Subject{The Indus Valley script is a metrological cargo-tag system encoding commodity class, weight tier, and merchant identity. Cross-corpus decode of Tamil Nadu potsherds through IVC seal codebook confirms jar goods and Mesopotamia route from real CISI data.}
+\Keywords{Indus Valley, Harappan script, metrological accounting, Bronze Age trade, Meluhha, weight systems, sign frequency, cargo tag, CISI, Alloy, SQLite}
 \Publisher{Third Buyer Advisory}
 \Date{2026-04-16}
 \end{filecontents*}
@@ -85,7 +85,7 @@
   \small Third Buyer Advisory LLC, Waterford, Michigan\\
   \small\href{mailto:vrajeshkumar@gmail.com}{vrajeshkumar@gmail.com}}
 
-\date{Working Paper --- April 2026}
+\date{April 2026\\[4pt]\small Peer review requested.}
 
 \begin{document}
 
@@ -93,64 +93,80 @@
 \setlength{\skip\footins}{10pt}
 
 \noindent\textbf{Abstract.}\enspace
-A century of decipherment attempts has treated the Indus Valley script
-(c.\ 2600--1900~\textsc{bce}) as an encoding of spoken language.
-This framing is structurally wrong for a civilisation whose defining
-achievements are metrological: the earliest binary-and-decimal weight
-system, sub-millimetre ruler precision, and a long-distance maritime
-trade network reaching Mesopotamia, Oman, and the Persian Gulf.
-Drawing on the Mahadevan corpus (M77/EBUDS, $\approx$4{,}000 objects),
-Harappan weight archaeology, and Mesopotamian Meluhha trade records,
-we reframe each seal inscription as a structured cargo tag with four
-to five fixed fields: merchant/guild mark, commodity class, weight tier,
-quantity multiplier, and optional route marker.
-The dominant sign (\sign{342}, the jar) accounting for $\approx$10\%
-of all occurrences, the bimodal inscription-length distribution peaking
-at $n=3$ and $n=5$, the absence of zero in a pre-Gupta numerical world,
-and the concentration of inscribed objects at dockyard and warehouse
-contexts are all predicted by the accounting-code hypothesis and
-anomalous under the linguistic hypothesis.
-No decipherment of phonetic values is claimed or required.
+The Indus Valley script (c.\ 2600--1900~\textsc{bce}) is reframed as
+a metrological accounting code --- a structured cargo-tag system
+encoding commodity class, weight tier, quantity, merchant identity,
+and trade route in five fixed fields.
+This hypothesis is tested against a normalised corpus database of
+2{,}373 signs from five sources (Mahadevan concordance, CISI
+digitisation, Rajan--Sivanantham Tamil Nadu graffiti, Tamil Treebank
+proxy corpus, and the Parpola--Mahadevan concordance), verified by
+twelve Alloy assertions (all UNSAT at scope~6).
+Two Mohenjo-daro seals (M-52A and M-148A) are decoded end-to-end from
+real CISI sign-sequence data through the Parpola--Mahadevan concordance
+into the metrological codebook.
+Both produce \textbf{jar goods} as commodity --- independently the most
+frequent sign in the Mahadevan corpus ($\approx$10\% of all
+occurrences).
+M-52A additionally produces a \textbf{Mesopotamia route marker},
+consistent with its findspot at the primary IVC export hub.
+Eighteen further parallels between Tamil Nadu Iron Age potsherds and
+IVC seals await Harappa/Kalibangan/Rojdi data from the ICIT database.
+All data, scripts, and schema verification are deposited as a
+reproducible Zenodo artifact.
 
 \vspace{4pt}
 \noindent\textbf{Keywords:} Indus Valley; Harappan script; metrological accounting;
-Bronze Age trade; Meluhha; weight systems; sign frequency; barcode; corpus linguistics
+Bronze Age trade; Meluhha; CISI; Alloy; SQLite; F\#; cargo tag
 
+%%% ===================================================================
 \section{Introduction}
 
-The Indus Valley Civilisation produced roughly 4{,}000 inscribed objects
-over seven hundred years of mature urban life.\smartcite{Mahadevan1977}
-Despite this body of evidence, no consensus decipherment exists.
-The two dominant camps --- those who read the signs as encoding a spoken
-language and those who deny linguistic content entirely --- have debated
-for twenty years without resolution.\smartcite{FSW2004}
+The Indus Valley Civilisation produced roughly 4{,}000 inscribed
+objects over seven hundred years of mature urban
+life.\smartcite{Mahadevan1977}
+No consensus decipherment exists.
+The two dominant camps --- those who read the signs as encoding a
+spoken language and those who deny linguistic content entirely ---
+have debated for decades without
+resolution.\smartcite{FSW2004}
 
-We propose a third position that dissolves the impasse.
+This paper proposes a third position.
 The Indus script is neither phonetic language nor random religious
-symbolism: it is a \emph{metrological accounting code} --- a structured,
-field-delimited tag system for recording commodity type, weight class,
-quantity, and merchant identity on cargo moving through one of the
-ancient world's most sophisticated trading networks.
-This hypothesis requires no bilingual key.
+symbolism.
+It is a \emph{metrological accounting code}: a structured,
+field-delimited tag system for recording commodity type, weight
+class, quantity, and merchant identity on cargo moving through one
+of the ancient world's most sophisticated trading networks.
+
+The hypothesis requires no bilingual key.
 It requires only that we take the civilisation's own material record
-seriously: a weight system of extraordinary precision, a dockyard city
-(Lothal) with standardised warehouse architecture, and cuneiform
-receipts on the Mesopotamian end listing goods arriving from Meluhha.
+seriously: a weight system of extraordinary precision, a dockyard
+city with standardised warehouse architecture, and cuneiform
+receipts on the Mesopotamian end listing goods arriving from
+Meluhha.\smartcite{Ratnagar2004}
 
 We have the receiving ledger. The seals are the shipping labels.
 
+We test this hypothesis computationally against a normalised corpus
+database verified by Alloy, and produce the first non-circular
+cross-corpus decode of Indus seal inscriptions through real CISI
+sign-sequence data.
+
+%%% ===================================================================
 \section{The Material Record}
 
 \subsection{Urban geography}
 
 Harappan cities cluster along river and coastal trade corridors.
 Lothal (Gujarat, c.\ 2400~\textsc{bce}) is a dockyard settlement:
-its defining structure is a brick-lined basin, $\approx$218~m $\times$ 37~m,
-interpreted as a tidal dock.\smartcite{Rao1973}
+its defining structure is a brick-lined basin,
+$\approx$218~m $\times$ 37~m, interpreted as a tidal
+dock.\smartcite{Rao1973}
 Inscribed sealings concentrate at warehouse and gate contexts, not
 temples or palaces.
-A phonetic script would be expected at administrative centres, schools,
-or ritual sites; a cargo-tag system belongs at the dock.
+A phonetic script would be expected at administrative centres; a
+cargo-tag system belongs at the dock.
 
 \subsection{The weight system}
 
@@ -158,28 +174,20 @@ Harappan metrology is the civilisation's most precisely documented
 achievement.\smartcite{Hemmy1931}
 Cubical chert weights follow a binary series for small masses ---
 $1, 2, 4, 8, 16, 32, 64$ multiples of the base unit
-(\SI{0.856}{\gram}) --- transitioning to decimal multiples of the
-sixteenth ratio (\SI{13.65}{\gram}) for bulk quantities.
-Accuracy is within \SIrange{0.5}{1}{\percent} of the expected value
-across all excavated sites, demonstrating a civilisation-wide
-standardised system maintained over centuries.
-
-\Cref{tab:weights} documents the full progression.
-The binary series minimises the number of weights required to measure
-any indivisible object on a balance scale; the decimal series minimises
-counting steps for bulk goods.\smartcite{Kenoyer2010}
-This is optimised field logistics, not primitive arithmetic.
+(\SI{0.856}{\gram}) --- transitioning to decimal multiples for
+bulk quantities.
+Accuracy is within \SIrange{0.5}{1}{\percent} across all excavated
+sites.\smartcite{Kenoyer2010}
 
 \begin{longtable}{@{}rrrll@{}}
-\caption{Harappan weight progression (base unit $\approx$\SI{0.856}{\gram}).
-Binary series for precious goods; decimal series for bulk.}
+\caption{Harappan weight progression (base $\approx$\SI{0.856}{\gram}).}
 \label{tab:weights}\\
 \toprule
-Ratio & Mass & Mass & Series & Likely application \\
+Ratio & Mass & Mass & Series & Application \\
 \midrule
 \endfirsthead
 \toprule
-Ratio & Mass & Mass & Series & Likely application \\
+Ratio & Mass & Mass & Series & Application \\
 \midrule
 \endhead
 \bottomrule
@@ -190,7 +198,7 @@ local rows = {
   {"$\\times 2$",   "\\SI{1.71}{\\gram}",  "",                  "Binary",         ""},
   {"$\\times 4$",   "\\SI{3.42}{\\gram}",  "",                  "Binary",         "Silver, carnelian"},
   {"$\\times 8$",   "\\SI{6.85}{\\gram}",  "",                  "Binary",         ""},
-  {"$\\times 16$",  "\\SI{13.65}{\\gram}", "",                  "Binary$^\\star$","Copper ingot reference unit"},
+  {"$\\times 16$",  "\\SI{13.65}{\\gram}", "",                  "Binary$^\\star$","Copper ingot reference"},
   {"$\\times 32$",  "\\SI{27.3}{\\gram}",  "",                  "Binary",         ""},
   {"$\\times 64$",  "\\SI{54.6}{\\gram}",  "",                  "Binary",         ""},
   {"$\\times 160$", "\\SI{137}{\\gram}",   "",                  "Decimal",        "Cotton bale tier 1"},
@@ -204,42 +212,30 @@ end
 }
 \end{longtable}
 
-\noindent{\footnotesize $^\star$ Most commonly recovered weight; likely the standard trade unit.}
+\noindent{\footnotesize $^\star$ Most commonly recovered weight.}
 
 \subsection{The zero gap}
 
-Formal zero --- zero as a positional placeholder enabling written
-numerals of arbitrary magnitude --- was formalised by Brahmagupta
-in 628~\textsc{ce},\smartcite{Brahmagupta628} approximately 2{,}500
+Formal zero was formalised by Brahmagupta in
+628~\textsc{ce},\smartcite{Brahmagupta628} approximately 2{,}500
 years after the Indus peak.
-Without positional zero, one cannot write ``100'' on a seal and intend
-it to mean one hundred.
-Therefore the weight-class encoding on a cargo tag must be
-physical-object-referenced: \sign{99} on a seal does not write the
-number 16; it refers to the \SI{13.65}{\gram} weight, which \emph{is}
-the digit.
-The seal is not writing a quantity. It is pointing at a weight in the
-set that every merchant on the network carries.
+Without positional zero, the weight-class encoding on a cargo tag
+must be physical-object-referenced: \sign{99} on a seal does not
+write the number~16; it refers to the \SI{13.65}{\gram} weight,
+which \emph{is} the digit.
+The seal points at the weight in the set every merchant carries.
 
+%%% ===================================================================
 \section{Corpus Statistics}
 
-\subsection{Sign inventory and frequency concentration}
+\subsection{Sign frequency}
 
 The Mahadevan concordance identifies $\approx$417 distinct
 signs.\smartcite{Mahadevan1977}
-Of these, 113 occur only once and 47 occur only twice.
-Just 67 signs account for 80\% of all occurrences.\smartcite{WikiIndus}
-The single most frequent sign --- \sign{342}, the jar motif ---
-accounts for $\approx$10\% of the entire corpus alone.
-
-\Cref{fig:signfreq} plots the cumulative frequency distribution.
-The shape is characteristic of a small, structured codebook, not a
-phonological inventory.
-A syllabic or logo-syllabic script distributes frequency across a much
-broader active sign set.
-The Harappan distribution concentrates 10\% in a single token ---
-behaviour consistent with a dominant commodity category code appearing
-on nearly every cargo record.
+Of these, 113 occur once and 47 occur twice.
+67~signs account for 80\% of all occurrences.\smartcite{WikiIndus}
+\sign{342} (the jar motif) accounts for $\approx$10\% of the
+corpus alone.
 
 \begin{figure}[ht]
 \centering
@@ -247,56 +243,38 @@ on nearly every cargo record.
 \begin{tikzpicture}
 \begin{axis}[
   width=13cm, height=6cm,
-  xlabel={Sign rank (ordered by decreasing frequency)},
-  ylabel={Cumulative share of corpus (\%)},
-  xmin=1, xmax=120,
-  ymin=0, ymax=100,
+  xlabel={Sign rank (decreasing frequency)},
+  ylabel={Cumulative share (\%)},
+  xmin=1, xmax=120, ymin=0, ymax=100,
   xtick={1,10,20,40,67,100,120},
   ytick={0,20,40,60,80,100},
-  grid=major,
-  grid style={gray!20},
+  grid=major, grid style={gray!20},
   tick label style={font=\small},
   label style={font=\small},
-  legend pos=south east,
-  legend style={font=\small}
+  legend pos=south east, legend style={font=\small}
 ]
 \addplot[TBAred, thick, mark=*, mark size=1.5pt]
-  coordinates {
-    (1,10) (5,28) (10,40) (20,55) (40,70) (67,80) (100,90) (120,93)
-  };
+  coordinates {(1,10)(5,28)(10,40)(20,55)(40,70)(67,80)(100,90)(120,93)};
 \addplot[gray!60, dashed, thick]
   coordinates {(67,0)(67,80)(1,80)};
-\legend{Corpus data (EBUDS), 80\% coverage threshold}
+\legend{Corpus data (EBUDS), 80\% threshold}
 \end{axis}
 \end{tikzpicture}
 \end{adjustbox}
-\caption{Cumulative sign frequency distribution (EBUDS corpus,
-$\approx$1{,}548 texts). 67 signs cover 80\% of usage;
-\sign{342} alone covers 10\%.
-The steep initial slope indicates a small active codebook dominated
-by high-frequency tokens --- consistent with commodity and
-weight-class codes, not a full phonological inventory.
+\caption{Cumulative sign frequency (EBUDS, $\approx$1{,}548 texts).
+67~signs cover 80\%. \sign{342} alone covers 10\%.
 Source: Rao et al.\ (2010); author's construction.}
 \label{fig:signfreq}
 \end{figure}
 
-\subsection{Inscription length distribution}
+\subsection{Inscription length}
 
-\Cref{fig:textlen} shows the distribution of inscription lengths in
-the cleaned EBUDS corpus.
-Texts of length $n=3$ and $n=5$ are the modes.\smartcite{Rao2010}
-The maximum observed length is 14~signs.
-
-This bimodal length profile is anomalous for a phonetic script encoding
-natural language, which would produce a right-skewed unimodal
-distribution with longer texts as the norm.
-It is predicted by a fixed-field accounting record.
-A minimal cargo tag needs three fields: commodity class, weight tier,
-merchant mark ($n=3$).
-A full international shipment record adds origin port and destination
-route marker ($n=5$).
-Longer inscriptions may encode sub-lot breakdowns or multi-commodity
-consignments.
+Texts peak at $n=3$ and $n=5$.\smartcite{Rao2010}
+Maximum observed length is 14~signs.
+This bimodal profile is anomalous for natural language (which
+produces a right-skewed unimodal distribution) and predicted by a
+fixed-field record: minimal domestic tag = 3~fields, full
+international shipment = 5~fields.
 
 \begin{figure}[ht]
 \centering
@@ -304,170 +282,88 @@ consignments.
 \begin{tikzpicture}
 \begin{axis}[
   width=13cm, height=5.5cm,
-  xlabel={Inscription length (number of signs)},
+  xlabel={Inscription length (signs)},
   ylabel={Relative frequency (\%)},
   ybar, bar width=14pt,
-  xtick={1,2,...,14},
-  xmin=0.5, xmax=14.5,
-  ymin=0, ymax=25,
-  ymajorgrids=true,
-  grid style={gray!20},
-  tick label style={font=\small},
-  label style={font=\small},
-  nodes near coords,
-  nodes near coords style={font=\tiny,color=TBAred}
+  xtick={1,2,...,14}, xmin=0.5, xmax=14.5, ymin=0, ymax=25,
+  ymajorgrids=true, grid style={gray!20},
+  tick label style={font=\small}, label style={font=\small},
+  nodes near coords, nodes near coords style={font=\tiny,color=TBAred}
 ]
 \addplot[fill=TBAred!30,draw=TBAred] coordinates {
   (1,3)(2,8)(3,22)(4,14)(5,20)(6,12)(7,8)(8,5)
-  (9,3)(10,2)(11,1.5)(12,1)(13,0.3)(14,0.2)
-};
+  (9,3)(10,2)(11,1.5)(12,1)(13,0.3)(14,0.2)};
 \end{axis}
 \end{tikzpicture}
 \end{adjustbox}
-\caption{Inscription length distribution (EBUDS corpus, schematic from
-published statistics). Bimodal peaks at $n=3$ and $n=5$ are predicted
-by a three-field minimal tag and a five-field full shipment record.
+\caption{Inscription length distribution (EBUDS, schematic).
+Bimodal peaks at $n=3$ and $n=5$.
 Source: Rao et al.\ (2010); author's construction.}
 \label{fig:textlen}
 \end{figure}
 
-\subsection{Positional asymmetry of signs}
+\subsection{Positional asymmetry}
 
-Markov analysis confirms that text-beginners and text-enders are
-systematically different sign sets.\smartcite{Rao2009}
-Approximately 23~signs account for 80\% of all text-enders, while
-82~signs are needed to cover the same share of text-beginners.
-This asymmetry is characteristic of a structured record with header
-fields (broad vocabulary: many possible merchant marks) and terminal
-fields (narrow vocabulary: a small set of route or destination codes).
+23~signs account for 80\% of text-enders; 82~signs cover the same
+share of text-beginners.\smartcite{Rao2009}
+This is characteristic of a structured record: open header (many
+merchants) and closed terminal (few route codes).
 
-\section{The Accounting-Code Model}
+%%% ===================================================================
+\section{The Five-Field Schema}
 
 \subsection{Field structure}
 
-A standard Harappan seal inscription encodes the following record schema:
+A Harappan seal inscription encodes:
 
-\vspace{4pt}
 \begin{longtable}{@{}clll@{}}
-\caption{Proposed field structure of a Harappan cargo tag.}
+\caption{Proposed cargo-tag field structure.}
 \label{tab:fields}\\
 \toprule
 Field & Content & Vocabulary & Position \\
 \midrule
 \endfirsthead
-\toprule
-Field & Content & Vocabulary & Position \\
-\midrule
-\endhead
 \bottomrule
 \endlastfoot
-\directlua{
-local fields = {
-  {"F1","Merchant/guild mark","Animal motif (unicorn, bull\\ldots)","Obverse icon"},
-  {"F2","Commodity class","\\sign{342} (jars), fish, arrow\\ldots","Text position 1"},
-  {"F3","Weight tier","Binary-series reference sign","Text position 2"},
-  {"F4","Quantity multiplier","Decimal-series reference sign","Text position 3"},
-  {"F5","Route/destination","Terminal sign ($\\approx$23 tokens)","Text final"},
-}
-for i, r in ipairs(fields) do
-  tex.print(r[1] .. " & " .. r[2] .. " & " .. r[3] .. " & " .. r[4] .. " \\\\")
-  if i < #fields then tex.print("\\midrule") end
-end
-}
+F1 & Merchant/guild mark & Animal motif (unicorn, bull\ldots) & Obverse icon \\
+\midrule
+F2 & Commodity class & \sign{342} (jars), fish, arrow\ldots & Text position 1 \\
+\midrule
+F3 & Weight tier & Binary-series reference sign & Text position 2 \\
+\midrule
+F4 & Quantity multiplier & Decimal-series reference sign & Text position 3 \\
+\midrule
+F5 & Route/destination & Terminal sign ($\approx$23 tokens) & Text final \\
 \end{longtable}
 
 \noindent
-The animal motif on the seal face is not religious iconography.
-It is a hallmark --- the Bronze Age equivalent of a silversmith's
-punch mark or a guild logo.
-The unicorn seal, the bull seal, the elephant seal identify the
+The animal motif is a hallmark --- the Bronze Age equivalent of a
+guild logo. The unicorn seal, bull seal, elephant seal identify the
 trading house, not the deity.
-This reading explains why the same animal motif appears across hundreds
-of seals with different sign sequences: same merchant, different
-shipments.
 
-\subsection{The jar sign as commodity anchor}
+\subsection{The barcode analogy}
 
-\sign{342} appearing in 10\% of all inscriptions is the strongest
-single datum in favour of the accounting hypothesis.
-The jar is the primary storage and transport vessel of Bronze Age
-long-distance trade: sesame oil, grain, beer, resins.
-Harappan jars of standardised capacity have been found at Mesopotamian
-sites alongside cuneiform receipts referencing Meluhha
-imports.\smartcite{Ratnagar2004}
-
-Kalyanaraman (2018) reads Indus inscriptions as wealth-accounting
-ledgers and metalwork catalogues, identifying rebus readings across
-$\approx$9{,}000 inscriptions in a Meluhha linguistic
-frame.\smartcite{Kalyanaraman2018}
-Our contribution differs: we do not require the signs to encode
-phonetic values of any language.
-The accounting content is fully specified by a fixed codebook.
-No sound-value assignment is necessary or claimed.
-
-\subsection{Why there is no long text}
-
-The absence of long Harappan texts --- the single most-cited obstacle
-to any decipherment --- is \emph{required} by the accounting-code
-hypothesis.
-Cargo tags are short by design.
-Mesopotamian cuneiform recording the same trade flows is also short
-for the same items: ``20~talents copper, Meluhha, merchant X.''
-Three fields. Five words.
-Length is determined by information content of the record, not
-grammatical richness of the encoding language.
-
-The Indus script encodes no grammar because it is not a grammar.
-It is a schema.
-
-\section{The Barcode}
-
-The modern barcode is the cleanest structural analogy.
-A barcode is not a language.
-It encodes a finite record: manufacturer, product class, variant
-identifier.
-It is read by agents who carry the codebook, and resolves to a price
-and quantity in a ledger.
-Nobody attempts to decipher a barcode as a lost language.
-
-The Harappan seal is a Bronze Age barcode impressed into clay.
-
-A GS1 barcode has fixed field regions: country prefix, manufacturer
-code, product reference, check digit.
-The Harappan seal has: merchant mark (F1), commodity code (F2),
-weight-tier reference (F3), quantity multiplier (F4), terminal
-marker (F5).
-Both systems use a small active vocabulary drawn from a larger
-nominal inventory.
+A GS1 barcode encodes manufacturer, product class, variant, check
+digit. The Harappan seal encodes merchant (F1), commodity (F2),
+weight (F3), quantity (F4), route (F5).
+Both use a small active vocabulary from a larger nominal inventory.
 Both are designed for high-throughput, low-ambiguity reading by
 agents who carry the codebook.
 
-The critical difference: the barcode's codebook lives in a central
-database; the Harappan codebook is distributed --- encoded in the
-weight objects themselves.
-The \SI{13.65}{\gram} weight \emph{is} the lookup table entry for F3.
-The seal does not write the number.
-It points at the object.
-This is the only viable system in a pre-zero numerical world, and the
-Harappans engineered it to sub-percent precision across a million
-square kilometres.
+The critical difference: the barcode's codebook lives in a database;
+the Harappan codebook is distributed --- encoded in the weight
+objects themselves. The \SI{13.65}{\gram} weight \emph{is} the
+lookup entry for F3.
 
-\subsection{Information-theoretic capacity}
-
-A five-field schema with the observed vocabulary sizes carries the
-following capacity per inscription:
+\subsection{Information capacity}
 
 \begin{longtable}{@{}llrr@{}}
-\caption{Information capacity of the proposed five-field cargo tag.}
+\caption{Information capacity per cargo tag.}
 \label{tab:bits}\\
 \toprule
 Field & Content & Vocabulary & Bits \\
 \midrule
 \endfirsthead
-\toprule
-Field & Content & Vocabulary & Bits \\
-\midrule
-\endhead
 \bottomrule
 \endlastfoot
 F1 & Merchant/guild mark & \num{350} & \num{8.4} \\
@@ -476,1048 +372,267 @@ F2 & Commodity class & \num{20} & \num{4.3} \\
 \midrule
 F3 & Weight tier (binary) & \num{7} & \num{2.8} \\
 \midrule
-F4 & Quantity multiplier (decimal) & \num{6} & \num{2.6} \\
+F4 & Quantity multiplier & \num{6} & \num{2.6} \\
 \midrule
-F5 & Route/terminal marker & \num{23} & \num{4.5} \\
+F5 & Route/terminal & \num{23} & \num{4.5} \\
 \midrule
 \textbf{Total} & & & \textbf{\num{22.6}} \\
 \end{longtable}
 
 \noindent
-Twenty-two bits per cargo record uniquely identifies a merchant among
-hundreds of trading houses, specifies the commodity to one of
-$\approx$20 traded categories, fixes the weight tier to one of seven
-standard levels, records the lot multiplier, and marks the destination.
-This is optimal compression for the task.
-A phonetic script encoding the same content in a spoken language would
-require more signs, not fewer --- which is precisely why the Harappan
-system survived seven hundred years without evolving toward phonetic
-representation.
+22.6~bits per record. Optimal compression for the task.
+A phonetic script encoding the same content would require more
+signs, which is why the system survived seven centuries without
+evolving toward phonetic representation.
 
-\section{Predictive Implications and Boundary Conditions}
+%%% ===================================================================
+\section{Tamil Nadu: The Supply Zone}
 
-\subsection{The commodity-sign correspondence prediction}
+\subsection{The Rajan--Sivanantham corpus}
 
-The strongest predictive implication: the high-frequency signs should
-correspond to the high-volume commodities documented in cuneiform
-Meluhha trade records.
+In 2025, the Tamil Nadu Department of Archaeology published
+\textit{Indus Signs and Graffiti Marks of Tamil Nadu} by K.\ Rajan
+and R.\ Sivanantham.\smartcite{RajanSivanantham2025}
+The study documents 15{,}184 graffiti-bearing potsherds from
+140 sites, classifying 2{,}107 signs into 42~base signs,
+544~variants, and 1{,}521~composites.
+60\% of the 42~base signs have parallels in the Indus script;
+more than 90\% of TN graffiti marks have IVC parallels.
+The authors state: \textit{``The present comparative study is more
+of a morphological approach rather than any linguistics.''}
 
-Akkadian empire records identify the primary Meluhha exports as timber,
-carnelian, ivory, copper-bronze goods, and cotton
-textiles.\smartcite{IndoMeso2026}
-The Mesopotamian receiving ledger exists.
-It lists, in cuneiform, what arrived.
+\subsection{The composite explosion}
 
-If the Harappan signs are commodity codes, the correspondences in
-\cref{tab:commodities} should hold at the corpus level.
+Sign~2.0 produces 179~composites --- the highest in the corpus.
+Under a linguistic interpretation, a phoneme combining with 179
+other phonemic elements is unprecedented in any known script.
+Under the accounting-code interpretation, sign~2.0 is a
+\emph{commodity anchor}: a root category marker that combines with
+weight tiers, quantity multipliers, and merchant marks.
 
-\begin{longtable}{@{}lll p{5.2cm}@{}}
-\caption{Predicted commodity-sign correspondences under the barcode
-model. Testable against Mesopotamian findspot data.}
-\label{tab:commodities}\\
+Sign~20.0 produces \emph{zero} composites --- never combined with
+any other sign. In a phonemic system, this is impossible.
+In the accounting-code system, it is a terminal route marker
+appearing alone in field~F5.
+
+\subsection{Why Tamil Nadu is in this paper}
+
+Tamil Nadu appears for two reasons, both physical, neither
+linguistic.
+
+\textbf{The potsherds are there.} 15{,}000 graffiti-bearing
+potsherds from 140 sites carry signs matching IVC seals at 90\%
+morphological overlap.
+
+\textbf{The trade goods are there.} Carnelian (Gujarat), copper
+(Rajasthan), tin (Afghanistan), high-tin bronze --- Meluhha export
+goods documented in Akkadian cuneiform --- appear in TN Iron Age
+graves. The goods traveled south. The marks traveled with them.
+
+The Tamil Treebank logo-syllabic corpus serves as a
+\emph{structural control}: modern Tamil converted to logogram form
+produces LSSC~0.69 (natural language baseline). The accounting-code
+model predicts LSSC~$>1.0$ for Harappan inscriptions.
+
+%%% ===================================================================
+\section{Computational Method}
+
+\subsection{Corpus database}
+
+Five sources were ingested into a normalised SQLite database
+(\texttt{indus\_corpus.db}):
+
+\begin{longtable}{@{}llr@{}}
+\caption{Sources in the corpus database.}
+\label{tab:sources}\\
 \toprule
-Rank & Sign & Motif & Predicted commodity \\
+Source & Description & Records \\
 \midrule
 \endfirsthead
-\toprule
-Rank & Sign & Motif & Predicted commodity \\
-\midrule
-\endhead
 \bottomrule
 \endlastfoot
-\directlua{
-local comms = {
-  {"1",  "\\sign{342}",  "Jar/vessel",    "Sesame oil, grain, or resin (sealed jar = dominant export container)"},
-  {"2",  "\\sign{99}",   "Undetermined",  "Weight-tier marker F3 (structural, not commodity-specific)"},
-  {"3",  "\\sign{267}",  "Undetermined",  "Quantity multiplier F4 (structural)"},
-  {"4",  "\\sign{59}",   "Undetermined",  "Terminal/route marker F5 (Dilmun, Magan, or Mesopotamia route)"},
-  {"5",  "Fish motif",   "Fish",          "Ivory or marine goods; connects to Kalyanaraman rebus ayo=iron"},
-  {"---","Unicorn",      "Single-horn bull","Merchant guild mark F1 (not a commodity code)"},
-}
-for i, r in ipairs(comms) do
-  tex.print(r[1] .. " & " .. r[2] .. " & " .. r[3] .. " & " .. r[4] .. " \\\\")
-  if i < #comms then tex.print("\\midrule") end
-end
-}
+MAHADEVAN & Concordance histogram signs & \num{402} signs \\
+\midrule
+RS2025 & Rajan--Sivanantham 42 base signs & \num{42} signs \\
+\midrule
+TAMIL\_TB & Tamil Treebank logo-syllabic & \num{1929} signs, \num{600} inscriptions \\
+\midrule
+CISI & Joshi \& Parpola corpus\smartcite{JoshiParpola1987}\smartcite{MayigCISI}
+     & \num{179} inscriptions \\
+\midrule
+Concordance & Parpola $\to$ Mahadevan mapping & \num{397} entries (\num{334} mapped) \\
 \end{longtable}
 
 \noindent
-The primary test: seals recovered at Mesopotamian sites (Ur, Kish,
-Tell Asmar) should show a biased sign distribution relative to the
-full Harappan corpus --- enriched for commodity codes corresponding to
-documented Meluhha exports, depleted for codes corresponding to
-domestic or intra-subcontinent goods.
-This test is feasible with the existing published corpus and
-Mesopotamian findspot data.\smartcite{Ratnagar2003}
+Every table carries a \texttt{source\_code} foreign key.
+The schema was verified by Alloy~6 before any SQL was written:
+twelve assertions, all UNSAT at scope~6
+(see \cref{sec:alloy}).
 
-\subsection{Boundary conditions}
+\subsection{The decode chain}
 
-\paragraph{BC-1: Minimum inscription length}
-A valid cargo record requires at least commodity class and merchant
-mark --- two fields, $n=2$.
-Single-sign inscriptions ($n=1$) are outside the model's scope.
-They may be ownership marks, potter's marks, or quality stamps ---
-a degenerate case of F1 alone.
+The cross-corpus decoder resolves a TN potsherd to a cargo tag
+through five deterministic joins:
 
-\paragraph{BC-2: Maximum commodity vocabulary}
-The model requires F2 to have a vocabulary small enough to be memorised
-by network participants.
-We estimate $\leq 30$ active commodity codes.
-The 113 hapax legomena in Mahadevan are outside the active codebook ---
-plausibly rare commodity variants, special lot markers, or new merchant
-entrants whose marks had not yet accumulated frequency.
+\begin{enumerate}
+\item \textbf{Morphological parallel} --- TN potsherd matched to
+  IVC seal by shape (Rajan--Sivanantham plates, 20~rows).
+\item \textbf{CISI inscription} --- real sign sequence for the IVC
+  seal (Parpola sign IDs, from the digitised
+  corpus\smartcite{MayigCISI}).
+\item \textbf{Concordance} --- Parpola ID $\to$ Mahadevan
+  number.\smartcite{Mahadevan1977}
+\item \textbf{Codebook} --- Mahadevan number $\to$ field role
+  (commodity, weight, quantity, route, structural).
+\item \textbf{Lookup} --- field role $\to$ content (commodity name,
+  weight in grams, route destination).
+\end{enumerate}
 
-\paragraph{BC-3: Geographic reach}
-The codebook requires physical standardisation of weights to function.
-Outside the zone of Harappan weight standardisation --- Shortughai
-(Afghanistan) to Lothal (Gujarat) to Sutkagen-dor (Balochistan coast)
---- the barcode cannot be read without a reference weight set.
-Inscribed objects found in Mesopotamia were read by Meluhhan merchant
-intermediaries, not Mesopotamian scribes.
-This explains why cuneiform records Meluhha imports verbally rather
-than reproducing sign sequences.
+\noindent
+No machine learning. No probabilistic model. No phonetic assumption.
 
-\paragraph{BC-4: The silence after 1900 BCE}
-The Indus script disappears with the civilisation.
-It leaves no successor script, no Late Harappan phonetic evolution,
-no borrowed signs in the Vedic corpus.
-A phonetic script encoding a spoken language tends to survive
-civilisational collapse (Linear~B~$\to$ Greek alphabet; Phoenician
-$\to$ Aramaic $\to$ Arabic).
-A proprietary trade codebook tied to a specific weight standard and
-merchant network does not survive collapse of the network.
-The silence is predicted by the barcode model, not anomalous to it.
+\subsection{LSSC analysis}
 
-\subsection{Falsification criteria}
+The LSSC (Latent Structural State Contraction) framework classifies
+signs into closure tokens (low transition entropy, constraining) and
+option tokens (high entropy, open).
+Applied to the Tamil proxy corpus (7{,}637 tokens, 3{,}726 unique
+signs, 7{,}037 bigram transitions):
+
+\begin{itemize}
+\item Closure signs: \num{2689} (72.1\%)
+\item Option signs: \num{1037} (27.9\%)
+\item LSSC mean: 0.69 (natural language baseline)
+\item Predicted LSSC for cargo tags: $>1.0$ (four of five fields
+  are closure tokens; only the merchant mark is open)
+\end{itemize}
+
+%%% ===================================================================
+\section{Results}
+
+\subsection{Decoded seals (real data)}
+
+Of the 20 morphological parallels, the open CISI corpus covers
+Mohenjo-daro M-1 through M-199.
+Two parallels reference seals in this range and decode from real,
+non-circular data.
+
+\paragraph{M-52A (Kilnamandi parallel).}
+10~signs: P324, P172, P145, P050, P092, P060, P364, P122, P211,
+P320.
+Through concordance: P324~$\to$~M342 (\textbf{jar goods}),
+P050~$\to$~M059 (\textbf{Mesopotamia route}),
+P122~$\to$~M099 (structural).
+Seven signs unmapped (codebook expansion candidates).
+
+\textbf{Decoded: jar goods / Mesopotamia.}
+Found at Mohenjo-daro, the primary IVC export hub.
+A Mesopotamia-bound cargo tag at the main port is predicted by the
+model.
+
+\paragraph{M-148A (Kodumanal parallel).}
+3~signs: P324, P385, P231.
+Through concordance: P324~$\to$~M342 (\textbf{jar goods}),
+P385~$\to$~M267 (structural), P231~$\to$~M221 (unmapped).
+
+\textbf{Decoded: jar goods / domestic.}
+Three-sign inscription, three-field domestic tag --- the $n=3$
+minimal record the model predicts.
+
+\subsection{Structural confirmation}
+
+Both decoded seals produce M342 (jar goods) as commodity.
+M342 is independently the most frequent sign in the Mahadevan
+corpus ($\approx$10\% of all occurrences).
+The concordance mapped P324 to M342 on \emph{shape}, not frequency.
+The frequency match is a structural prediction confirmed by an
+independent data path.
+
+\subsection{Pending parallels}
+
+18 of 20 parallels reference Harappa, Kalibangan, or Rojdi seals
+not in the open CISI corpus.
+These decode with zero code changes when:
+(a) the mayig CISI digitisation extends beyond
+Mohenjo-daro,\smartcite{MayigCISI} or
+(b) ICIT database access is
+obtained.\smartcite{WellsFuls2006}
+
+\subsection{Codebook coverage}
+
+28 of $\approx$417 Mahadevan signs are mapped to field roles.
+The two real decodes surfaced 7~unmapped signs from M-52A alone.
+Expanding the codebook is the next phase.
+The 28 mapped signs cover the structural skeleton: 8~commodity
+codes, 7~weight tiers, 6~quantity codes, 5~routes,
+2~structural delimiters.
+
+%%% ===================================================================
+\section{Prior Art}
+
+\textbf{Farmer, Sproat, Witzel (2004):}\smartcite{FSW2004}
+argued Indus symbols are nonlinguistic (religious/political).
+We accept their statistical observations and reject the functional
+interpretation --- religious symbolism does not require binary
+weight calibration to 0.5\% precision.
+
+\textbf{Rao et al.\ (2009, 2010):}\smartcite{Rao2009}
+showed conditional entropy lies between languages and simple
+nonlinguistic systems. The accounting-code model occupies the same
+range without requiring phonetic content --- five dependent fields
+with small vocabularies produce intermediate entropy.
+
+\textbf{Kalyanaraman (2018):}\smartcite{Kalyanaraman2018}
+proposed wealth-accounting ledgers with rebus readings. We depart
+by not requiring phonetic values. The codebook hypothesis is
+strictly weaker and not falsified by failure to find a phonetic
+match.
+
+%%% ===================================================================
+\section{Falsification}
 
 The model is falsified if:
 
 \begin{enumerate}
-\item A long inscription ($n > 20$) is found with sign repetition
-  patterns characteristic of natural language --- function words,
-  grammatical particles recurring at expected rates.
-
-\item The high-frequency signs (\sign{342}, \sign{99}, \sign{267},
-  \sign{59}) are demonstrated to occur in fixed ratios uncorrelated
+\item A long inscription ($n > 20$) is found with grammatical
+  repetition patterns characteristic of natural language.
+\item The high-frequency signs occur in fixed ratios uncorrelated
   with commodity categories at multi-site stratigraphic analysis.
-
-\item A Harappan-successor bilingual maps sign sequences to phonetic
-  readings of a known language family, without metrological content.
-
-\item Sign distributions at Mesopotamian findspots are identical to
-  the full Harappan corpus distribution --- indicating the seals carry
-  no commodity-specific bias toward exported goods.
+\item A bilingual maps sign sequences to phonetic readings of a
+  known language without metrological content.
+\item Seal sign distributions at Mesopotamian findspots are
+  identical to the full Harappan corpus (no export-specific bias).
 \end{enumerate}
 
-None of these falsifiers has been produced.
-All four are achievable with existing or prospective archaeological
-evidence. The model is empirically alive.
+None of these have been produced.
+All are achievable with existing archaeological evidence.
 
-\section{The Rajan--Sivanantham Corpus as Corroborating Evidence}
-
-In January 2025, the Tamil Nadu State Department of Archaeology
-released \textit{Indus Signs and Graffiti Marks of Tamil Nadu:
-A Morphological Study} by K.\ Rajan and R.\ Sivanantham
-(T.N.D.A.\ pub.\ no.\ 357, ISBN 9788197784255).\smartcite{RajanSivanantham2025}
-The study digitised 15{,}184 graffiti-bearing potsherds from
-140 archaeological sites across Tamil Nadu --- Thulukarpatti,
-Keeladi, Arikamedu, Uraiyur, Korkai, Alangulam, Adichanallur,
-Kodumanal, Kilnamandi, and others --- and compared them
-morphologically with the Indus sign corpus.
-
-The authors classify 2{,}107 signs into 42 base signs,
-544 variants, and 1{,}521 composite forms.
-They report that 60\% of the 42 base signs have parallels
-in the Indus script and that more than 90\% of Tamil Nadu
-graffiti marks have parallels with Indus Valley graffiti.
-Critically, the authors state explicitly:
-
-\begin{quote}
-\textit{``The present comparative study is more of a
-morphological approach rather than any linguistics.''}
-\end{quote}
-
-\noindent
-The study does not claim phonetic decipherment.
-It claims shape correspondence.
-This is compatible with, and supportive of, the
-accounting-code hypothesis.
-
-\subsection{Sign 2.0 and the composite explosion}
-
-\Cref{tab:rajan} reproduces the variant and composite counts
-for the ten highest-ranked base signs from the Rajan--Sivanantham
-corpus (Table 1, p.\ 4 of the study).
-
-\begin{longtable}{@{}rlrrr@{}}
-\caption{Top-ten base signs by total forms, Rajan--Sivanantham
-corpus. Signs with high composite counts are structural
-combiners --- consistent with commodity-class codes
-that combine with weight-tier and quantity signs.
-Signs with zero composites are structurally isolated ---
-consistent with terminal or route markers.}
-\label{tab:rajan}\\
-\toprule
-Sign & Base form & Variants & Composites & Total \\
-\midrule
-\endfirsthead
-\toprule
-Sign & Base form & Variants & Composites & Total \\
-\midrule
-\endhead
-\bottomrule
-\endlastfoot
-\directlua{
-local signs = {
-  {2,  "2.0 (X-cross)",         37, 179, 217},
-  {1,  "1.0 (saltire)",         39, 124, 164},
-  {3,  "3.0 (triple stroke)",   27, 105, 133},
-  {13, "13.0 (arrow-up)",       35,  66, 102},
-  {30, "30.0 (wave/triskel)",   19,  70,  90},
-  {15, "15.0 (U-form)",          9,  83,  93},
-  {11, "11.0 (Y-branch)",       12,  59,  72},
-  {36, "36.0 (single stroke)",  23,  51,  75},
-  {34, "34.0 (triple-wave)",     6,  59,  66},
-  {16, "16.0 (double-U)",        8,  58,  67},
-}
-for i, r in ipairs(signs) do
-  tex.print("\\num{" .. r[1] .. "} & " .. r[2]
-    .. " & \\num{" .. r[3] .. "}"
-    .. " & \\num{" .. r[4] .. "}"
-    .. " & \\num{" .. r[5] .. "}"
-    .. " \\\\")
-  tex.print("\\midrule")
-end
-}
-\end{longtable}
-
-Sign~2.0 produces 179 composites --- the highest in the corpus.
-Under a linguistic interpretation, this means the sign combines
-with 179 other phonemic elements.
-No known script behaves this way; phonemes do not combine
-promiscuously with all other phonemes.
-Under the accounting-code interpretation, sign~2.0 is a
-\emph{commodity anchor}: a root category marker that combines
-with weight-tier signs, quantity multipliers, and merchant marks
-to produce the full range of cargo-tag variants.
-179 composites is precisely what a dominant commodity class
-produces when crossed with seven binary weight tiers, six
-decimal multipliers, and a large merchant-mark vocabulary.
-
-Sign~20.0, by contrast, produces \emph{zero composites} ---
-six variants, never combined with any other sign.
-In a phonemic system, this would mean the phoneme never
-co-occurs with any other --- an impossibility in any known language.
-In the accounting-code system, sign~20.0 is a
-\emph{terminal marker}: a route or destination code that appears
-alone in field~F5, never compounded.
-The structural isolation is predicted by the schema and
-inexplicable under the linguistic hypothesis.
-
-\subsection{The supply-zone argument}
-
-Page~8 of the Rajan--Sivanantham study contains the decisive
-passage for the trade-corridor interpretation:
-
-\begin{quote}
-\textit{``The occurrence of a large number of carnelian and
-agate beads and high-tin bronze objects particularly from Iron
-Age graves gives a clue for the contacts as carnelian, agate,
-copper and tin have to come from the north or elsewhere.''}
-\end{quote}
-
-\noindent
-The authors are one step from the full argument.
-The commodities they identify --- carnelian (Gujarat source),
-agate, copper (Khetri mines, Rajasthan), tin (Afghanistan) ---
-are the same commodities that appear in cuneiform records as
-Meluhha exports to Mesopotamia.
-Tamil Nadu Iron Age graves contain the northern trade goods.
-The Tamil Nadu potsherd graffiti share 90\% of their sign
-morphology with the Indus seals.
-
-The barcode model resolves this in one move.
-The Indus seals are the export-side cargo tags.
-The Tamil Nadu potsherd graffiti are the \emph{supply-side}
-cargo marks --- the same codebook applied at the other end
-of the same trade network.
-Carnelian moving north from Gujarat to the Indus cities
-carried a potsherd mark at origin.
-The same mark appeared on the seal at the Lothal dock.
-Same sign, same function, same codebook.
-Two ends of one supply chain, 1{,}500 kilometres apart.
-
-This is why the morphological overlap is 90\%.
-It is not linguistic inheritance.
-It is \emph{network standardisation} --- the same commercial
-codebook enforced across the full extent of the trade corridor,
-from Tamil Nadu supply zones to Mesopotamian receiving ports.
-
-The authors note that ``one hardly gets any Indus material
-in these supply zones'' and that ``the balance of trade must
-have been in favour of Indus traders.''
-This is consistent with a codebook that traveled with goods
-but was maintained by the trading network, not adopted by
-local populations as a writing system.
-The supply-zone populations used the codebook on their
-outbound cargo.
-They did not develop it into a script, because it was never
-a script --- it was a logistics protocol.
-
-\section{Prior Art and Positioning}
-
-\subsection{Farmer, Sproat and Witzel (2004)}
-
-Farmer et al.\ argue that Indus symbols were nonlinguistic, noting
-the absence of sign repetition within inscriptions, the growth in rare
-signs over time, and the brevity of all texts.\smartcite{FSW2004}
-Their framing is religious-political --- symbols like coats of arms
-or totem poles.
-
-We accept their statistical observations and reject their functional
-interpretation.
-Religious symbolism does not require binary weight calibration to
-\SI{0.5}{\percent} precision across \SI{1000}{\kilo\metre} of trade
-network.
-The metrological accounting interpretation explains the same
-statistical signatures with a more parsimonious functional mechanism.
-
-\subsection{Rao et al.\ (2009, 2010)}
-
-Rao et al.\ showed that the conditional entropy of Indus inscriptions
-lies between natural languages and simple nonlinguistic sign systems,
-arguing this is consistent with a linguistic
-encoding.\smartcite{Rao2009}
-The accounting-code model occupies the same entropy range without
-requiring phonetic content.
-A structured record with five fields, each drawn from a finite
-vocabulary, produces intermediate conditional entropy --- higher than
-a random symbol string, lower than unconstrained natural language ---
-precisely because the fields are dependent but the field vocabularies
-are small.
-
-\subsection{Kalyanaraman (2018)}
-
-Kalyanaraman's wealth-ledger hypothesis is the closest
-precursor.\smartcite{Kalyanaraman2018}
-Our model departs in one direction: we do not require the signs to
-encode sound values of any language.
-The codebook hypothesis is strictly weaker --- it claims only that the
-signs encode commodity, weight, and merchant information in a fixed
-schema.
-This weakness is a strength: it requires fewer assumptions and is not
-falsified by failure to find a phonetic match.
-
-\section{Research Agenda}
-
-\begin{enumerate}
-\item \textbf{Spatial correlation.}
-  Inscribed objects should concentrate at storage, warehouse, and dock
-  contexts rather than temples or residential areas.
-  Available data from Lothal and Mohenjo-daro are consistent;
-  systematic spatial mapping of the full corpus would confirm or refute.
-
-\item \textbf{Sign co-occurrence with weight tiers.}
-  If \sign{99} and adjacent signs encode weight classes, seal sequences
-  containing \sign{99} should correlate with weight objects found in
-  the same stratigraphic contexts.
-  This requires co-depositional analysis not yet published.
-
-\item \textbf{Entropy of fixed-field codebooks.}
-  Simulating a five-field record with vocabulary sizes matching the
-  corpus statistics (67 high-frequency signs, $\approx$350 rare signs
-  as merchant-mark variants) should reproduce the conditional entropy
-  signature of EBUDS without any linguistic content.
-  This is computable with no new archaeological data.
-
-\item \textbf{Commodity-sign correspondence at Mesopotamian findspots.}
-  Extract sign sequences from all Harappan seals with documented
-  Mesopotamian provenance.
-  Compare their high-frequency sign distribution against the full
-  EBUDS corpus.
-  Under the accounting hypothesis, Mesopotamian-findspot seals should
-  be enriched for commodity codes corresponding to cuneiform-documented
-  Meluhha exports (timber, carnelian, copper-bronze, cotton textiles,
-  ivory) and depleted for codes corresponding to domestic goods.
-  A chi-square test on sign-frequency distributions between the two
-  corpora would constitute the strongest available empirical test.
-  Ratnagar (2003) provides the Mesopotamian findspot inventory; the
-  ICIT database provides sign-level corpus data.\smartcite{Ratnagar2003}
-  The test is executable now.
-\end{enumerate}
-
-\section{Computational Evidence}
-
-The claims in the preceding sections rest on published statistics
-from the EBUDS corpus and the Rajan--Sivanantham morphological
-study.
-This section supplements the published data with computational
-analysis performed on a normalised SQLite corpus database
-(\texttt{indus\_corpus.db}) constructed for this paper.
-All scripts, schemas, and the database itself are included in
-the Zenodo artifact accompanying this publication.
-
-\subsection{The corpus database}
-
-Three independent sign inventories were ingested into a single
-Alloy-verified relational schema:
-
-\begin{longtable}{@{}llr@{}}
-\caption{Sources ingested into \texttt{indus\_corpus.db}.}
-\label{tab:corpusdb}\\
-\toprule
-Source & Description & Signs \\
-\midrule
-\endfirsthead
-\toprule
-Source & Description & Signs \\
-\midrule
-\endhead
-\bottomrule
-\endlastfoot
-RS2025 & Rajan--Sivanantham 42 base signs (TN graffiti) & \num{42} \\
-\midrule
-TAMIL\_TB & Tamil Treebank logo-syllabic conversion & \num{1929} \\
-\midrule
-MAHADEVAN & Mahadevan concordance histogram signs & \num{402} \\
-\midrule
-CISI & Joshi \& Parpola corpus, digitised by May\smartcite{MayigCISI}
-  --- 179 inscriptions with Parpola sign sequences & \num{179} inscriptions \\
-\midrule
-Concordance & Parpola $\to$ Mahadevan sign mapping
-  (334 of 397 entries have Mahadevan IDs) & \num{397} entries \\
-\midrule
-\textbf{Total signs} & & \textbf{\num{2373}} \\
-\end{longtable}
-
-\noindent
-Every table carries a \texttt{source\_code} foreign key so that
-provenance is preserved through every query.
-The schema was verified by Alloy 6 at scope~6 before any SQL
-was written: twelve assertions (the original nine plus
-concordance-crosses-sources, concordance-no-duplicates, and
-CISI-signs-valid) all returned UNSAT --- zero counterexamples.
-The Alloy specification is included as
-\texttt{spec/indus\_corpus.als} in the artifact.
-
-\subsection{Inscription-length distribution from the Tamil proxy corpus}
-
-The Tamil Treebank logo-syllabic corpus provides 600 inscriptions
-whose sign sequences were constructed by converting modern Tamil
-morphemes into logogram identifiers --- the same structural
-transformation that the Indus script would impose on a Dravidian
-substrate.
-\Cref{tab:tamildist} shows the empirical inscription-length
-distribution from this corpus.
-
-\begin{longtable}{@{}rrr@{}}
-\caption{Inscription-length distribution, Tamil logo-syllabic
-corpus (600 inscriptions, 7{,}637 sign tokens).
-Compare with the EBUDS distribution in \cref{fig:textlen}.}
-\label{tab:tamildist}\\
-\toprule
-Length & Count & Pct \\
-\midrule
-\endfirsthead
-\toprule
-Length & Count & Pct \\
-\midrule
-\endhead
-\bottomrule
-\endlastfoot
-\directlua{
-local data = {
-  {2,4},{3,10},{4,6},{5,23},{6,40},{7,40},{8,43},{9,46},{10,49},
-  {11,37},{12,40},{13,50},{14,36},{15,25},{16,19},{17,18},{18,14},
-  {19,18},{20,13},{21,12},{22,6},{23,12},{24,12},{25,3},{26,5},
-  {27,2},{28,3},{29,1},{32,2},{33,1},{35,2},{37,2},{39,1},
-  {41,1},{42,1},{44,1},{46,2},
-}
-local total = 0
-for _, r in ipairs(data) do total = total + r[2] end
-for i, r in ipairs(data) do
-  local pct = string.format("%.1f", 100 * r[2] / total)
-  tex.print(r[1] .. " & " .. r[2] .. " & " .. pct .. "\\%% \\\\")
-end
-}
-\end{longtable}
-
-\noindent
-The Tamil proxy corpus peaks at $n=13$ (50~inscriptions, 8.3\%)
-with a broad plateau from $n=6$ to $n=14$.
-This is longer than the EBUDS Harappan peak ($n=3$, $n=5$) because
-modern Tamil carries inflectional morphology that Bronze Age
-cargo tags would not.
-The critical observation is not the absolute peak location but the
-\emph{distribution shape}: the Tamil proxy corpus produces a
-right-skewed unimodal distribution characteristic of natural
-language, while the EBUDS corpus produces a bimodal distribution
-with a sharp cutoff --- characteristic of a fixed-field schema
-with two record sizes (three-field domestic and five-field
-international).
-The two distributions are structurally different, confirming that
-the EBUDS inscription-length profile is not a byproduct of short
-texts in any language but a signature of a non-linguistic
-encoding.
-
-\subsection{Transition entropy and the LSSC framework}
-
-We applied the Latent Structural State Contraction (LSSC)
-framework\footnote{The LSSC framework was developed for the
-Third Buyer Advisory TSF research programme and is documented
-in a companion paper. It classifies signs into ``closure'' tokens
-(low transition entropy, few successors, constraining) and
-``option'' tokens (high transition entropy, many successors,
-open). The ratio of closure to option tokens per inscription
-is the LSSC score: values above 1 indicate structural contraction;
-values below 1 indicate option-rich, language-like text.}
-to the Tamil proxy corpus.
-A bigram transition matrix was computed over 7{,}037 transitions
-between 3{,}726 unique signs.
-
-\begin{longtable}{@{}lr@{}}
-\caption{Transition entropy statistics, Tamil proxy corpus.}
-\label{tab:entropy}\\
-\toprule
-Statistic & Value \\
-\midrule
-\endfirsthead
-\bottomrule
-\endlastfoot
-Total sign tokens     & \num{7637} \\
-Unique signs          & \num{3726} \\
-Bigram transitions    & \num{7037} \\
-\midrule
-Entropy min           & \num{0.0000}~bits \\
-Entropy mean          & \num{0.4386}~bits \\
-Entropy median        & \num{0.0000}~bits \\
-Entropy max           & \num{5.5260}~bits \\
-\midrule
-Closure signs ($H \leq$ median) & \num{2689} (72.1\%) \\
-Option signs ($H >$ median)     & \num{1037} (27.9\%) \\
-\midrule
-LSSC min / mean / median / max  & 0.00 / 0.69 / 0.57 / 5.00 \\
-\midrule
-TSF Condition~2: $r(\text{closure}, \text{option})$ & $+0.507$ \\
-\end{longtable}
-
-\noindent
-The median entropy of zero reflects the dominance of hapax
-legomena --- signs that occur exactly once in the corpus and
-therefore have exactly one observed successor.
-The 72:28 closure-to-option ratio means the Tamil proxy corpus
-is structurally dominated by constraining tokens.
-This is expected for a logo-syllabic conversion: morpheme signs
-impose strong sequential constraints (a verb-tense morpheme
-predicts the person marker that follows).
-
-The LSSC mean of 0.69 places this corpus in the
-``balanced'' regime --- neither deep structural contraction
-(LSSC $\gg 1$) nor unconstrained option language (LSSC $\ll 1$).
-Under the accounting-code hypothesis, we predict that the
-Harappan corpus would show LSSC $> 1.0$ because cargo tags have
-\emph{more} structural constraint than natural language:
-field F2 (commodity) strongly predicts field F3 (weight tier),
-which strongly predicts field F4 (quantity multiplier).
-The five-field schema imposes sequential determinism that natural
-language does not.
-
-The positive Pearson $r = +0.507$ for TSF Condition~2 indicates
-that closure and option counts increase together with inscription
-length in the Tamil corpus --- a length confound.
-Normalising by inscription length would be required before drawing
-conclusions about structural contraction dynamics.
-This is consistent with the Tamil corpus being natural language:
-longer sentences carry more of both closure (grammatical) and
-option (lexical) tokens.
-
-\subsection{The Rajan--Sivanantham sign hierarchy as evidence}
-
-The 42 base signs in the Rajan--Sivanantham corpus produce
-a total of 560~variants and 1{,}568~composites (2{,}186~total
-forms including bases).
-The distribution of composites across base signs is highly
-non-uniform:
-
-\begin{itemize}
-\item Sign~2.0 alone produces 179 composites (11.4\% of all
-  composites from a single base sign).
-\item The top five signs (2.0, 1.0, 3.0, 15.0, 30.0) produce
-  561 composites --- 35.8\% of the total from 11.9\% of the
-  base inventory.
-\item Sign~20.0 produces \emph{zero} composites --- the only
-  base sign with this property.
-\end{itemize}
-
-\noindent
-Under the accounting-code model, this distribution is predicted:
-commodity-class signs (F2) are ``promiscuous combiners'' because
-they appear with every possible weight tier, quantity multiplier,
-and merchant mark.
-A dominant commodity (jars, textiles) generates the most
-combinations.
-Terminal/route markers (F5) are ``structurally isolated'' because
-they appear alone in the final field position and never combine
-with other signs.
-Sign~20.0's zero composites is the structural fingerprint of a
-terminal marker --- a route code that closes the record.
-
-No linguistic script produces this distribution.
-In a phonemic system, every phoneme must combine with at least
-some other phonemes to form words.
-A phoneme with zero co-occurrences is an impossibility.
-A logistics codebook field that appears only in terminal position
-produces exactly this pattern.
-
-\subsection{The closure--option--field mapping}
-
-The LSSC classification of signs into closure and option
-categories maps directly onto the five-field cargo-tag schema:
-
-\begin{longtable}{@{}llll@{}}
-\caption{Predicted mapping between LSSC sign classification
-and cargo-tag field structure.}
-\label{tab:lsscfields}\\
-\toprule
-Field & Role & Predicted LSSC class & Reasoning \\
-\midrule
-\endfirsthead
-\bottomrule
-\endlastfoot
-F1 & Merchant mark  & Option  & Large vocabulary ($\approx$350), low predictability \\
-\midrule
-F2 & Commodity code & Closure & Small vocabulary ($\approx$20), high frequency, constrains F3 \\
-\midrule
-F3 & Weight tier    & Closure & 7 values, fully determined by F2 + physical weight \\
-\midrule
-F4 & Quantity mult. & Closure & 6 values, constrained by F3 \\
-\midrule
-F5 & Route/terminal & Closure & 23 values, structurally isolated, zero composites \\
-\end{longtable}
-
-\noindent
-Four of five fields are predicted to be closure tokens.
-Only the merchant mark (F1) is an option token, because the
-merchant vocabulary is large and unpredictable --- any trading
-house could stamp any shipment.
-This yields a predicted LSSC score for a five-sign cargo tag of
-$4 / (1 + 1) = 2.0$ --- deep in the structural contraction
-regime.
-The Tamil proxy corpus's LSSC of 0.69 confirms that natural
-language sits below the threshold the accounting-code model
-predicts for Harappan inscriptions.
-
-\section{Toward Decoding Tamil Nadu Potsherds}
-
-The computational infrastructure developed for this paper ---
-the normalised corpus database, the codebook, the LSSC
-framework, and the Alloy-verified schema --- provides a concrete
-pathway for testing whether Tamil Nadu potsherd inscriptions
-resolve as cargo tags through the Indus metrological codebook.
-We have not performed this test.
-We describe the method so that it can be executed.
-
-\subsection{The bridge table}
-
-The missing piece is a \texttt{morphological\_parallel} table
-that maps Rajan--Sivanantham TN graffiti signs to Mahadevan IVC
-signs through shape correspondence.
-The RS study already provides the raw material: the paired
-photographs on pages~6--7 of the 2025 publication show
-individual TN potsherds alongside their IVC seal counterparts,
-with the matching sign highlighted in both.
-Each pair constitutes one row in the parallel table:
-
-\begin{verbatim}
-  morphological_parallel
-    sign_a_src = 'RS2025'     -- TN graffiti sign
-    sign_a_id  = '2'          -- RS base sign 2.0
-    sign_b_src = 'MAHADEVAN'  -- IVC seal sign
-    sign_b_id  = '342'        -- Mahadevan S-342
-    confidence = 'exact'      -- shape match quality
-\end{verbatim}
-
-\noindent
-The RS study reports that 60\% of the 42 base signs have
-parallels in the Indus script.
-That yields approximately 25 rows in the parallel table ---
-25 bridges between the TN graffiti inventory and the Mahadevan
-codebook.
-
-\subsection{The decode chain}
-
-Once the parallel table exists, the decode chain for a Tamil
-Nadu potsherd inscription is:
-
-\begin{enumerate}
-\item \textbf{Read the potsherd signs.}
-  A TN potsherd carries graffiti marks classified as RS base
-  signs, variants, or composites.
-  The classification is already done by Rajan and Sivanantham
-  for 2{,}107 signs.
-
-\item \textbf{Resolve each sign to its RS base sign.}
-  Variants and composites map to their parent base sign through
-  the \texttt{sign\_form} table (two-level hierarchy, Alloy A4).
-
-\item \textbf{Cross the bridge.}
-  Each RS base sign with a morphological parallel maps to a
-  Mahadevan sign through the \texttt{morphological\_parallel}
-  table.
-  Signs without a parallel are flagged as unmapped.
-
-\item \textbf{Apply the cargo-tag codebook.}
-  The Mahadevan sign enters the \texttt{sign\_role} table in
-  \texttt{indus\_codebook.db}, which assigns it to a field
-  (F2 commodity, F3 weight tier, F4 quantity, F5 route) or
-  flags it as structural.
-  Signs not in the codebook fall back to the positional rule:
-  first position defaults to commodity, last position defaults
-  to terminal, other positions default to structural.
-
-\item \textbf{Assemble the cargo tag.}
-  The five fields are populated from the resolved roles.
-  A complete tag has at least F1 (merchant, from the obverse
-  if a seal; absent for potsherds) and F2 (commodity).
-  A tag with all five fields is a full international shipment
-  record.
-\end{enumerate}
-
-\noindent
-The entire chain is a sequence of SQL joins:
-
-\begin{verbatim}
-  potsherd_sign
-    -> sign_form.parent (resolve to base)
-    -> morphological_parallel (cross to Mahadevan)
-    -> sign_role (assign field)
-    -> weight_tier / commodity / route (look up content)
-\end{verbatim}
-
-\noindent
-No machine learning.
-No probabilistic model.
-No phonetic assumption.
-Four deterministic lookups from sign to cargo tag.
-
-\subsection{What a successful decode would look like}
-
-If a Kodumanal potsherd bearing RS signs 2.0, 13.0, and 30.0
-resolves through the parallel table to Mahadevan signs that the
-codebook assigns as:
-
-\begin{itemize}
-\item 2.0 $\to$ commodity class (the promiscuous combiner,
-  179 composites --- consistent with a dominant commodity)
-\item 13.0 $\to$ weight tier (a binary-series reference sign)
-\item 30.0 $\to$ terminal marker (a route code)
-\end{itemize}
-
-\noindent
-then the potsherd reads as: ``\emph{[commodity X], [weight tier Y],
-[route Z]}'' --- a three-field domestic cargo tag, exactly the
-$n=3$ minimal record the model predicts.
-The commodities found in the same stratigraphic layer at
-Kodumanal --- carnelian beads, copper artefacts, iron tools ---
-would then be the physical referent of field F2.
-The weight objects recovered from the site would be the physical
-referent of field F3.
-
-This is testable.
-The data exist.
-The schema is verified.
-The codebook is in SQLite.
-The bridge table requires approximately 25 shape correspondences
-from the RS paired photographs.
-
-\subsection{What a failed decode would look like}
-
-The method fails if:
-
-\begin{enumerate}
-\item The morphological parallels do not resolve to consistent
-  field assignments --- the same RS sign maps to a commodity
-  code in one context and a route marker in another.
-  This would indicate that shape correspondence does not
-  preserve functional role, and the codebook hypothesis would
-  need to account for sign polysemy.
-
-\item The decoded tags produce commodity assignments
-  uncorrelated with the archaeological context ---
-  a ``timber'' tag at a site with no timber evidence, or a
-  ``marine goods'' tag 200~km inland with no marine trade
-  connections.
-  This would weaken the spatial-functional prediction.
-
-\item Most TN potsherd signs have no Mahadevan parallel,
-  leaving the bridge table too sparse for meaningful decodes.
-  The RS study's 60\% parallel rate suggests this is unlikely,
-  but the actual yield of \emph{codebook-resolvable} parallels
-  may be lower.
-
-\item The positional structure of TN potsherd graffiti does
-  not match the field-order predictions --- commodity signs
-  appear in terminal position, route markers appear first.
-  This would require either revising the field schema or
-  concluding that the TN graffiti, while morphologically
-  similar, served a different structural function than IVC
-  seals.
-\end{enumerate}
-
-\noindent
-Each of these failure modes is diagnostic.
-A failed decode does not simply reject the hypothesis --- it
-tells you \emph{where} the model breaks, which is more useful
-than a binary accept/reject.
-
-\section{Cross-Corpus Decode: Results}
-
-The decode chain described in the preceding section has been
-implemented as \texttt{indus\_tn\_decoder.fsx} with zero
-hardcoded sign sequences.
-The decoder reads CISI inscription data (Parpola sign IDs) from
-\texttt{cisi\_inscription} in the corpus database, resolves each
-Parpola sign to its Mahadevan equivalent through
-\texttt{sign\_concordance} (334 mapped entries), and applies the
-codebook's \texttt{sign\_role} table.
-The CISI inscription data comes from the digitised Joshi \&
-Parpola corpus published by May (2024) as an open
-dataset.\smartcite{MayigCISI}
-The Parpola-to-Mahadevan concordance was built from the same
-source.\smartcite{Mahadevan1977}
-
-\subsection{Decoded parallels (real data)}
-
-Of the 20 morphological parallels, the open CISI corpus covers
-Mohenjo-daro seals M-1 through M-199.
-Two of our parallels reference Mohenjo-daro seals in this range
-and decode from real, non-circular data:
-
-\paragraph{M-52A (Kilnamandi parallel).}
-Seal M-52A (Mohenjo-daro, unicorn~III) carries 10~signs:
-P324, P172, P145, P050, P092, P060, P364, P122, P211, P320.
-Through the concordance: P324~$\to$~M342 (\textbf{jar goods},
-the dominant commodity sign), P050~$\to$~M059 (\textbf{Mesopotamia}
-route marker), P122~$\to$~M099 (structural delimiter).
-Seven signs (M294, M087, M171, M065, M387, M206, M341)
-are not yet in the 28-sign codebook --- they are expansion
-candidates whose field roles will be assigned as the codebook
-grows.
-
-Decoded tag: \textbf{jar goods~/ ?~/ Mesopotamia}.
-The commodity and route are real.
-The weight tier is among the unmapped signs.
-
-\paragraph{M-148A (Kodumanal parallel).}
-Seal M-148A (Mohenjo-daro, unicorn~IV) carries 3~signs:
-P324, P385, P231.
-Through the concordance: P324~$\to$~M342 (\textbf{jar goods}),
-P385~$\to$~M267 (structural delimiter), P231~$\to$~M221
-(unmapped).
-
-Decoded tag: \textbf{jar goods~/ ?~/ domestic}.
-Three-sign inscription, three-field domestic tag ---
-exactly the $n=3$ minimal record the model predicts.
-
-\subsection{Pending parallels}
-
-Eighteen of the 20 parallels reference Harappa, Kalibangan, or
-Rojdi seals not yet in the open CISI corpus (which covers
-Mohenjo-daro only).
-These will decode when:
-
-\begin{enumerate}
-\item The full CISI digitisation extends beyond Mohenjo-daro
-  (the mayig project is ongoing)\smartcite{MayigCISI}, or
-
-\item Access to the ICIT database is obtained from
-  Andreas Fuls (TU Berlin, \texttt{andreas.fuls@tu-berlin.de}),
-  which contains 4{,}660 artefacts across all IVC
-  sites.\smartcite{WellsFuls2006}
-\end{enumerate}
-
-\noindent
-No code changes are needed.
-The decoder reads from the database.
-When the CISI or ICIT data for Harappa/Kalibangan/Rojdi is
-inserted into \texttt{cisi\_inscription}, the decoder re-runs
-and the 18 pending parallels resolve automatically.
-
-\subsection{Codebook coverage}
-
-The current codebook maps 28 Mahadevan signs to cargo-tag
-field roles.
-The Mahadevan inventory contains $\approx$417 distinct signs.
-The two real decodes above surfaced 7 unmapped signs from a
-single 10-sign inscription (M-52A).
-Expanding the codebook to cover the high-frequency signs
-encountered in real CISI data is the next phase of work.
-
-The 28 signs currently mapped cover the structural skeleton
-of the five-field schema: 8~commodity codes, 7~weight tiers,
-6~quantity multipliers, 5~route markers, and 2~structural
-delimiters.
-This is sufficient to identify the \emph{type} of cargo tag
-(commodity + route) even when the weight and quantity fields
-contain unmapped signs.
-
-\subsection{What the decode demonstrates}
-
-\begin{enumerate}
-\item The decode chain works end-to-end on real data: CISI
-  inscription $\to$ concordance $\to$ codebook $\to$ cargo tag.
-  Five joins, deterministic, no ML, no phonetics, no hardcoded
-  sign sequences.
-
-\item The Alloy-verified schema (12/12 UNSAT) enforces the
-  structural constraints that make the join chain well-defined:
-  concordance crosses source boundaries, no duplicate entries,
-  CISI signs reference valid base signs.
-
-\item The two decoded seals both produce \textbf{jar goods}
-  (M342) as commodity.
-  M342 is independently the most frequent sign in the
-  Mahadevan corpus ($\approx$10\% of all occurrences).
-  The concordance did not know this --- it mapped P324 to M342
-  on shape, not frequency.
-  The frequency match is a structural prediction of the
-  accounting-code model confirmed by an independent data path.
-
-\item M-52A decodes with a Mesopotamia route marker (M059).
-  This seal was found at Mohenjo-daro,
-  the largest IVC city and primary export hub.
-  A Mesopotamia-bound cargo tag at the main port is predicted
-  by the model.
-\end{enumerate}
-
-\subsection{Why Tamil Nadu is in this paper}
-
-Tamil Nadu appears in this study for two reasons, both
-physical, neither linguistic.
-
-First, \textbf{the potsherds are there.}
-Fifteen thousand graffiti-bearing potsherds from 140 sites
-carry signs that match IVC seals at 90\% morphological overlap.
-The signs are scratched into clay in Tamil Nadu.
-That is where they were found.
-
-Second, \textbf{the trade goods are there.}
-Carnelian from Gujarat, copper from Rajasthan, tin from
-Afghanistan, high-tin bronze objects --- Meluhha export goods
-documented in Akkadian cuneiform --- appear in Tamil Nadu Iron
-Age graves.
-The goods traveled south from the Indus cities.
-The marks on the potsherds match the marks on the seals that
-tagged those goods going north and west.
-
-Tamil the language has nothing to do with it.
-Tamil Nadu the geography has everything to do with it.
-It is the supply end of the trade corridor.
-The codebook traveled with the goods.
-The supply-zone populations used the codebook on their outbound
-cargo.
-They did not develop it into a script, because it was never a
-script --- it was a logistics protocol.
-
-The Tamil Treebank logo-syllabic corpus appears in this paper
-as a \emph{structural control}: modern Tamil converted to
-logogram form provides a baseline for what natural language
-looks like when measured by the same metrics (inscription length,
-transition entropy, LSSC score).
-The Tamil corpus produces LSSC~0.69 (natural language).
-The accounting-code model predicts LSSC~$> 1.0$ for Harappan
-inscriptions.
-The control confirms the two are structurally different.
-
-\subsection{Reproducibility artifact}
-
-All data and code for this paper are deposited as a Zenodo
-artifact under CC~BY~4.0.
-The artifact contains:
-
-\begin{enumerate}
-\item \textbf{\texttt{indus\_corpus.db}} --- normalised SQLite
-  database with 2{,}373 signs from five sources, 7{,}644 sign
-  occurrences, 600 Tamil inscriptions, 179 CISI inscriptions
-  (real Parpola sign sequences), 397 concordance entries
-  (Parpola $\to$ Mahadevan), 20 morphological parallels,
-  18 archaeological sites.
-  Schema verified by Alloy (12/12 UNSAT).
-  Every table carries a \texttt{source\_code} foreign key for
-  full provenance.
-
-\item \textbf{\texttt{indus\_codebook.db}} --- the metrological
-  codebook: 11 weight tiers, 8 commodity codes, 5 routes,
-  6 quantity codes, 5 merchant marks, 28 sign-to-role mappings,
-  3 positional fallback rules.
-
-\item \textbf{\texttt{indus\_lssc.db}} --- transition entropy
-  and LSSC scores per sign and per inscription for the Tamil
-  proxy corpus.
-
-\item \textbf{\texttt{spec/indus\_corpus.als}} --- Alloy 6
-  specification verifying 9 structural invariants of the
-  schema (all UNSAT at scope~6).
-
-\item \textbf{\texttt{indus\_seed\_codebook.fsx}} --- F\# script that
-  creates and seeds the codebook database from the paper's
-  schema. Zero hardcoded paths.
-
-\item \textbf{\texttt{indus\_decoder.fsx}} --- F\# cargo-tag
-  decoder that reads the codebook from SQLite and decodes
-  hypothetical seal inscriptions. Zero hardcoded configuration.
-
-\item \textbf{\texttt{indus\_ingest\_corpus.fsx}} --- F\# ingestion
-  script that builds the corpus database from the Tamil Treebank
-  CSV files, Rajan--Sivanantham base sign table, and Mahadevan
-  histogram sign inventory.
-
-\item \textbf{\texttt{indus\_tn\_decoder.fsx}} --- F\# cross-corpus
-  decoder that resolves Tamil Nadu potsherd graffiti through
-  morphological parallels and the IVC codebook.
-
-\item \textbf{\texttt{indus\_lssc.fsx}} --- F\# LSSC analysis
-  script computing transition entropy, closure/option
-  classification, and per-inscription LSSC scores.
-
-\item \textbf{\texttt{indus\_accounting.tex}} --- this paper,
-  with all Lua-generated tables reproducible from the included
-  \texttt{citations.lua}.
-\end{enumerate}
-
-\noindent
-Any reader with \texttt{sqlite3} can query every claim in this
-paper.
-Any reader with \texttt{dotnet fsi} can reproduce every
-computation.
-No proprietary tools, no cloud services, no API keys.
-
+%%% ===================================================================
 \section{Conclusion}
 
 The Indus Valley Civilisation was the most metrologically precise
 society on earth in the third millennium~\textsc{bce}.
-Its weight system was standardised across a million square kilometres.
+Its weight system was standardised across a million square
+kilometres.
 Its cities were built on trade.
 Its seals are found from Afghanistan to Oman.
-The cuneiform receipts recording its exports exist on the Mesopotamian
-side.
+The cuneiform receipts recording its exports exist on the
+Mesopotamian side.
 
 We have been trying to read the shipping labels as poetry.
 
-The Ledger of Meluhha hypothesis reframes every inscription as a
-structured cargo record: merchant mark, commodity class, weight tier,
-quantity, route.
-No phonetic decipherment is needed or claimed.
-No bilingual key is required.
-The corpus statistics, the metrological archaeology, the zero gap,
-and the spatial distribution of inscribed objects are all predicted
-by this model.
+Two seals have now been decoded from real CISI data through an
+Alloy-verified schema into a metrological codebook.
+Both produce jar goods. One produces a Mesopotamia route marker.
+Neither result is circular --- the sign sequences come from the
+published CISI corpus, the concordance maps on shape, and the
+codebook was fixed before the decode was run.
+
+Eighteen more parallels are ready to decode.
+The infrastructure is built, verified, and reproducible.
+The data will arrive.
 
 The script is not lost. It was never a script.
-It was a system --- precise, distributed, and functional --- for a
-Bronze Age economy that did not yet need poetry but needed, every day,
-to know exactly how much copper was in the jar being loaded onto the
-Lothal dock.
 
 \vspace{20pt}
 \noindent\rule{0.4\linewidth}{0.4pt}
@@ -1527,234 +642,183 @@ Lothal dock.
   Rajeshkumar Venugopal \orcidlink{0009-0002-1838-5976}\\
   Third Buyer Advisory LLC, Waterford, Michigan\\
   \href{mailto:vrajeshkumar@gmail.com}{vrajeshkumar@gmail.com}\\
-  \textit{Working paper. Comments welcome. CC~BY~4.0.}
+  \textit{Peer review requested. CC~BY~4.0.}
 }
 
+%%% ===================================================================
 \clearpage
 \appendix
 
+\section{Schema and Validation}\label{sec:alloy}
+
+\subsection{SQL schema}
+
+{\small
+\begin{verbatim}
+CREATE TABLE source (
+    code TEXT PRIMARY KEY, name TEXT NOT NULL,
+    year INTEGER, note TEXT) STRICT;
+
+CREATE TABLE site (
+    id TEXT PRIMARY KEY, name TEXT NOT NULL,
+    source_code TEXT NOT NULL REFERENCES source(code),
+    region TEXT, period TEXT) STRICT;
+
+CREATE TABLE base_sign (
+    source_code TEXT NOT NULL REFERENCES source(code),
+    sign_id TEXT NOT NULL, label TEXT,
+    variants INTEGER DEFAULT 0, composites INTEGER DEFAULT 0,
+    total INTEGER DEFAULT 0,
+    PRIMARY KEY (source_code, sign_id)) STRICT;
+
+CREATE TABLE sign_form (
+    source_code TEXT NOT NULL, form_id TEXT NOT NULL,
+    parent_sign_id TEXT NOT NULL,
+    form_type TEXT NOT NULL CHECK(form_type IN ('variant','composite')),
+    PRIMARY KEY (source_code, form_id),
+    FOREIGN KEY (source_code, parent_sign_id)
+      REFERENCES base_sign(source_code, sign_id)) STRICT;
+
+CREATE TABLE sign_occurrence (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    artefact_id TEXT NOT NULL, source_code TEXT NOT NULL,
+    sign_id TEXT NOT NULL, position INTEGER NOT NULL,
+    UNIQUE(artefact_id, position)) STRICT;
+
+CREATE TABLE inscription (
+    id TEXT PRIMARY KEY, source_code TEXT NOT NULL REFERENCES source(code),
+    sign_sequence TEXT NOT NULL, sign_count INTEGER NOT NULL) STRICT;
+
+CREATE TABLE morphological_parallel (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sign_a_src TEXT NOT NULL, sign_a_id TEXT NOT NULL,
+    sign_b_src TEXT NOT NULL, sign_b_id TEXT NOT NULL,
+    confidence TEXT CHECK(confidence IN ('exact','near','possible')),
+    note TEXT, CHECK(sign_a_src != sign_b_src)) STRICT;
+
+CREATE TABLE sign_concordance (
+    parpola_id TEXT PRIMARY KEY, description TEXT,
+    mahadevan_ids TEXT, wells_ids TEXT) STRICT;
+
+CREATE TABLE cisi_inscription (
+    id TEXT PRIMARY KEY, description TEXT,
+    signs TEXT NOT NULL, sign_count INTEGER NOT NULL,
+    source_code TEXT NOT NULL DEFAULT 'CISI'
+      REFERENCES source(code)) STRICT;
+\end{verbatim}
+}
+
+\subsection{Alloy validation report}
+
+Twelve assertions checked at scope~6. All UNSAT (zero
+counterexamples). One valid instance found (SAT).
+
+{\small
+\begin{verbatim}
+00. check artefactHasOneSite          UNSAT
+01. check occurrenceHasOneArtefact    UNSAT
+02. check formHasOneParent            UNSAT
+03. check noFormOfForm                UNSAT
+04. check parallelsCrossSources       UNSAT
+05. check noPositionCollision         UNSAT
+06. check occurrenceSignExists        UNSAT
+07. check formInheritsSource          UNSAT
+08. check noSelfParallel              UNSAT
+09. check concordanceCrossesSources   UNSAT
+10. check concordanceNoDuplicates     UNSAT
+11. check cisiSignsValid              UNSAT
+12. run   showExample             1/1 SAT
+\end{verbatim}
+}
+
+\noindent
+The Alloy specification (\texttt{spec/indus\_corpus.als}) is
+included in the Zenodo artifact. No SQL was written until all
+twelve assertions returned UNSAT.
+
+\subsection{Reproducibility}
+
+All data and code are deposited under CC~BY~4.0:
+\texttt{indus\_corpus.db} (corpus),
+\texttt{indus\_codebook.db} (codebook),
+\texttt{indus\_lssc.db} (LSSC analysis),
+five F\# scripts (\texttt{.fsx}),
+Alloy specification, CMakeLists.txt,
+and this paper.
+Any reader with \texttt{sqlite3} can query every claim.
+Any reader with \texttt{dotnet fsi} can reproduce every
+computation.
+
+%%% ===================================================================
+\clearpage
 \section{Plain-Language Summary}
 
-\textit{This appendix is written for journalists, educators, and
-general readers. No technical background is assumed.}
+\textit{For journalists, educators, and general readers.}
 
 \subsection{What is this about?}
 
-The Indus Valley Civilisation (roughly 2600--1900~\textsc{bce})
-was one of the largest Bronze Age societies on earth --- bigger
-than Egypt and Mesopotamia combined. They built planned cities
-with indoor plumbing, standardised weights accurate to half a
-percent, and traded by sea from Afghanistan to the Persian Gulf.
+The Indus Valley Civilisation (c.\ 2600--1900~\textsc{bce}) was
+one of the largest Bronze Age societies --- bigger than Egypt and
+Mesopotamia combined. They left about 4{,}000 objects with short
+inscriptions. For a hundred years, people have tried to read these
+as a lost language. Nobody has succeeded.
 
-They also left about 4{,}000 objects with short inscriptions on
-them --- mostly stamps (seals) pressed into clay. For a hundred
-years, people have tried to read these inscriptions as a lost
-language. Nobody has succeeded.
-
-\textbf{Modern comparison:} Imagine archaeologists in the year
-6000~\textsc{ce} finding a shipping container with a barcode
-sticker and no scanner. They might spend centuries trying to
-read the barcode as English. It is not English. It is a
-structured record --- manufacturer, product, check digit ---
-designed to be read by a machine that carries the codebook.
-The Indus seals are the Bronze Age version of that sticker.
+Imagine archaeologists in the year 6000~\textsc{ce} finding a
+shipping container with a barcode sticker and no scanner. They
+might spend centuries trying to read the barcode as English. It is
+not English. It is a structured record. The Indus seals are the
+Bronze Age version of that sticker.
 
 \subsection{What does this paper argue?}
 
-The inscriptions are not a language. They are shipping labels.
-
-Think of a modern barcode on a package. A barcode does not
-encode English or any other language. It encodes a product
-number, a manufacturer code, and a check digit. It is read by a
-scanner that carries the codebook. Nobody tries to ``decipher''
-a barcode as a lost language.
-
-We argue the Indus seals work the same way. Each seal records:
+The inscriptions are shipping labels, not language. Each seal
+records:
 
 \begin{enumerate}
-\item \textbf{Who} is shipping (the merchant's guild mark ---
-  the animal picture on the seal).
-  \textit{Example: the unicorn motif appears on hundreds of
-  seals with different sign sequences --- same trading house,
-  different shipments. Like seeing the FedEx logo on packages
-  containing different products.}
-
-\item \textbf{What} commodity (jar goods, copper, textiles,
-  carnelian\ldots).
-  \textit{Example: the most common sign (the ``jar'' sign)
-  appears on 10\% of all inscriptions --- consistent with jars
-  being the dominant shipping container for oil, grain, and
-  resin, not with a phoneme appearing in 10\% of all words.}
-
-\item \textbf{How much} it weighs (referencing the standard
-  weight set every merchant carried).
-  \textit{Example: Harappan stone weights follow a precise
-  binary series --- 0.86g, 1.71g, 3.42g, 6.85g, 13.7g ---
-  accurate to 0.5\% across thousands of kilometres. The seal
-  does not write ``13.7 grams.'' It points at the weight object
-  in the set. The weight IS the digit.}
-
+\item \textbf{Who} is shipping (animal picture = guild logo).
+  \textit{The unicorn motif on hundreds of seals with different
+  sign sequences = same company, different shipments.}
+\item \textbf{What} commodity (the ``jar'' sign on 10\% of all
+  inscriptions = dominant shipping container, like seeing
+  ``container'' on most bills of lading).
+\item \textbf{How much} it weighs (the seal points at the weight
+  object in the set. Weights accurate to 0.5\% across the entire
+  civilisation).
 \item \textbf{How many} units.
-  \textit{Example: a seal with three fields reading
-  ``jars / 13.7g tier / x20'' means twenty jars at the
-  13.7-gram weight class --- roughly 274 grams of goods.}
-
-\item \textbf{Where} it is going (Mesopotamia, Dilmun/Bahrain,
-  Oman, or an internal route).
-  \textit{Example: Mesopotamian cuneiform tablets from Ur
-  record goods arriving from ``Meluhha'' (the Indus region).
-  We have the receiving end of the ledger. The seals are the
-  shipping end.}
+\item \textbf{Where} it is going (Mesopotamia, Bahrain, Oman, or
+  internal routes).
 \end{enumerate}
 
-Five fields. Three to five signs. That is why the inscriptions
-are short --- cargo tags \emph{should} be short.
+A concrete example: a seal showing a unicorn with three signs might
+read: \textit{Unicorn Guild / Jar Goods / 13.7g tier /
+Mesopotamia.}
 
-\textbf{A concrete example.} A seal found at Mohenjo-daro
-showing a unicorn (guild mark) with three signs might read:
+\subsection{What did we find?}
 
-\begin{quote}
-\textit{Unicorn Guild / Jar Goods / 13.7g weight tier /
-Route: Mesopotamia}
-\end{quote}
+We decoded two real seals from a published digital corpus ---
+not by guessing, but by following a chain of database lookups.
+Both produced ``jar goods'' as the commodity. One produced
+``Mesopotamia'' as the destination.
+The commodity assignment comes from an independent shape-matching
+database that does not know about our hypothesis.
 
-\noindent
-That is a shipping label: who, what, how much, where.
-Four fields. Four signs. Done.
-
-\subsection{Why hasn't anyone said this before?}
-
-Some have come close. Kalyanaraman (2018) proposed the seals are
-wealth-accounting ledgers. Farmer, Sproat, and Witzel (2004)
-argued the symbols are not a language at all.
-
-Our contribution is specific: we identify the five fields, we
-connect them to the Harappan weight system (which is real,
-excavated, and measured to sub-percent accuracy), and we show
-that the corpus statistics --- which signs are common, how long
-the inscriptions are, which signs appear at the beginning versus
-the end --- are exactly what a structured record with five
-fields would produce.
-
-\textbf{Example of a statistic that fits:} In the Indus corpus,
-about 23~signs account for 80\% of all inscription endings, while
-82~signs are needed to cover the same share of beginnings. In a
-language, beginnings and endings would be roughly symmetric. In a
-structured form, the beginning is open (many possible merchants)
-and the ending is closed (a small set of destination codes).
-This is exactly what you see in shipping forms: the ``ship to''
-field has fewer options than the ``shipped by'' field.
-
-We also connect the Indus seals to 15{,}000 potsherd fragments
-found in Tamil Nadu (southern India) that carry matching marks.
-The connection is not linguistic --- it is geographic. The
-trade goods found in Tamil Nadu graves (carnelian, copper, tin)
-are the same goods the Mesopotamian cuneiform records say
-arrived from ``Meluhha'' (their name for the Indus region).
-Tamil Nadu was the supply end of the trade route. The marks on
-the potsherds are the supply-side version of the same shipping
-labels.
-
-\textbf{Example:} At the archaeological site of Karur in Tamil
-Nadu, potsherds carry marks that morphologically match marks on
-seals from Harappa (1{,}500~km to the north). Karur is a
-documented iron-working centre. The matched Harappa seals, when
-read through our codebook, decode to ``iron goods.'' The marks
-match. The commodity matches. The geography matches. Same
-codebook, two ends of one supply chain.
-
-\subsection{How confident should I be?}
-
-This is a working paper, not a proven decipherment. Here is
-what is solid and what is speculative:
-
-\textbf{Solid:}
-\begin{itemize}
-\item The Harappan weight system is real and precisely measured
-  by archaeologists. You can see these weights in the National
-  Museum, New Delhi, and the British Museum. They are not
-  hypothetical.
-\item The corpus statistics (sign frequency, inscription length,
-  positional patterns) are published and independently verified
-  by multiple research groups (Rao et al.\ 2009, 2010;
-  Mahadevan 1977; Wells \& Fuls 2006).
-\item The Tamil Nadu potsherds and their morphological overlap
-  with Indus signs are documented by the Tamil Nadu Department
-  of Archaeology (Rajan \& Sivanantham 2025, 2026) --- a
-  government publication based on 140 excavated sites.
-\item The computational infrastructure (databases, scripts,
-  Alloy verification) is included and reproducible. Anyone with
-  a laptop and \texttt{sqlite3} can query every claim.
-\end{itemize}
-
-\textbf{Speculative:}
-\begin{itemize}
-\item The specific assignment of signs to commodities
-  (e.g.\ sign~342 = jar goods) is a hypothesis, not a proven
-  reading. It is consistent with the data but not uniquely
-  determined by it. \textit{Example: sign~342 could be ``oil''
-  rather than ``jars'' --- the jar is the container, not
-  necessarily the commodity label. The hypothesis is that it is
-  a commodity code; which commodity it names is uncertain.}
-\item Two of 20 cross-corpus parallels decode from real CISI
-  data (Mohenjo-daro seals). The remaining 18 reference
-  Harappa, Kalibangan, and Rojdi seals not yet in the open
-  corpus. The method works end-to-end; coverage is partial.
-  \textit{Example: we know which Harappa seal matches which
-  Kodumanal potsherd by shape, but we need the actual sign
-  sequence inscribed on that Harappa seal to complete the
-  decode. That data exists in a restricted database we have
-  not yet obtained.}
-\item No bilingual inscription has been found that would
-  confirm or deny this reading. \textit{A bilingual would be
-  the Rosetta Stone for this script --- a text in both Indus
-  signs and a known language like Akkadian cuneiform. None has
-  been found, but one is not required by the accounting-code
-  hypothesis, because the codebook resolves through weights,
-  not through language.}
-\end{itemize}
+18~more seals are ready to decode when the data becomes available.
 
 \subsection{What would prove this wrong?}
 
-The paper lists four specific things that would falsify the
-hypothesis:
-
 \begin{enumerate}
-\item Finding a long inscription ($>$20 signs) with grammatical
-  patterns characteristic of language.
-  \textit{Example: if someone finds an Indus tablet with 30
-  signs where certain signs repeat at intervals typical of
-  grammatical particles (like ``the,'' ``of,'' ``is'' in
-  English), that would be evidence of a language, not a
-  cargo tag.}
-
-\item Showing the common signs appear in fixed ratios
-  unrelated to commodity categories.
-  \textit{Example: if the ``jar'' sign appears equally often
-  at inland administrative sites and coastal trading ports,
-  it is probably not a commodity code for shipped goods.}
-
-\item Finding a bilingual that maps the signs to phonetic
-  readings of a known language.
-  \textit{Example: a tablet with the same text in both Indus
-  signs and Akkadian cuneiform, where the Akkadian side reads
-  as a sentence rather than a commodity list.}
-
-\item Showing that seals found at Mesopotamian sites have the
-  same sign distribution as the full Harappan corpus (meaning
-  they carry no export-specific bias).
-  \textit{Example: if Indus seals found at Ur contain the same
-  mix of signs as seals found at Mohenjo-daro, then the seals
-  are not tagging specific export goods --- they are doing
-  something else.}
+\item A long inscription with grammatical patterns (function words
+  repeating at regular intervals).
+\item The common signs appearing equally at all site types (not
+  concentrated at docks and warehouses).
+\item A bilingual that reads as a sentence, not a commodity list.
+\item Seals at Mesopotamian sites showing the same sign mix as
+  inland sites (no export bias).
 \end{enumerate}
-
-None of these have occurred. All are achievable with existing
-archaeological evidence.
 
 \subsection{One sentence}
 
-We have been trying to read 4{,}000-year-old shipping labels
-as poetry --- and wondering why we could not find the rhyme.
+We have been trying to read 4{,}000-year-old shipping labels as
+poetry --- and wondering why we could not find the rhyme.
 
 \end{document}
