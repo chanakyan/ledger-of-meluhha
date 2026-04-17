@@ -406,37 +406,42 @@ printfn "  base_sign (TAMIL_TB): %d lemmas, %d morphemes, %d clitics, %d letters
 // --- Tamil logo-syllabic inscriptions ---
 let sentFile = Path.Combine(logoDir, "logo_syllabic_tamil_sentences.csv")
 let sentRows = parseCsv sentFile
-let mutable inscCount = 0
-for line in sentRows do
-    let fields = splitCsvLine line
-    if fields.Length >= 2 then
-        let iid = fields.[0]
-        let seq = fields.[1]
-        let signs =
-            seq.Split(' ', StringSplitOptions.RemoveEmptyEntries)
-            |> Array.filter (fun t ->
-                t.Length > 0 && t <> "(" && t <> ")" && t <> "," && t <> "." && t <> ":" && t <> ";")
-        use cmd = new SqliteCommand(
-            "INSERT OR IGNORE INTO inscription VALUES (@i,@s,@q,@c)", con, tx)
-        cmd.Parameters.AddWithValue("@i", sprintf "TAMIL_%s" iid) |> ignore
-        cmd.Parameters.AddWithValue("@s", "TAMIL_TB") |> ignore
-        cmd.Parameters.AddWithValue("@q", seq) |> ignore
-        cmd.Parameters.AddWithValue("@c", signs.Length) |> ignore
-        cmd.ExecuteNonQuery() |> ignore
 
-        // sign occurrences
-        for pos in 0 .. signs.Length - 1 do
-            use ocmd = new SqliteCommand(
-                "INSERT INTO sign_occurrence (artefact_id, source_code, sign_id, position) VALUES (@a,@s,@i,@p)",
-                con, tx)
-            ocmd.Parameters.AddWithValue("@a", sprintf "TAMIL_%s" iid) |> ignore
-            ocmd.Parameters.AddWithValue("@s", "TAMIL_TB") |> ignore
-            ocmd.Parameters.AddWithValue("@i", signs.[pos]) |> ignore
-            ocmd.Parameters.AddWithValue("@p", pos) |> ignore
-            ocmd.ExecuteNonQuery() |> ignore
+// Pure: parse into (id, sequence, signs) array
+let parsedInscriptions =
+    sentRows
+    |> Array.choose (fun line ->
+        let fields = splitCsvLine line
+        if fields.Length >= 2 then
+            let iid = fields.[0]
+            let seq = fields.[1]
+            let signs =
+                seq.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                |> Array.filter (fun t ->
+                    t.Length > 0 && t <> "(" && t <> ")" && t <> "," && t <> "." && t <> ":" && t <> ";")
+            Some (iid, seq, signs)
+        else None)
 
-        inscCount <- inscCount + 1
-printfn "  inscription (TAMIL_TB): %d" inscCount
+// Write at boundary
+parsedInscriptions |> Array.iter (fun (iid, seq, signs) ->
+    use cmd = new SqliteCommand(
+        "INSERT OR IGNORE INTO inscription VALUES (@i,@s,@q,@c)", con, tx)
+    cmd.Parameters.AddWithValue("@i", sprintf "TAMIL_%s" iid) |> ignore
+    cmd.Parameters.AddWithValue("@s", "TAMIL_TB") |> ignore
+    cmd.Parameters.AddWithValue("@q", seq) |> ignore
+    cmd.Parameters.AddWithValue("@c", signs.Length) |> ignore
+    cmd.ExecuteNonQuery() |> ignore
+
+    signs |> Array.iteri (fun pos signId ->
+        use ocmd = new SqliteCommand(
+            "INSERT INTO sign_occurrence (artefact_id, source_code, sign_id, position) VALUES (@a,@s,@i,@p)",
+            con, tx)
+        ocmd.Parameters.AddWithValue("@a", sprintf "TAMIL_%s" iid) |> ignore
+        ocmd.Parameters.AddWithValue("@s", "TAMIL_TB") |> ignore
+        ocmd.Parameters.AddWithValue("@i", signId) |> ignore
+        ocmd.Parameters.AddWithValue("@p", pos) |> ignore
+        ocmd.ExecuteNonQuery() |> ignore))
+printfn "  inscription (TAMIL_TB): %d" parsedInscriptions.Length
 
 // --- Mahadevan signs from histogram file names ---
 let histDir = Path.Combine(dataDir, "Statistical_Analysis/Histograms2")
@@ -466,41 +471,46 @@ if File.Exists ivDbPath then
     use ivCon = new SqliteConnection(sprintf "Data Source=%s;Mode=ReadOnly" ivDbPath)
     ivCon.Open()
 
-    // concordance
-    let mutable concCount = 0
-    use concCmd = new SqliteCommand(
-        "SELECT parpola_id, description, mahadevan_ids, wells_ids FROM sign_concordance", ivCon)
-    use concRdr = concCmd.ExecuteReader()
-    while concRdr.Read() do
-        use ins = new SqliteCommand(
-            "INSERT OR IGNORE INTO sign_concordance VALUES (@p,@d,@m,@w)", con, tx)
-        ins.Parameters.AddWithValue("@p", concRdr.GetString 0) |> ignore
-        ins.Parameters.AddWithValue("@d", if concRdr.IsDBNull 1 then box System.DBNull.Value else box (concRdr.GetString 1)) |> ignore
-        ins.Parameters.AddWithValue("@m", if concRdr.IsDBNull 2 then box System.DBNull.Value else box (concRdr.GetString 2)) |> ignore
-        ins.Parameters.AddWithValue("@w", if concRdr.IsDBNull 3 then box System.DBNull.Value else box (concRdr.GetString 3)) |> ignore
-        ins.ExecuteNonQuery() |> ignore
-        concCount <- concCount + 1
-    concRdr.Close()
-    printfn "  sign_concordance: %d rows (from %s)" concCount ivDbPath
+    // Pure read: DB -> arrays
+    let readRows (srcCon: SqliteConnection) sql (mapper: SqliteDataReader -> 'T) =
+        use cmd = new SqliteCommand(sql, srcCon)
+        use rdr = cmd.ExecuteReader()
+        [| while rdr.Read() do yield mapper rdr |]
 
-    // CISI inscriptions
-    let mutable cisiCount = 0
-    use cisiCmd = new SqliteCommand(
-        "SELECT inscription_id, description, signs, sign_count FROM cisi_inscriptions", ivCon)
-    use cisiRdr = cisiCmd.ExecuteReader()
-    while cisiRdr.Read() do
-        use ins = new SqliteCommand(
-            "INSERT OR IGNORE INTO cisi_inscription VALUES (@i,@d,@s,@c,'CISI')", con, tx)
-        ins.Parameters.AddWithValue("@i", cisiRdr.GetString 0) |> ignore
-        ins.Parameters.AddWithValue("@d", if cisiRdr.IsDBNull 1 then box System.DBNull.Value else box (cisiRdr.GetString 1)) |> ignore
-        ins.Parameters.AddWithValue("@s", cisiRdr.GetString 2) |> ignore
-        ins.Parameters.AddWithValue("@c", cisiRdr.GetInt32 3) |> ignore
-        ins.ExecuteNonQuery() |> ignore
-        cisiCount <- cisiCount + 1
-    cisiRdr.Close()
-    printfn "  cisi_inscription: %d rows (from %s)" cisiCount ivDbPath
+    let concSql = "SELECT parpola_id, description, mahadevan_ids, wells_ids FROM sign_concordance"
+    let concRows = readRows ivCon concSql (fun r ->
+        r.GetString 0,
+        (if r.IsDBNull 1 then box System.DBNull.Value else box (r.GetString 1)),
+        (if r.IsDBNull 2 then box System.DBNull.Value else box (r.GetString 2)),
+        (if r.IsDBNull 3 then box System.DBNull.Value else box (r.GetString 3)))
+
+    let cisiSql = "SELECT inscription_id, description, signs, sign_count FROM cisi_inscriptions"
+    let cisiRows = readRows ivCon cisiSql (fun r ->
+        r.GetString 0,
+        (if r.IsDBNull 1 then box System.DBNull.Value else box (r.GetString 1)),
+        r.GetString 2,
+        r.GetInt32 3)
 
     ivCon.Close()
+
+    // Write at boundary
+    concRows |> Array.iter (fun (p, d, m, w) ->
+        use ins = new SqliteCommand("INSERT OR IGNORE INTO sign_concordance VALUES (@p,@d,@m,@w)", con, tx)
+        ins.Parameters.AddWithValue("@p", p) |> ignore
+        ins.Parameters.AddWithValue("@d", d) |> ignore
+        ins.Parameters.AddWithValue("@m", m) |> ignore
+        ins.Parameters.AddWithValue("@w", w) |> ignore
+        ins.ExecuteNonQuery() |> ignore)
+    printfn "  sign_concordance: %d rows (from %s)" concRows.Length ivDbPath
+
+    cisiRows |> Array.iter (fun (i, d, s, c) ->
+        use ins = new SqliteCommand("INSERT OR IGNORE INTO cisi_inscription VALUES (@i,@d,@s,@c,'CISI')", con, tx)
+        ins.Parameters.AddWithValue("@i", i) |> ignore
+        ins.Parameters.AddWithValue("@d", d) |> ignore
+        ins.Parameters.AddWithValue("@s", s) |> ignore
+        ins.Parameters.AddWithValue("@c", c) |> ignore
+        ins.ExecuteNonQuery() |> ignore)
+    printfn "  cisi_inscription: %d rows (from %s)" cisiRows.Length ivDbPath
 else
     printfn "  CISI: SKIP (%s not found)" ivDbPath
 
@@ -515,30 +525,38 @@ let conllFile =
 
 match conllFile with
 | Some cf ->
-    let lines = File.ReadAllLines(cf)
-    let mutable sentId = 0
-    let mutable tokenCount = 0
-    for line in lines do
-        if line.Trim() = "" then
-            sentId <- sentId + 1
-        elif not (line.StartsWith("#")) then
-            let cols = line.Split('\t')
-            if cols.Length >= 8 then
-                use cmd = new SqliteCommand(
-                    "INSERT INTO treebank_token (sentence_id,position,form,lemma,pos,pos_detail,features,head,dep_rel)
-                     VALUES (@s,@p,@f,@l,@pos,@pd,@ft,@h,@dr)", con, tx)
-                cmd.Parameters.AddWithValue("@s", sentId) |> ignore
-                cmd.Parameters.AddWithValue("@p", cols.[0]) |> ignore
-                cmd.Parameters.AddWithValue("@f", cols.[1]) |> ignore
-                cmd.Parameters.AddWithValue("@l", cols.[2]) |> ignore
-                cmd.Parameters.AddWithValue("@pos", cols.[3]) |> ignore
-                cmd.Parameters.AddWithValue("@pd", cols.[4]) |> ignore
-                cmd.Parameters.AddWithValue("@ft", if cols.Length > 5 then cols.[5] else "") |> ignore
-                cmd.Parameters.AddWithValue("@h", if cols.Length > 6 then (box (cols.[6])) else box System.DBNull.Value) |> ignore
-                cmd.Parameters.AddWithValue("@dr", if cols.Length > 7 then cols.[7] else "") |> ignore
-                cmd.ExecuteNonQuery() |> ignore
-                tokenCount <- tokenCount + 1
-    printfn "  treebank_token: %d tokens, %d sentences (from %s)" tokenCount sentId cf
+    // Pure: parse CoNLL into (sentenceId, cols) array
+    let tokens =
+        File.ReadAllLines(cf)
+        |> Array.fold (fun (sid, acc) line ->
+            if line.Trim() = "" then (sid + 1, acc)
+            elif line.StartsWith("#") then (sid, acc)
+            else
+                let cols = line.Split('\t')
+                if cols.Length >= 8 then (sid, Array.append acc [| (sid, cols) |])
+                else (sid, acc))
+            (0, [||])
+        |> snd
+
+    let sentenceCount =
+        if tokens.Length > 0 then (tokens |> Array.map fst |> Array.max) + 1 else 0
+
+    // Write at boundary
+    tokens |> Array.iter (fun (sid, cols) ->
+        use cmd = new SqliteCommand(
+            "INSERT INTO treebank_token (sentence_id,position,form,lemma,pos,pos_detail,features,head,dep_rel)
+             VALUES (@s,@p,@f,@l,@pos,@pd,@ft,@h,@dr)", con, tx)
+        cmd.Parameters.AddWithValue("@s", sid) |> ignore
+        cmd.Parameters.AddWithValue("@p", cols.[0]) |> ignore
+        cmd.Parameters.AddWithValue("@f", cols.[1]) |> ignore
+        cmd.Parameters.AddWithValue("@l", cols.[2]) |> ignore
+        cmd.Parameters.AddWithValue("@pos", cols.[3]) |> ignore
+        cmd.Parameters.AddWithValue("@pd", cols.[4]) |> ignore
+        cmd.Parameters.AddWithValue("@ft", if cols.Length > 5 then cols.[5] else "") |> ignore
+        cmd.Parameters.AddWithValue("@h", if cols.Length > 6 then box cols.[6] else box System.DBNull.Value) |> ignore
+        cmd.Parameters.AddWithValue("@dr", if cols.Length > 7 then cols.[7] else "") |> ignore
+        cmd.ExecuteNonQuery() |> ignore)
+    printfn "  treebank_token: %d tokens, %d sentences (from %s)" tokens.Length sentenceCount cf
 | None ->
     printfn "  treebank_token: SKIP (CoNLL file not found)"
 
@@ -548,26 +566,32 @@ let logoPath = Path.Combine(dataDir, "Preprocessing/Converted_Tamil/LogoSyllabic
 if File.Exists origPath && File.Exists logoPath then
     let origLines = parseCsv origPath
     let logoLines = parseCsv logoPath
-    let mutable sentCount = 0
-    for i in 0 .. min origLines.Length logoLines.Length - 1 do
-        let origFields = splitCsvLine origLines.[i]
-        let logoFields = splitCsvLine logoLines.[i]
-        if origFields.Length >= 2 && logoFields.Length >= 2 then
-            let tamil = origFields.[1]
-            let logo = logoFields.[1]
-            let signCount =
-                logo.Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                |> Array.filter (fun t -> t.Length > 0 && t <> "(" && t <> ")" && t <> "," && t <> "." && t <> ":" && t <> ";")
-                |> Array.length
-            use cmd = new SqliteCommand(
-                "INSERT OR IGNORE INTO tamil_sentence VALUES (@i,@t,@l,@c)", con, tx)
-            cmd.Parameters.AddWithValue("@i", i) |> ignore
-            cmd.Parameters.AddWithValue("@t", tamil) |> ignore
-            cmd.Parameters.AddWithValue("@l", logo) |> ignore
-            cmd.Parameters.AddWithValue("@c", signCount) |> ignore
-            cmd.ExecuteNonQuery() |> ignore
-            sentCount <- sentCount + 1
-    printfn "  tamil_sentence: %d rows (original + logosyllabic aligned)" sentCount
+
+    // Pure: zip and parse
+    let alignedSentences =
+        Array.init (min origLines.Length logoLines.Length) (fun i ->
+            let origFields = splitCsvLine origLines.[i]
+            let logoFields = splitCsvLine logoLines.[i]
+            if origFields.Length >= 2 && logoFields.Length >= 2 then
+                let logo = logoFields.[1]
+                let signCount =
+                    logo.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                    |> Array.filter (fun t -> t.Length > 0 && t <> "(" && t <> ")" && t <> "," && t <> "." && t <> ":" && t <> ";")
+                    |> Array.length
+                Some (i, origFields.[1], logo, signCount)
+            else None)
+        |> Array.choose id
+
+    // Write at boundary
+    alignedSentences |> Array.iter (fun (i, tamil, logo, signCount) ->
+        use cmd = new SqliteCommand(
+            "INSERT OR IGNORE INTO tamil_sentence VALUES (@i,@t,@l,@c)", con, tx)
+        cmd.Parameters.AddWithValue("@i", i) |> ignore
+        cmd.Parameters.AddWithValue("@t", tamil) |> ignore
+        cmd.Parameters.AddWithValue("@l", logo) |> ignore
+        cmd.Parameters.AddWithValue("@c", signCount) |> ignore
+        cmd.ExecuteNonQuery() |> ignore)
+    printfn "  tamil_sentence: %d rows (original + logosyllabic aligned)" alignedSentences.Length
 else
     printfn "  tamil_sentence: SKIP (Original_Tamil_Sentences.csv not found)"
 
