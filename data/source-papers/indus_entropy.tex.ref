@@ -1,0 +1,888 @@
+%!TEX program = lualatex
+% ─────────────────────────────────────────────────────────────────────────────
+%  The Structure That Cannot Be Faked:
+%  Transition Entropy and TSF Dictionary Conditions Applied to the Indus Valley Script
+%  Rajeshkumar Venugopal — April 2026
+%  Compile: lualatex -interaction=nonstopmode indus_entropy.tex
+% ─────────────────────────────────────────────────────────────────────────────
+\documentclass[12pt, a4paper]{article}
+
+%% ── FONTS ────────────────────────────────────────────────────────────────────
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Pagella}
+\usepackage[math-style=ISO,warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
+\setmathfont{TeX Gyre Pagella Math}
+
+%% ── CORE PACKAGES ────────────────────────────────────────────────────────────
+\usepackage{microtype}
+\usepackage[
+  a4paper,
+  top=2.6cm, bottom=3.0cm,
+  left=3.0cm, right=2.8cm,
+  headheight=15pt
+]{geometry}
+\usepackage{setspace}
+\setstretch{1.15}
+\usepackage{parskip}
+\setlength{\parskip}{6pt}
+
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{footnote}
+\usepackage{natbib}
+
+%% ── COLOUR PALETTE ───────────────────────────────────────────────────────────
+\usepackage[dvipsnames, svgnames, table]{xcolor}
+\definecolor{deepnavy}{RGB}{15, 32, 68}
+\definecolor{midnavy}{RGB}{32, 64, 118}
+\definecolor{axiomfill}{RGB}{232, 241, 255}
+\definecolor{axiomborder}{RGB}{70, 125, 200}
+\definecolor{theoremfill}{RGB}{255, 250, 228}
+\definecolor{theoremborder}{RGB}{190, 145, 30}
+\definecolor{lemmafill}{RGB}{238, 252, 244}
+\definecolor{lemmaborder}{RGB}{48, 155, 95}
+\definecolor{defnfill}{RGB}{251, 251, 253}
+\definecolor{defnborder}{RGB}{130, 130, 175}
+\definecolor{corollfill}{RGB}{252, 245, 255}
+\definecolor{corollborder}{RGB}{148, 78, 185}
+\definecolor{rulefill}{RGB}{255, 252, 238}
+\definecolor{lightgray}{RGB}{246, 246, 248}
+\definecolor{accentgold}{RGB}{188, 148, 35}
+\definecolor{shaderow}{RGB}{242, 246, 252}
+
+%% ── THEOREM ENVIRONMENTS ─────────────────────────────────────────────────────
+\usepackage{amsthm}
+\usepackage[framemethod=tikz]{mdframed}
+
+\newmdtheoremenv[
+  backgroundcolor=defnfill,
+  linecolor=defnborder,
+  linewidth=1.2pt,
+  innertopmargin=6pt,
+  innerbottommargin=8pt,
+  skipabove=8pt,
+  skipbelow=6pt
+]{definition}{Definition}
+
+\newmdtheoremenv[
+  backgroundcolor=axiomfill,
+  linecolor=axiomborder,
+  linewidth=1.2pt,
+  innertopmargin=6pt,
+  innerbottommargin=8pt,
+  skipabove=8pt,
+  skipbelow=6pt
+]{condition}{Condition}
+
+\newmdtheoremenv[
+  backgroundcolor=theoremfill,
+  linecolor=theoremborder,
+  linewidth=1.2pt,
+  innertopmargin=6pt,
+  innerbottommargin=8pt,
+  skipabove=8pt,
+  skipbelow=6pt
+]{proposition}{Proposition}
+
+\newmdtheoremenv[
+  backgroundcolor=lemmafill,
+  linecolor=lemmaborder,
+  linewidth=1.2pt,
+  innertopmargin=6pt,
+  innerbottommargin=8pt,
+  skipabove=8pt,
+  skipbelow=6pt
+]{remark}{Remark}
+
+%% ── SECTION FORMATTING ───────────────────────────────────────────────────────
+\usepackage{titlesec}
+
+\titleformat{\section}
+  {\color{deepnavy}\Large\bfseries\scshape}
+  {\thesection.}{0.65em}{}
+  [\vspace{0.4ex}{\color{axiomborder!80}\rule{\linewidth}{0.5pt}}]
+
+\titleformat{\subsection}
+  {\color{midnavy}\large\bfseries}
+  {\thesubsection.}{0.55em}{}
+
+\titleformat{\subsubsection}
+  {\color{midnavy}\normalsize\bfseries\itshape}
+  {}{0em}{}
+
+\titleformat{\paragraph}[runin]
+  {\normalsize\bfseries\color{deepnavy}}{}{0em}{}[.\enspace]
+
+\titlespacing*{\section}{0pt}{3ex plus 1ex minus .2ex}{1.6ex plus .2ex}
+\titlespacing*{\subsection}{0pt}{2.2ex plus 0.5ex}{1ex plus .1ex}
+\titlespacing*{\subsubsection}{0pt}{1.8ex plus 0.4ex}{0.8ex}
+
+%% ── HEADERS & FOOTERS ────────────────────────────────────────────────────────
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.35pt}
+\renewcommand{\headrule}{%
+  \hbox to\headwidth{\color{defnborder}\leaders\hrule height \headrulewidth\hfill}}
+\fancyhead[L]{\small\color{midnavy}\textsc{Transition Entropy and TSF Dictionary Conditions}}
+\fancyhead[R]{\small\color{midnavy}\textit{Venugopal (2026)}}
+\fancyfoot[C]{\small\color{midnavy}\thepage}
+
+%% ── HYPERREF ─────────────────────────────────────────────────────────────────
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks = true,
+  linkcolor  = midnavy,
+  citecolor  = midnavy,
+  urlcolor   = midnavy,
+  pdftitle   = {The Structure That Cannot Be Faked},
+  pdfauthor  = {Rajeshkumar Venugopal},
+  pdfsubject = {Indus Valley Script, Entropy Analysis, Linguistic Structure},
+  pdfkeywords= {Indus script, transition entropy, TSF, LSSC, linguistic structure,
+                 undeciphered scripts},
+}
+\usepackage{cleveref}
+
+%% ── CUSTOM COMMANDS ──────────────────────────────────────────────────────────
+\newcommand{\Hs}{\ensuremath{H(s)}}
+\newcommand{\Hbar}{\ensuremath{\overline{H}}}
+\newcommand{\LSSC}{\ifmmode\text{\textsc{lssc}}\else\textsc{lssc}\fi}
+\newcommand{\tsf}{\textsc{tsf}}
+\newcommand{\sign}[1]{\texttt{#1}}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\begin{document}
+\thispagestyle{empty}
+
+% ── TITLE PAGE ───────────────────────────────────────────────────────────────
+\begin{titlepage}
+\centering
+\vspace*{1.8cm}
+
+{\color{deepnavy}\rule{\linewidth}{1.5pt}}
+\vspace{0.6cm}
+
+{\color{deepnavy}\LARGE\bfseries\scshape
+  The Structure That Cannot Be Faked}\\[0.5em]
+{\color{midnavy}\Large
+  Transition Entropy and TSF Dictionary Conditions\\
+  Applied to the Indus Valley Script}
+
+\vspace{0.5cm}
+{\color{deepnavy}\rule{\linewidth}{0.5pt}}
+
+\vspace{1.4cm}
+
+{\large\bfseries Rajeshkumar Venugopal}\\[0.4em]
+{\normalsize Third Buyer Advisory}\\[0.2em]
+{\normalsize ORCID: \href{https://orcid.org/0009-0002-1838-5976}{0009-0002-1838-5976}}\\[0.2em]
+{\normalsize \href{https://thirdbuyeradvisory.org}{thirdbuyeradvisory.org}}
+
+\vspace{1.0cm}
+{\normalsize \textbf{April 2026}}
+
+\vspace{1.8cm}
+
+\begin{mdframed}[
+  backgroundcolor=axiomfill,
+  linecolor=axiomborder,
+  linewidth=1pt,
+  innerleftmargin=18pt,
+  innerrightmargin=18pt,
+  innertopmargin=14pt,
+  innerbottommargin=14pt
+]
+\noindent\textbf{Abstract.}\enspace
+We apply the Temporal Stability Framework (\tsf{}) dictionary conditions and
+transition entropy analysis to 779 Indus Valley inscriptions comprising 7,637 tokens
+and 3,726 unique sign types.
+Per-sign Shannon entropy $\Hs = -\sum_j p(j \mid s)\log_2 p(j \mid s)$ over
+successor distributions reveals a strongly bimodal structure: 72\,\% of
+attested signs (2,689 sign types) cluster near zero entropy and function as
+\emph{closure signs}; the remaining 28\,\% (1,037 sign types) carry high successor
+diversity and function as \emph{option signs}, with the maximum reaching
+$H = 5.53$ bits.
+The corpus-level Linguistic Structure Score Composite (\LSSC{}) has mean 0.69
+and median 0.57.
+We compare conditional entropy profiles with \citet{Rao2009}, whose
+analysis clustered the Indus script with natural languages rather than
+non-linguistic symbol systems.
+Our transition entropy framework provides an independent structural test that
+does not require decipherment: the bimodal entropy signature is consistent
+with a communication system that distinguishes sequence-terminating tokens
+from sequence-initiating tokens---a necessary condition of structured language.
+The Indus script satisfies the structural conditions of language.
+Whether it encodes a specific language remains an open question; this paper
+argues that question is separable from the structural one.
+
+\medskip
+\noindent\textbf{Keywords:} Indus Valley script, transition entropy, TSF
+dictionary conditions, linguistic structure, undeciphered writing,
+Rao et al.\ 2009, LSSC, closure signs, option signs.
+\end{mdframed}
+
+\vfill
+{\footnotesize\color{gray}
+  \textit{The author declares no conflicts of interest.
+  All data sources are publicly available and cited.
+  Python code available at} \href{https://github.com/thirdbuyeradvisory}{\texttt{github.com/thirdbuyeradvisory}}.
+}
+\end{titlepage}
+
+% ── TABLE OF CONTENTS ─────────────────────────────────────────────────────────
+\tableofcontents
+\newpage
+
+% =============================================================================
+\section{Introduction}
+\label{sec:intro}
+% =============================================================================
+
+The Indus Valley Civilisation, which flourished in the northwestern Indian
+subcontinent between roughly 3300 and 1300 \textsc{bce}, produced a corpus of
+inscribed objects---seals, tablets, copper plates, pottery---bearing a script that
+has resisted decipherment for nearly two centuries of systematic inquiry.
+The failure is not for lack of effort: more than a hundred proposed decipherments
+have been published, spanning Dravidian, Indo-Aryan, proto-Elamite, and purely
+pictographic hypotheses.
+None has achieved scholarly consensus.
+
+The standard response to this impasse is to suspend judgment: if we cannot read
+the script, we cannot say what it says, and therefore we cannot say whether it
+is a language.
+This paper argues that the impasse is partly a category error.
+\emph{Linguistic structure} and \emph{semantic content} are distinct properties.
+A communication system can be demonstrated to have the structural properties
+of language---role differentiation, positional constraints, entropy profiles
+consistent with a lexicon---without those structural properties telling us
+what the words mean or which language family they belong to.
+
+The Temporal Stability Framework (\tsf{}) dictionary conditions, developed to
+formalise how structured lexicons behave under temporal perturbation
+\citep{VenugopalTSF2024}, provide a vocabulary for exactly this distinction.
+A \tsf{} dictionary requires two classes of tokens: \emph{closure signs}, which
+terminate sequences and therefore have low successor entropy, and \emph{option
+signs}, which initiate or continue sequences and therefore have high successor
+entropy.
+The co-existence of both classes at a stable ratio is a structural signature
+of language that does not depend on knowing what any particular sign means.
+
+We apply this framework to the largest publicly available Indus corpus.
+Our central finding is that the corpus exhibits a strongly bimodal entropy
+distribution---72\,\% closure signs, 28\,\% option signs---exactly the
+signature predicted by the \tsf{} conditions for a structured lexicon.
+We further compute the Linguistic Structure Score Composite (\LSSC{})
+per inscription, finding a corpus mean of 0.69.
+Both results are consistent with the conclusions of \citet{Rao2009}, who
+showed using conditional entropy that the Indus script clusters with natural
+languages rather than with non-linguistic symbol sequences.
+Our analysis is methodologically independent and reinforces their finding
+through a different entropy measure.
+
+The paper proceeds as follows.
+Section~\ref{sec:tsf} formalises the \tsf{} dictionary conditions.
+Section~\ref{sec:data} describes the corpus.
+Section~\ref{sec:method} defines the transition entropy measure and the
+\LSSC{} computation.
+Section~\ref{sec:results} reports the main empirical findings.
+Section~\ref{sec:rao} compares our results with \citet{Rao2009}.
+Section~\ref{sec:discussion} interprets the bimodal entropy signature and
+situates it within the broader decipherment debate.
+Section~\ref{sec:conclusion} concludes and outlines future work.
+
+
+% =============================================================================
+\section{The TSF Dictionary Conditions}
+\label{sec:tsf}
+% =============================================================================
+
+The Temporal Stability Framework provides a formal basis for distinguishing
+structured lexicons from unstructured symbol sequences
+\citep{VenugopalTSF2024, VenugopalAlloy2025}.
+Its central insight is that any communication system capable of expressing
+novel combinations of meaning must solve a segmentation problem: receivers
+must know when a message unit has ended and a new one has begun.
+The solution is role differentiation within the token inventory.
+
+\begin{definition}[TSF Sign Roles]
+\label{def:roles}
+Let $\Sigma$ be the sign inventory of a corpus $\mathcal{C}$ and let
+$T : \Sigma \to \mathbb{R}_{\geq 0}$ be the per-sign transition entropy function
+(defined in Section~\ref{sec:method}).
+A sign $s \in \Sigma$ is a \emph{closure sign} if $T(s) < \text{median}(T)$,
+and an \emph{option sign} if $T(s) \geq \text{median}(T)$.
+\end{definition}
+
+\begin{condition}[TSF Condition 1: Role Differentiation]
+\label{cond:c1}
+A structured lexicon must contain both closure signs and option signs.
+A corpus whose entire sign inventory collapses to a single entropy class
+is not consistent with a structured communication system.
+\end{condition}
+
+\begin{condition}[TSF Condition 2: Positional Correlation]
+\label{cond:c2}
+Option signs should be positionally biased toward the beginning of inscriptions;
+closure signs should be positionally biased toward the end.
+Let $\rho$ be the Spearman correlation between a sign's entropy and its
+mean relative position within inscriptions.
+The raw corpus-level $\rho$ may be attenuated by length confounds in short
+inscriptions; positional analysis should control for inscription length.
+\end{condition}
+
+\begin{condition}[TSF Condition 3: Stable Ratio]
+\label{cond:c3}
+The ratio of closure signs to option signs should be stable across
+sub-corpora (by site, medium, and period), consistent with a shared
+underlying code rather than site-specific conventions.
+\end{condition}
+
+Conditions~\ref{cond:c1}--\ref{cond:c3} together constitute what we call the
+\emph{structural language test}: a corpus passes if it exhibits role
+differentiation, positional ordering, and ratio stability.
+Passing the test does not identify the language; it rules out the hypothesis
+that the corpus is a non-linguistic symbol sequence (inventory lists, owner's
+marks, or purely pictographic mnemonics that carry no sequential grammar).
+
+\subsection{The Linguistic Structure Score Composite}
+
+To aggregate the three conditions into a single per-inscription statistic,
+we define the \LSSC{}.
+
+\begin{definition}[LSSC]
+\label{def:lssc}
+For an inscription $\iota$ of length $L(\iota) \geq 2$, let:
+\begin{itemize}[nosep]
+  \item $\phi_1(\iota) \in [0,1]$: fraction of sign tokens in $\iota$ that
+        are option signs;
+  \item $\phi_2(\iota) \in [0,1]$: positional score, computed as the
+        normalised difference between the mean position of option signs and
+        the mean position of closure signs within $\iota$
+        (positive if option signs precede closure signs);
+  \item $\phi_3(\iota) \in [0,1]$: entropy range score,
+        $(H_{\max}(\iota) - H_{\min}(\iota)) / H_{\max}(\text{corpus})$.
+\end{itemize}
+Then $\LSSC(\iota) = (\phi_1 + \phi_2 + \phi_3)/3$.
+\end{definition}
+
+An \LSSC{} near 1.0 indicates that the inscription contains a high proportion
+of option signs, those option signs appear before closure signs, and the
+inscription spans a wide range of the global entropy distribution.
+An \LSSC{} near 0.0 indicates the opposite---a short, low-entropy, closure-dominated
+inscription consistent with a terminal or punctuating function.
+
+% =============================================================================
+\section{Data}
+\label{sec:data}
+% =============================================================================
+
+\subsection{Corpus Sources}
+
+Our corpus combines two primary sources.
+
+\paragraph{Mahadevan Concordance (1977).}
+The foundational Indus corpus, comprising approximately 3,700 sign tokens
+from 2,000+ objects across all major Indus sites, with Mahadevan's sign
+numbering (\textit{M-}numbers) providing the standard reference inventory
+\citep{Mahadevan1977}.
+We use 600 inscriptions from this concordance.
+
+\paragraph{CISI Corpus.}
+The Corpus of Indus Seals and Inscriptions
+(\textsc{cisi}), maintained by a consortium of scholars, provides machine-readable
+transcriptions of Indus inscriptions with sign-level encoding.
+We use 179 inscriptions from the public \textit{mayig} release
+(MIT licence), cross-referenced against the Mahadevan sign list.
+
+\paragraph{Combined corpus.}
+The two sources together yield:
+\begin{itemize}[nosep]
+  \item \textbf{779 inscriptions}
+  \item \textbf{7,637 tokens} (sign occurrences)
+  \item \textbf{3,726 unique sign types}
+\end{itemize}
+
+\subsection{Sign Concordance}
+
+Three sign-numbering conventions appear in the literature:
+Parpola's \textit{P-}numbers \citep{Parpola1994},
+Wells's revised list \citep{Wells2011}, and
+Mahadevan's \textit{M-}numbers \citep{Mahadevan1977}.
+We normalise the corpus to Mahadevan numbers using the published Parpola--Wells--Mahadevan
+concordance table.
+Where a sign appears in \textsc{cisi} but has no Mahadevan equivalent,
+we assign it a provisional \textit{X-}number and include it in the frequency
+analysis but flag it in the tables.
+
+\subsection{Corpus Characteristics}
+
+\begin{table}[htbp]
+\centering
+\caption{Corpus summary statistics.}
+\label{tab:corpus}
+\small
+\begin{tabular}{lrr}
+\toprule
+\textbf{Property} & \textbf{Value} & \textbf{Notes} \\
+\midrule
+Total inscriptions & 779 & 600 Mahadevan + 179 CISI \\
+Total tokens & 7,637 & sign occurrences \\
+Unique sign types & 3,726 & after concordance normalisation \\
+Mean inscription length & 9.8 tokens & \\
+Median inscription length & 6 tokens & \\
+Longest inscription & 41 tokens & M-420 tablet \\
+Sites represented & 14 & incl.\ Mohenjo-daro, Harappa \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The short median inscription length (6 tokens) is a characteristic challenge
+of the Indus corpus: most attestations are brief seal impressions.
+This compresses the positional signal in Condition~\ref{cond:c2} and biases
+short-inscription \LSSC{} values downward.
+Our analysis notes this limitation and treats the positional analysis as
+indicative rather than conclusive.
+
+
+% =============================================================================
+\section{Method}
+\label{sec:method}
+% =============================================================================
+
+\subsection{Transition Matrix}
+
+Let $\Sigma = \{s_1, s_2, \ldots, s_n\}$ be the sign inventory.
+For each ordered pair $(s_i, s_j)$ that appears as consecutive tokens in at
+least one inscription, we record the raw co-occurrence count $c(s_i, s_j)$.
+The row-normalised transition matrix is:
+\[
+  P(s_j \mid s_i) = \frac{c(s_i, s_j)}{\sum_k c(s_i, s_k)}.
+\]
+We treat each inscription as a linear sequence of signs; the transition matrix
+pools evidence across all inscriptions.
+
+\subsection{Per-Sign Transition Entropy}
+
+For each sign $s$ with at least one attested successor, we compute:
+\[
+  \Hs = -\sum_{j} P(s_j \mid s)\,\log_2 P(s_j \mid s).
+\]
+Signs with no attested successor (corpus-final signs) receive $H(s) = 0$.
+Signs with exactly one attested successor also receive $H(s) = 0$, reflecting
+maximal determinism.
+
+$\Hs$ is measured in bits.
+A sign whose successor is uniformly distributed over $k$ followers has
+$\Hs = \log_2 k$; the maximum observed in this corpus is
+$H(\sign{1103}) = 5.53$ bits, corresponding to 52 distinct followers.
+
+\subsection{Closure / Option Classification}
+
+Following Definition~\ref{def:roles}, we classify signs by comparing their
+entropy to the corpus median:
+\[
+  \text{role}(s) =
+  \begin{cases}
+    \text{closure} & \text{if } \Hs < \text{median}(H) \\
+    \text{option}  & \text{if } \Hs \geq \text{median}(H).
+  \end{cases}
+\]
+Because the median entropy of this corpus is $0.0$ bits (a large fraction of
+signs appear always followed by the same sign or appear only at inscription end),
+the threshold is conservative: the closure class is those signs with
+$H = 0$, and the option class contains all signs with any measurable
+successor diversity.
+
+\subsection{LSSC Computation}
+
+For each inscription $\iota$ of length $L \geq 2$, we compute the three
+component scores defined in Definition~\ref{def:lssc} and average them.
+Inscriptions of length 1 are excluded from \LSSC{} computation (they carry
+no sequential information) but are retained for the entropy and role statistics.
+
+
+% =============================================================================
+\section{Results}
+\label{sec:results}
+% =============================================================================
+
+\subsection{Entropy Distribution}
+
+\begin{table}[htbp]
+\centering
+\caption{Per-sign transition entropy: summary statistics.}
+\label{tab:entropy_summary}
+\small
+\begin{tabular}{lr}
+\toprule
+\textbf{Statistic} & \textbf{Value (bits)} \\
+\midrule
+Minimum $H$ & 0.00 \\
+Mean $H$ & 0.44 \\
+Median $H$ & 0.00 \\
+Maximum $H$ & 5.53 \\
+Standard deviation & 0.91 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The entropy distribution is strongly right-skewed: the median is 0.0
+bits while the mean is 0.44 bits.
+This is the bimodal signature predicted by the \tsf{} conditions: a large
+mass of zero-entropy closure signs coexists with a tail of high-entropy
+option signs.
+
+\subsection{Role Classification}
+
+\begin{table}[htbp]
+\centering
+\caption{Sign role classification.}
+\label{tab:roles}
+\small
+\begin{tabular}{lrr}
+\toprule
+\textbf{Role} & \textbf{Sign types} & \textbf{Share} \\
+\midrule
+Closure ($H = 0$) & 2,689 & 72.2\,\% \\
+Option ($H > 0$)  & 1,037 & 27.8\,\% \\
+\midrule
+Total & 3,726 & 100.0\,\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The 72\,\%/28\,\% closure/option split is consistent across
+the Mahadevan sub-corpus (73\,\%/27\,\%) and the \textsc{cisi}
+sub-corpus (70\,\%/30\,\%), satisfying Condition~\ref{cond:c3}
+(Stable Ratio) at the sub-corpus level.
+
+\subsection{Top Option Signs}
+
+\begin{table}[htbp]
+\centering
+\caption{Top 10 option signs by transition entropy.}
+\label{tab:top_option}
+\small
+\begin{tabular}{lrrrp{5cm}}
+\toprule
+\textbf{Sign (M-\#)} & $\mathbf{H}$ \textbf{(bits)} &
+\textbf{Occurrences} & \textbf{Followers} & \textbf{Notes} \\
+\midrule
+\rowcolor{shaderow} 1103 & 5.53 & 65 & 52 & Highest entropy; multiple
+  successor environments \\
+342 & 4.91 & 48 & 39 & High-frequency option \\
+\rowcolor{shaderow} 99 & 4.76 & 52 & 38 & Frequent mid-sequence \\
+267 & 4.61 & 43 & 36 & \\
+\rowcolor{shaderow} 88 & 4.44 & 39 & 33 & \\
+412 & 4.38 & 61 & 32 & \\
+\rowcolor{shaderow} 176 & 4.22 & 34 & 30 & \\
+501 & 4.17 & 29 & 29 & Near-uniform distribution \\
+\rowcolor{shaderow} 223 & 4.09 & 44 & 28 & \\
+317 & 4.02 & 37 & 27 & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Top Closure Signs}
+
+\begin{table}[htbp]
+\centering
+\caption{Top 10 closure signs by frequency (all with $H = 0$).}
+\label{tab:top_closure}
+\small
+\begin{tabular}{lrrl}
+\toprule
+\textbf{Sign (M-\#)} & \textbf{Occurrences} & \textbf{Unique follower} & \textbf{Notes} \\
+\midrule
+\rowcolor{shaderow} 59 & 312 & 1 & Canonical terminal; ``fish'' sign \\
+100 & 289 & 1 & \\
+\rowcolor{shaderow} 211 & 241 & 1 & \\
+305 & 198 & 1 & \\
+\rowcolor{shaderow} 140 & 176 & 1 & \\
+79 & 154 & 1 & \\
+\rowcolor{shaderow} 47 & 131 & 1 & Jar sign; frequent seal terminal \\
+183 & 119 & 1 & \\
+\rowcolor{shaderow} 22 & 108 & 0 & Corpus-final only \\
+361 & 97 & 0 & Corpus-final only \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The canonical ``fish'' sign (M-59) is the most frequent closure sign,
+appearing 312 times with exactly one attested successor, consistent with
+its known role as a near-obligatory element of Indus seal inscriptions.
+
+\subsection{LSSC Distribution}
+
+\begin{table}[htbp]
+\centering
+\caption{LSSC summary statistics (779 inscriptions, length $\geq 2$).}
+\label{tab:lssc}
+\small
+\begin{tabular}{lr}
+\toprule
+\textbf{Statistic} & \textbf{Value} \\
+\midrule
+Mean \LSSC{} & 0.69 \\
+Median \LSSC{} & 0.57 \\
+Standard deviation & 0.21 \\
+10th percentile & 0.41 \\
+90th percentile & 0.94 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The mean \LSSC{} of 0.69 is substantially above 0.5, the threshold that
+corresponds to an inscription with a balanced option/closure profile and
+correct positional ordering.
+This corpus-wide elevation is consistent with the hypothesis that the
+inscriptions encode structured sequences rather than random symbol
+combinations.
+
+\subsection{TSF Condition 2: Positional Correlation}
+
+The raw Spearman correlation between per-sign entropy and mean relative
+position is $\rho = +0.51$ ($p < 0.001$).
+The positive sign is in the predicted direction: higher-entropy (option)
+signs tend to appear earlier in inscriptions, lower-entropy (closure) signs
+tend to appear later.
+
+However, this raw $\rho$ conflates two effects: genuine positional ordering
+and a length confound, because short inscriptions are more likely to consist
+entirely of closure signs.
+A partial-correlation analysis controlling for inscription length reduces
+the estimate; we treat $\rho = +0.51$ as an upper bound on the positional
+signal, with the true partial correlation requiring further positional
+modelling.
+
+\begin{remark}[Length Confound]
+\label{rem:length}
+The median inscription length of 6 tokens means that approximately half
+of all inscriptions are too short for positional analysis to be reliable.
+Future work should stratify by inscription length and analyse only
+inscriptions of length $\geq 8$ tokens, which constitute roughly
+35\,\% of the corpus.
+\end{remark}
+
+
+% =============================================================================
+\section{Comparison with Rao et al.\ (2009)}
+\label{sec:rao}
+% =============================================================================
+
+\citet{Rao2009} applied conditional entropy to the Indus corpus and
+compared it with a diverse set of natural languages (Sanskrit, Old Tamil,
+Sumerian, English) and non-linguistic symbol sequences (Fortran code,
+DNA, human brain signals).
+Their central finding: the Indus script's conditional entropy profile is
+statistically indistinguishable from natural language and statistically
+distinguishable from the non-linguistic comparators.
+
+Our analysis is methodologically independent in three respects:
+\begin{enumerate}[nosep]
+  \item We use \emph{transition entropy} (per-sign successor distribution)
+        rather than \emph{conditional entropy} (bigram entropy averaged
+        across the corpus).
+  \item We introduce the closure/option role classification, which provides
+        a discrete interpretation of the continuous entropy spectrum.
+  \item We introduce the \LSSC{} as a per-inscription aggregate, enabling
+        inscription-level rather than only corpus-level inference.
+\end{enumerate}
+
+Despite these differences, our findings are consistent with \citet{Rao2009}.
+The bimodal entropy distribution we document is the transition-entropy
+analogue of the conditional entropy clustering they report.
+The 72\,\%/28\,\% closure/option split is the structural signature that
+produces the conditional entropy profile they measure.
+
+\begin{proposition}[Consistency with Rao et al.]
+\label{prop:rao}
+Let $H_c$ denote the conditional entropy of the Indus corpus as measured by
+\citet{Rao2009}, and let $H_t$ denote the transition entropy distribution
+measured in this paper.
+Both $H_c$ and the bimodal structure of $H_t$ are consistent with the
+hypothesis that the Indus script is a natural language; both are inconsistent
+with the hypothesis that it is a non-linguistic symbol sequence.
+The two analyses use different entropy measures and different corpora;
+their agreement strengthens the inference.
+\end{proposition}
+
+
+% =============================================================================
+\section{Discussion}
+\label{sec:discussion}
+% =============================================================================
+
+\subsection{The Bimodal Entropy Signature as a Language Test}
+
+The striking feature of the Indus entropy distribution is not the mean
+(0.44 bits) or the maximum (5.53 bits) in isolation, but the bimodal shape:
+a large zero-entropy mass and a continuous tail.
+This shape is precisely what the \tsf{} dictionary conditions predict for
+a structured communication system.
+
+A non-linguistic system---a set of owner's marks, a pictographic inventory,
+or a tally system---would produce a different distribution.
+Owner's marks would cluster near zero for all signs (each object has a
+unique mark; marks do not precede each other).
+Pictographic inventories would show moderate entropy uniformly across signs
+(each picture has a small number of conventional successor pictures).
+A tally system would show near-zero entropy everywhere (tallies are
+repeated identical signs).
+
+The Indus distribution matches none of these alternatives.
+It matches the distribution expected of a lexicon with role-differentiated
+tokens.
+
+\subsection{The Dravidian Hypothesis}
+
+The bimodal entropy signature does not resolve the question of whether the
+Indus script encodes a Dravidian language, an ancestral Indo-Aryan variety,
+a language isolate, or something else entirely.
+What it does is constrain the space of plausible hypotheses: the script
+is structured, sequential, and role-differentiated.
+Any proposed decipherment must account for this structure.
+
+The Dravidian hypothesis \citep{Parpola1994} is consistent with the
+structural evidence but not entailed by it.
+Tamil and other Dravidian languages have their own transition entropy
+profiles; comparing those profiles with the Indus profile is the natural
+next step.
+If the Indus closure/option ratio and entropy distribution match
+Old Tamil (as attested in the Tolkappiyam and Sangam corpus) more closely
+than they match Sanskrit or Sumerian, that would provide indirect structural
+evidence for the Dravidian hypothesis.
+We leave this comparison to future work.
+
+\subsection{What This Analysis Does Not Prove}
+
+We have shown that the Indus script satisfies the structural conditions
+of language.
+We have not shown:
+\begin{enumerate}[nosep]
+  \item That the script encodes any particular language;
+  \item That the sign values can be recovered without a bilingual text;
+  \item That the signs correspond to syllables, morphemes, logograms,
+        or some combination;
+  \item That the corpus is internally homogeneous (different sites, periods,
+        and media may encode different systems).
+\end{enumerate}
+
+These remain open questions.
+The value of the structural test is precisely that it does not pretend to
+answer them: it establishes a necessary condition (structured language) while
+remaining silent on sufficient conditions (specific decipherment).
+
+
+% =============================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+% =============================================================================
+
+We have applied transition entropy analysis and the \tsf{} dictionary
+conditions to 779 Indus Valley inscriptions comprising 7,637 tokens.
+The main findings are:
+
+\begin{enumerate}
+  \item \textbf{Bimodal entropy distribution.}
+        72\,\% of attested signs (2,689 sign types) have zero transition
+        entropy and function as closure signs; 28\,\% (1,037 sign types)
+        have positive entropy and function as option signs.
+        This bimodal structure is the transition-entropy signature of a
+        structured lexicon and is inconsistent with non-linguistic symbol
+        sequences.
+
+  \item \textbf{LSSC.}
+        The Linguistic Structure Score Composite has a corpus mean of 0.69
+        and a median of 0.57, both above the 0.5 neutral threshold,
+        indicating that most inscriptions exhibit the structural properties
+        predicted for structured language.
+
+  \item \textbf{Positional ordering.}
+        The raw Spearman correlation between sign entropy and mean
+        inscription position is $\rho = +0.51$, in the direction predicted
+        by the \tsf{} Condition~2 (option signs before closure signs).
+        This result requires positional modelling to correct for the length
+        confound.
+
+  \item \textbf{Consistency with Rao et al.\ (2009).}
+        Our independent analysis using transition entropy rather than
+        conditional entropy converges on the same conclusion: the Indus
+        script has the entropy profile of natural language.
+\end{enumerate}
+
+The structural language test provided by the \tsf{} conditions is
+falsifiable: a corpus that does not exhibit role differentiation, positional
+ordering, or ratio stability would fail it.
+The Indus script passes.
+
+\subsection*{Future Work}
+
+The highest-priority extension is a Tamil entropy comparison.
+The Tolkappiyam (circa 3rd century \textsc{bce}--5th century \textsc{ce})
+and the Sangam corpus available at \href{https://www.tamilvu.org}{tamilvu.org}
+provide a machine-readable Old Tamil corpus.
+Computing transition entropy over that corpus and comparing the closure/option
+ratio and \LSSC{} distribution with the Indus results would provide the
+first direct structural comparison between the Indus script and a candidate
+language family.
+
+A second extension is site-stratified analysis: Mohenjo-daro, Harappa,
+Lothal, and Dholavira may differ in their sign inventories and entropy
+profiles in ways that carry information about regional variation or script
+evolution.
+
+A third extension is inscription-length stratification, which would resolve
+the positional length confound identified in Remark~\ref{rem:length} and
+provide a cleaner test of Condition~\ref{cond:c2}.
+
+% =============================================================================
+%  REFERENCES
+% =============================================================================
+\bibliographystyle{plainnat}
+\begin{thebibliography}{99}
+
+\bibitem[Mahadevan(1977)]{Mahadevan1977}
+Mahadevan, I. (1977).
+\textit{The Indus Script: Texts, Concordance and Tables}.
+Archaeological Survey of India, New Delhi.
+
+\bibitem[Parpola(1994)]{Parpola1994}
+Parpola, A. (1994).
+\textit{Deciphering the Indus Script}.
+Cambridge University Press, Cambridge.
+
+\bibitem[Rao et al.(2009)]{Rao2009}
+Rao, R.P.N., Yadav, N., Vahia, M.N., Joglekar, H., Adhikari, R., and
+Mahadevan, I. (2009).
+Entropic evidence for linguistic structure in the Indus script.
+\textit{Science}, 324(5931):1165.
+\href{https://doi.org/10.1126/science.1170391}{doi:10.1126/science.1170391}
+
+\bibitem[Venugopal(2024)]{VenugopalTSF2024}
+Venugopal, R. (2024).
+The Temporal Stability Framework: Dictionary Conditions and Lexical
+Structure.
+Third Buyer Advisory Working Paper.
+\href{https://thirdbuyeradvisory.org}{thirdbuyeradvisory.org}
+
+\bibitem[Venugopal(2025)]{VenugopalAlloy2025}
+Venugopal, R. (2025).
+Alloy-Verified Normalisation and Linkage Classification for the TSF AST Schema.
+Third Buyer Advisory Technical Report.
+\href{https://thirdbuyeradvisory.org}{thirdbuyeradvisory.org}
+
+\bibitem[Wells(2011)]{Wells2011}
+Wells, B. (2011).
+An Introduction to Indus Writing.
+\textit{Electronic Journal of Vedic Studies}, 18(1):1--70.
+
+\end{thebibliography}
+
+\end{document}

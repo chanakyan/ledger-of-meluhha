@@ -1,0 +1,496 @@
+﻿# Ledger of Meluhha — Visualization Architecture
+## Third Buyer Advisory LLC | Venugopal 2026
+
+
+---
+
+
+## What It Is
+
+
+A single self-contained HTML file. User drags a database file
+onto the page. Everything renders live — geographic trade map,
+decoded seals, sign frequency, weight codebook — all from live
+queries against the Alloy-verified corpus schema. No server.
+No build chain. No framework. Just a browser and a database file.
+
+
+---
+
+
+## Design Language
+
+
+### Visual identity
+- Header link: thirdbuyeradvisory.org
+- Background: #0f0c07 (near-black, warm)
+- Accent: #b5121b (TBAred)
+- Primary text: #f0e6d0 (warm sand)
+- Data color: #c4924a (clay)
+- Display font: Cormorant Garamond — narrative, conclusions,
+  titles. Weight 300 for large headings. Italic for emphasis.
+- Data font: JetBrains Mono — sign numbers, field labels,
+  weights, coordinates, methodology notes.
+- Font is epistemological status. Cormorant = interpretation.
+  JetBrains Mono = fact.
+
+
+### Tufte rules — non-negotiable
+1. Data-ink ratio. No chartjunk. No grid boxes. No panel borders
+   around data. No background fills on charts. Every mark earns
+   its place.
+2. Direct annotation. Routes labeled at midpoint. Sites labeled
+   at the dot. No floating legend box anywhere on the page.
+3. Small multiples. All routes visible simultaneously at low
+   opacity. Hover brings one forward. The comparison between
+   iron moving north and jar goods moving west is the argument —
+   it must be visible simultaneously, not sequentially.
+4. One claim sentence per panel. Above every visualization, a
+   declarative sentence stating what the data shows. The chart
+   proves the sentence. Not a title. A conclusion.
+5. The detail is the hero. The decoded seal field breakdown —
+   F1 through F5, sign number, concordance path, resolved value —
+   is shown large and complete, not tucked away.
+
+
+---
+
+
+## Width Encoding — Sankey Routes on Geography
+
+
+Route stroke-width is proportional to relative trade volume
+derived from cuneiform Meluhha records. This is the primary
+analytical contribution of the visualization.
+
+
+| Route                         | Width | Evidence basis |
+|-------------------------------|-------|----------------|
+| Jar goods to Mesopotamia      | 8px   | S-342 = 10% of entire corpus |
+| Textiles to Mesopotamia       | 6px   | Primary bulk cuneiform record |
+| Copper-bronze to Magan/Dilmun | 5px   | Khetri mines to Lothal to Oman |
+| Carnelian to Dilmun           | 4px   | Luxury export, lower volume |
+| Iron: Tamil Nadu to IVC       | 3px   | Fish sign supply corridor |
+| Timber and Ivory              | 2px   | Sporadic high-value lots |
+
+
+Width calibration bar drawn directly on map, bottom-left.
+Annotated in place: "Width proportional to relative trade volume
+(cuneiform records)." No legend box. One reference mark.
+
+
+### The crossing
+
+
+The iron supply corridor — green, thin, running south-to-north
+from Tamil Nadu — crosses the jar goods maritime route — clay,
+thick, running west toward Mesopotamia — near the Gujarat coast.
+Lothal sits exactly at the crossing node.
+
+
+This crossing is the paper's argument made visible. Iron moving
+up. Bulk goods moving out. Two ends of one ledger. Width encoding
+makes the asymmetry immediate — thick westbound export, thin
+northbound supply. The eye resolves the argument before the
+text is read.
+
+
+---
+
+
+## Layout — Three Columns
+
+
+### Left panel (~20% width)
+Decoded seals M-52A and M-148A. Each as a field card:
+F1 merchant mark, F2 commodity, F3 weight tier,
+F4 quantity, F5 route. Sign numbers and concordance
+paths in JetBrains Mono. Resolved values in Cormorant.
+Below the cards: Alloy verification badge in TBAred —
+"12 assertions UNSAT at scope 6."
+Claim sentence above: "Two seals decoded from real CISI data.
+Neither result is circular."
+
+
+### Center panel (~55% width)
+Geographic map, full height. D3 projection centered on the
+IVC trade zone. Dark water. Warm land. Width-encoded Sankey
+routes as curved SVG paths. Site dots sized by importance.
+Direct labels on major sites — Mohenjo-daro, Harappa, Lothal,
+Ur, Dilmun, Magan, Kodumanal, Keeladi. Period annotation
+top-left of map: "c. 2400 BCE — Bronze Age Trade Network"
+in JetBrains Mono, dim.
+
+
+### Right panel (~25% width)
+Three charts stacked vertically:
+
+
+Sign frequency cumulative curve. Claim sentence: "67 signs
+carry 80% of all inscriptions. A codebook, not a phonology."
+
+
+Weight codebook horizontal bars — binary series then decimal.
+Claim sentence: "Zero not invented until 628 CE. The weight
+object is the digit."
+
+
+Commodity manifest table — sign, commodity, primary route.
+Click a row to filter the map.
+
+
+---
+
+
+## Two States
+
+
+### State 1 — Landing
+Full screen dark field. TBA wordmark top-left, linked to
+thirdbuyeradvisory.org, in JetBrains Mono small.
+Title centered: "The Ledger of Meluhha" in Cormorant,
+large, weight 300.
+Below in JetBrains Mono, small, dim:
+"Drag indus_corpus.db to begin."
+Dashed border in TBAred animates on dragover.
+Drop triggers crossfade to dashboard. No page reload.
+
+
+### State 2 — Dashboard
+Full three-column layout. Everything computed live from the
+database on first drop. Stateless — refresh clears,
+drag again to reload.
+
+
+---
+
+
+## Interactions
+
+
+Hover route: JetBrains Mono tooltip — commodity name,
+relative volume, cuneiform source.
+
+
+Hover site: tooltip — name, period, role (export hub,
+supply zone, Mesopotamian destination, resource zone).
+
+
+Click seal card: that route highlights at full opacity,
+all others dim to 10%. Click again to reset.
+
+
+Click commodity manifest row: filter map to routes
+carrying that commodity only.
+
+
+---
+
+
+## Header and Footer
+
+
+Header: thirdbuyeradvisory.org left linked, JetBrains Mono.
+Paper title center, Cormorant italic. DOI and April 2026 right.
+TBAred 1px rule below header.
+
+
+Footer: "No statistical model. Deterministic join chain.
+Alloy verified. 12 assertions UNSAT at scope 6."
+JetBrains Mono, 9px, dim. The methodology as colophon.
+
+
+---
+
+
+## Data Flow
+
+
+Database file dropped onto page. FileReader reads binary into
+ArrayBuffer. sql.js WASM opens it in memory. Queries execute
+against live schema. D3 renders all panels.
+
+
+No intermediate files. No server round-trips. No JSON export.
+No build step. The HTML file is the artifact.
+
+
+---
+
+
+## Queries to Panels
+
+
+Trade route map: sites table for coordinates and type,
+routes hardcoded with width values from volume table above.
+
+
+Sign frequency: base_sign table, source MAHADEVAN,
+ordered by total descending, cumulative running sum.
+
+
+Decoded seals: cisi_inscription joined to sign_concordance,
+filtered to M-52A and M-148A, joined to codebook for
+field role resolution.
+
+
+Weight codebook: hardcoded from base unit 0.856g.
+Binary series times 1/2/4/8/16/32/64.
+Decimal series times 160/200/500/1000.
+
+
+Rajan-Sivanantham composite chart: base_sign table,
+source RS2025, ordered by composites descending, top 10.
+Sign 2.0 at 179 composites and Sign 20.0 at 0 composites
+annotated directly on the chart.
+
+
+Tamil Nadu parallels: morphological_parallel table,
+sign_a_src RS2025 joined to MAHADEVAN and CISI.
+Confidence level drives opacity on map.
+
+
+---
+
+
+## Zenodo Artifact
+
+
+ledger_of_meluhha_tba_2026.zip:
+
+
+indus_accounting.tex — paper source, 900 lines
+citations.lua — 14 sources, smartcite registry
+Program.fs — F# decoder, discriminated union type system
+Script.fsx — runnable with dotnet fsi
+IndusDecoder.fsproj — project file, no NuGet
+indus_corpus.db — Alloy-verified corpus database
+indus_codebook.db — field role codebook
+spec/indus_corpus.als — Alloy specification
+ledger_of_meluhha.html — WASM visualization, self-contained
+
+
+PDF uploaded to Zenodo separately. Never inside zip.
+
+
+---
+
+
+## What the Page Proves
+
+
+Every chart is a live query against the Alloy-verified schema.
+The decoded seals are the result of running the five-field
+join chain against real CISI inscriptions — not mock data.
+
+
+Anyone with a browser and the database file can reproduce
+every result in the paper. That is the reproducibility claim.
+
+
+---
+
+
+Third Buyer Advisory LLC | thirdbuyeradvisory.org
+Rajeshkumar Venugopal | vrajeshkumar@gmail.com
+ORCID: 0009-0002-1838-5976
+April 2026 | CC BY 4.0
+
+
+---
+
+
+## Constraints — Single HTML File
+
+
+The entire application is one HTML file. No CDN calls at runtime.
+No external dependencies. No internet connection required after
+the file is saved.
+
+
+Plotly.js compiled in. The Plotly bundle is embedded directly
+inside the HTML file as an inline script. One file, opens
+anywhere, works offline. Size will be approximately 3–4MB —
+acceptable for a research artifact.
+
+
+sql.js WASM compiled in. The WebAssembly binary for SQLite is
+base64-encoded and embedded inline. No CDN. No locateFile path.
+The WASM module initialises from the embedded binary on load.
+
+
+D3.js compiled in. The D3 bundle embedded inline alongside
+Plotly for the geographic map rendering.
+
+
+Result: the HTML file is fully self-contained. Drop it on a
+USB stick, open it on an air-gapped machine, drag the database
+file onto it — everything works. That is the correct constraint
+for an archival research artifact.
+
+
+The database files ship separately in the Zenodo zip.
+The HTML file needs no network access whatsoever.
+
+
+### Chart library division
+
+
+D3 handles the geographic map — projection, curved route paths,
+site dots, direct annotation, width-encoded Sankey strokes.
+D3 is the right tool for geographic SVG.
+
+
+Plotly handles the analytic charts — sign frequency cumulative
+curve, weight codebook horizontal bars, Rajan-Sivanantham
+composite bar chart. Plotly produces cleaner interactive charts
+with less code for these panel visualizations.
+
+
+Both libraries embedded inline. No conflict.
+
+
+---
+
+
+## Excel and SQLite — Direct Connection
+
+
+No Excel export script. No intermediate files. Excel connects
+directly to the SQLite databases.
+
+
+Data → Get Data → From Database → From SQLite Database.
+Point at indus_corpus.db or indus_codebook.db.
+Every table loads as a named Power Query.
+Joins, filters, and pivots work on the live data.
+Refresh pulls from the database file directly.
+
+
+This means researchers get full analytical access without
+any export step. The database is the source of truth.
+Excel is the analysis surface. They stay in sync.
+
+
+Platform note: on Windows, SQLite ODBC is straightforward.
+On Mac, the sqliteodbc driver from Christian Werner is required
+before the Excel connection works. Worth installing before
+sitting down with the data.
+
+
+The Zenodo zip ships the two database files. Researchers
+connect Excel themselves. No workbook to maintain.
+No export script to run.
+
+
+---
+
+
+## Data Registry — What the Map Needs to Light Up
+
+
+The map renders what it has. Each data source added unlocks
+more routes, more sites, more decoded seals. This is the
+live research agenda expressed as a visualization roadmap.
+
+
+### Currently in indus_corpus.db — renders now
+
+
+MAHADEVAN concordance: 402 signs with frequency data.
+Sign frequency chart renders. S-342 at 10% visible.
+67-sign threshold visible.
+
+
+CISI Mohenjo-daro M-1 through M-199: 179 inscriptions.
+M-52A and M-148A decoded. Both render as seal cards.
+Jar goods commodity confirmed. Mesopotamia route on map.
+
+
+RS2025 Rajan-Sivanantham: 42 base signs, 544 variants,
+1521 composites from 140 Tamil Nadu sites.
+Supply corridor routes render. Sign 2.0 and Sign 20.0
+composite chart renders.
+
+
+Weight codebook: binary and decimal series hardcoded.
+Weight bars render immediately, no database needed.
+
+
+### Data needed — each unlocks map features
+
+
+ICIT database (Wells and Fuls, TU Berlin).
+Contact: andreas.fuls@tu-berlin.de
+4,660 artefacts, 5,644 texts, 17,957 signs.
+Unlocks: 18 pending parallels decode. Harappa, Kalibangan,
+Rojdi seals render on map. Route coverage increases from
+2 decoded points to 20. The map fills in.
+
+
+CISI volumes 2 and 3 digitisation.
+Mohenjo-daro M-200 onward, Harappa, Mohenjodaro Pakistan
+collections. Currently only mayig/indus-valley-script-corpus
+covers M-1 through M-199 on GitHub (CC BY 4.0).
+Unlocks: full Mohenjo-daro corpus. All unicorn guild
+shipments traceable. Commodity distribution by site visible.
+
+
+Mesopotamian findspot inventory (Ratnagar 2003).
+Harappan seals and weights found at Ur, Kish, Tell Asmar,
+with provenance data.
+Unlocks: the critical falsification test. Sign distribution
+at Mesopotamian sites versus full Harappan corpus. If
+commodity codes cluster at export destinations, the barcode
+model is confirmed. This is the most important missing data.
+
+
+Stratigraphic co-occurrence data.
+Weight objects found in same archaeological layer as
+specific seal types, by site.
+Unlocks: weight-tier sign correlation. If sign 5 (binary x16)
+appears with the 13.65g weight in the same deposit, field F3
+assignment is independently confirmed.
+
+
+Additional Tamil Nadu site graffiti.
+Rajan-Sivanantham cover 140 sites. More sites are being
+excavated — Sivagalai, Adichanallur ongoing.
+Unlocks: supply corridor density increases. More potsherd
+marks plotted on map. The fish sign distribution across
+Tamil Nadu sites becomes visible as a geographic pattern.
+
+
+Lothal warehouse context data.
+Inscribed sealings by find context — warehouse floor,
+gate, residential, ceremonial.
+Unlocks: spatial concentration test. If sealings cluster
+at warehouse and dock contexts, boundary condition BC-1
+is confirmed. This can be checked against published
+Lothal excavation reports (Rao 1973).
+
+
+### Priority order for data acquisition
+
+
+1. Write to Andreas Fuls for ICIT access — unlocks 18 seals
+2. Ratnagar (2003) Mesopotamian findspot table — unlocks
+   the falsification test
+3. Lothal context data from Rao (1973) excavation report —
+   unlocks BC-1 confirmation
+4. CISI volumes 2 and 3 digitisation — long term
+
+
+### What the map looks like at full data
+
+
+Every major IVC site plotted with seal count.
+Every commodity route width-encoded from corpus frequency.
+Every decoded seal as a clickable card highlighting its route.
+Tamil Nadu supply sites plotted with potsherd count.
+Mesopotamian destination sites with cuneiform receipt count.
+The crossing — iron north, jar goods west — visible at every
+zoom level. Lothal as the node where both ledgers meet.
+
+
+That is the target. Each dataset is one more lamp turned on.

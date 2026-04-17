@@ -24,3 +24,6 @@ build/
 # PDF — generated from tex, not tracked
 # (ship the tex, not the pdf — Overleaf or cmake --build build --target paper)
 *.pdf
+
+# Large archives — backed up to GDrive, not tracked in git
+data/indus-valley-archive.tar.gz

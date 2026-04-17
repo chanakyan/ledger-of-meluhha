@@ -1,0 +1,1019 @@
+% !TEX program = xelatex
+% Against the Disturbance Hypothesis — Third Buyer Advisory Working Paper
+% Raj Sivasubramanian  ORCID 0009-0002-1838-5976
+\documentclass[12pt,a4paper]{article}
+
+% ── Fonts ─────────────────────────────────────────────────────────────────
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Pagella}
+\usepackage[final]{microtype}
+
+% ── Layout ────────────────────────────────────────────────────────────────
+\usepackage[a4paper,top=25mm,bottom=25mm,left=28mm,right=28mm,
+            headheight=15pt]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0pt}
+\setlength{\parindent}{1.5em}
+\hbadness=10000
+\setlength{\emergencystretch}{3em}
+\hfuzz=5pt
+\hyphenation{May-ila-dum-pa-rai Ad-i-cha-nal-lur Ti-ru-van-na-ma-lai}
+
+% ── Headers ───────────────────────────────────────────────────────────────
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{Third Buyer Advisory}}
+\fancyhead[R]{\small\textit{Working Paper --- April 2026}}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ── Maths ─────────────────────────────────────────────────────────────────
+\usepackage{amsmath,amssymb}
+
+% ── Numbers ───────────────────────────────────────────────────────────────
+\usepackage{siunitx}
+\sisetup{group-separator={,},group-minimum-digits=4}
+
+% ── Tables ────────────────────────────────────────────────────────────────
+\usepackage{booktabs,longtable,array}
+\usepackage{graphicx}
+\setlength{\tabcolsep}{5pt}
+
+% ── Colours ───────────────────────────────────────────────────────────────
+\usepackage{xcolor}
+\definecolor{TBAred}{HTML}{b5121b}
+\definecolor{codebg}{HTML}{f8f8f8}
+\definecolor{codecomment}{HTML}{555555}
+\definecolor{codekey}{HTML}{0000aa}
+
+% ── Listings ──────────────────────────────────────────────────────────────
+\usepackage{listings}
+\lstset{
+  basicstyle      = \ttfamily\fontsize{7.5}{9.5}\selectfont,
+  backgroundcolor = \color{codebg},
+  frame=single, framesep=4pt, xleftmargin=4pt, xrightmargin=4pt,
+  breaklines=true, breakatwhitespace=false,
+  columns=fullflexible, keepspaces=true,
+  commentstyle=\color{codecomment}\itshape,
+  keywordstyle=\color{codekey}\bfseries,
+  showstringspaces=false, language=SQL,
+  morekeywords={REFERENCES,RESTRICT,CASCADE,UNIQUE,DEFAULT,CHECK,
+    BETWEEN,TRIGGER,BEFORE,BEGIN,CASE,WHEN,THEN,RAISE,ABORT,END,
+    PRAGMA,FOREIGN,KEYS,DISTINCT,COUNT,LIMIT,DELETE,OR,AND}
+}
+
+% ── Links & ORCID ─────────────────────────────────────────────────────────
+\usepackage[colorlinks=true,linkcolor=black,
+            urlcolor=black,citecolor=black]{hyperref}
+\usepackage{orcidlink}
+
+% ── Appendix ──────────────────────────────────────────────────────────────
+\usepackage[title]{appendix}
+
+% ── Shortcuts ─────────────────────────────────────────────────────────────
+\newcommand{\BCE}[1]{#1\,\textsc{bce}}
+\newcommand{\prob}[1]{\Pr\!\left(#1\right)}
+\newcommand{\Ho}{\mathcal{H}_0}
+\newcommand{\Ha}{\mathcal{H}_1}
+
+% ══════════════════════════════════════════════════════════════════════════
+\begin{document}
+% ══════════════════════════════════════════════════════════════════════════
+
+%% ── Title page ────────────────────────────────────────────────────────────
+\begin{titlepage}
+\begin{center}
+\vspace*{16mm}
+{\color{TBAred}\rule{\textwidth}{1.5pt}}\vspace{5mm}
+
+{\fontsize{18}{23}\selectfont\bfseries
+Tamil Civilization Is More Ancient Than Assumed:\\[4pt]
+A Statistical Case from Radiometric Evidence}
+
+\vspace{4mm}
+{\fontsize{11}{15}\selectfont\itshape
+Against the Stratigraphic Disturbance Hypothesis ---
+Independent Sites, Independent Laboratories, Independent Materials,
+and What the Bernoulli Distribution Says About Iron Age Tamil Nadu}
+
+\vspace{5mm}
+{\color{TBAred}\rule{\textwidth}{1.5pt}}\vspace{14mm}
+
+{\large Raj Sivasubramanian \orcidlink{0009-0002-1838-5976}}\\[3mm]
+{\itshape Third Buyer Advisory}\\[1mm]
+{\small\url{https://thirdbuyeradvisory.org}}
+
+\vspace{12mm}
+{\small Working Paper\quad\textbullet\quad April 2026}
+\vspace{14mm}
+
+\begin{minipage}{0.88\textwidth}
+\setlength{\parskip}{6pt}\setlength{\parindent}{0pt}\small
+\textbf{Abstract.}
+The primary objection to early radiometric dates from Tamil Nadu iron age
+sites is stratigraphic disturbance: organic material may predate the iron
+objects with which it is associated, producing spuriously old measurements.
+This paper demonstrates that the disturbance hypothesis is statistically
+implausible as a complete explanation. Five geographically independent
+sites---Sivagalai, Adichanallur, Mayiladumparai, Kilnamandi, and
+Mangadu---each yield early dates in direct association with iron.
+Under a generous per-site disturbance prior of $p = 0.20$, the
+probability that all five are simultaneously disturbed is
+$p^{5} = \num{3.2e-4}$. Three independent laboratories measuring
+samples from a single Sivagalai burial urn converge on
+third-millennium \textsc{bce} results using two entirely different
+physical methods---AMS $^{14}$C and optically stimulated
+luminescence---multiplying the improbability by a further factor of
+$10^{3}$. Multiple independent organic materials (charcoal, paddy,
+millet) at the same sites show consistent early clustering. Noise
+scatters. Signal clusters. The observed pattern is signal.
+\end{minipage}
+\end{center}
+\end{titlepage}
+
+\newpage\tableofcontents\newpage
+
+%% ── 1. Introduction ───────────────────────────────────────────────────────
+\section{Introduction}
+
+The Tamil Nadu State Department of Archaeology, in collaboration with the
+Archaeological Survey of India and several universities, published in 2025
+a compilation of radiometric dates from iron age sites across the
+state.\footnote{K.~Rajan and R.~Sivanantham,
+\textit{Antiquity of Iron: Recent Radiometric Dates from Tamil Nadu},
+Publication No.~356, Tamil Nadu Department of Archaeology, 2025. All
+dates cited in this paper derive from a structured relational database
+constructed from that report. The schema and full date table appear in
+Appendices A and B.}
+Three dates from Sivagalai carry calibrated ages in the first quarter of
+the fourth millennium \textsc{bce}---contemporaneous with the early
+Harappan phase. Figure~\ref{fig:map} locates the primary sites.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.70\textwidth]{tn_sites_map.pdf}
+\caption{Tamil Nadu iron age sites with radiometric dates. Solid red
+circles mark the five primary sites constituting the independence argument
+(\S\,\ref{sec:independence}). Hollow red circles mark additional sites
+in the dataset. Grey points are reference cities. Coordinates from the
+project database, sourced from Rajan and Sivanantham (2025).}
+\label{fig:map}
+\end{figure}
+
+Expert commentary has come from Dilip Kumar Chakrabarti (Cambridge),
+K.~Paddayya (Deccan College), Rakesh Tewari (former Director General,
+Archaeological Survey of India), and Osmund Bopearachchi
+(Berkeley / CNRS Paris). No published rebuttal has challenged the
+laboratory results directly. The operative objection is stratigraphic
+disturbance.
+
+Stratigraphic disturbance is a legitimate concern. Charcoal recovered from
+an excavation trench may originate from wood that burned centuries before
+the surrounding cultural material was deposited.\footnote{The old wood
+problem is most acute for long-lived tree species in temperate climates.
+In tropical South India, where large old-growth conifers are absent from
+the archaeological record, the structural magnitude of the effect is
+smaller, as Sharada Srinivasan notes in her commentary accompanying the
+Antiquity of Iron report.}
+A single early date from a single site warrants caution. The argument
+changes when early dates appear at multiple geographically independent
+sites, when multiple material types converge on similar chronologies,
+and when independent laboratories using different physical methods produce
+consistent results. This paper formalises that argument.
+
+The claim is precise and limited: \textit{stratigraphic disturbance is
+statistically implausible as a complete explanation for the observed
+pattern of early radiometric dates across Tamil Nadu iron age sites.}
+No claim is made about the absolute antiquity of iron technology in South
+India, nor that every early date is correct. The argument is that the null
+hypothesis of universal disturbance cannot be maintained at any reasonable
+probability threshold.
+
+%% ── 2. Null hypothesis ────────────────────────────────────────────────────
+\section{The Null Hypothesis}
+
+Let $\mathcal{S} = \{s_1, s_2, \ldots, s_n\}$ be the set of $n$
+independently excavated sites, each yielding at least one early radiometric
+date in direct association with iron objects. Define $D_i$ as the event
+that the early dates from site $s_i$ are entirely attributable to
+stratigraphic disturbance or sample contamination rather than genuine
+antiquity.
+
+The null hypothesis requires universal disturbance:
+\begin{equation}
+  \Ho : \bigcap_{i=1}^{n} D_i \label{eq:H0}
+\end{equation}
+
+The alternative requires only a single genuine site:
+\begin{equation}
+  \Ha : \exists\; i \in \{1,\ldots,n\} \text{ such that } D_i^{c}
+  \label{eq:H1}
+\end{equation}
+
+%% ── 3. Site independence ──────────────────────────────────────────────────
+\section{Site Independence}
+\label{sec:independence}
+
+The joint probability under $\Ho$ requires an assessment of independence.
+Table~\ref{tab:sites} summarises the five primary sites. They span four
+districts and three river basins. Geographic separation ranges from
+approximately \SI{80}{\kilo\metre} between the adjacent Tamirabarani
+sites to over \SI{400}{\kilo\metre} between Sivagalai and Kilnamandi.
+Different field teams conducted each excavation; different national
+institutions were involved; the laboratories were independent. The
+river basins are: Tamirabarani (coastal alluvial), Palar system
+(granite upland), and Kaveri (inland floodplain)---three geologically
+distinct environments.
+
+\begin{table}[h!]
+\centering
+\small
+\caption{Primary Tamil Nadu sites with iron-associated early radiometric
+dates. All primary dates are AMS $^{14}$C on charcoal unless stated.
+Earliest BCE refers to the midpoint of the primary calibrated range.}
+\label{tab:sites}
+\begin{tabular}{@{}
+  p{3.1cm}
+  p{3.0cm}
+  p{3.1cm}
+  p{3.8cm}
+  r
+@{}}
+\toprule
+\textbf{Site} & \textbf{District} & \textbf{River basin} &
+\textbf{Excavating body} & \textbf{BCE} \\
+\midrule
+Sivagalai      & Thoothukudi    & Tamirabarani    & TNSDA              & 3345 \\
+Adichanallur   & Tirunelveli    & Tamirabarani    & ASI / TNSDA        & 2522 \\
+Mayiladumparai & Krishnagiri    & Palar system    & TNSDA              & 2172 \\
+Kilnamandi     & Tiruvannamalai & Cheyyar / Palar & TNSDA              & 1692 \\
+Mangadu        & Salem          & Kaveri          & Pondicherry Univ.  & 1510 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Sivagalai and Adichanallur share the Tamirabarani basin, introducing a
+limited positive correlation. The remaining three sites---Mayiladumparai
+(granite hill terrace), Kilnamandi (red laterite, Tiruvannamalai), and
+Mangadu (Kaveri floodplain, Salem)---are geologically and geographically
+distinct. The assumption of independence is well supported for the
+five-site set as a whole.
+
+%% ── 4. Probability model ──────────────────────────────────────────────────
+\section{The Probability Model}
+
+\subsection{Single-site prior}
+
+Assign a prior probability $p = \prob{D_i}$ that disturbance explains all
+early dates at site $s_i$. This paper adopts $p = 0.20$: one in five
+professionally conducted excavations with sealed urns, multiple samples,
+and documented stratigraphic sections would yield early dates entirely
+attributable to contamination. Beta Analytic's ISO/IEC~17025:2017
+certification constrains laboratory error to well below this level.
+The $p = 0.20$ prior is conservative in the direction that most
+favours $\Ho$.
+
+\subsection{Joint probability under independence}
+
+\begin{equation}
+  \prob{\Ho}
+    = \prod_{i=1}^{5} p_i
+    = (0.20)^5
+    = 3.20 \times 10^{-4}
+  \label{eq:joint}
+\end{equation}
+
+Table~\ref{tab:probs} shows the sensitivity to the prior assumption.
+
+\begin{table}[h!]
+\centering
+\small
+\caption{Joint probability that all five sites are simultaneously
+disturbed, as a function of the per-site prior~$p$.}
+\label{tab:probs}
+\begin{tabular}{@{}
+  >{\centering\arraybackslash}p{3.0cm}
+  >{\centering\arraybackslash}p{3.8cm}
+  >{\raggedright\arraybackslash}p{5.5cm}
+@{}}
+\toprule
+\textbf{Prior} $p$ &
+\textbf{Joint} $p^5$ &
+\textbf{Odds against $\Ho$} \\
+\midrule
+0.30 & $2.43\times10^{-3}$ & $\approx 411:1$              \\
+0.20 & $3.20\times10^{-4}$ & $\approx 3{,}124:1$           \\
+0.10 & $1.00\times10^{-5}$ & $\approx 99{,}999:1$          \\
+0.05 & $3.13\times10^{-7}$ & $\approx 3.2\times10^{6}:1$   \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Bayesian update}
+
+A skeptic at exact equipoise ($\prob{\Ho}=0.5$) who observes concordant
+early dates at five independent sites should update via:
+\begin{equation}
+  \Lambda
+    = \frac{\prob{\text{data}\mid\Ha}}{\prob{\text{data}\mid\Ho}}
+    \;\geq\; \frac{1}{p^5}
+    = \frac{1}{3.20\times10^{-4}}
+    \approx 3125
+  \label{eq:LR}
+\end{equation}
+\begin{equation}
+  \prob{\Ho\mid\text{data}}
+    = \frac{0.5}{0.5 + 0.5\times 3125}
+    \approx 3.2\times10^{-4}
+  \label{eq:posterior}
+\end{equation}
+
+A skeptic who begins at equipoise and observes five concordant independent
+sites should assign a posterior probability of approximately
+$3\times10^{-4}$ to universal disturbance.
+
+%% ── 5. Multi-laboratory cross-validation ──────────────────────────────────
+\section{Multi-Laboratory Cross-Validation}
+
+Samples from Sivagalai Trench A2-Urn-1 were submitted independently to
+three laboratories using two different physical methods.
+Table~\ref{tab:crosslab} presents the results.
+
+\begin{table}[h!]
+\centering\small
+\caption{Three independent measurements from Sivagalai Trench A2-Urn-1.
+Two physical methods; three independent institutions; all results in the
+third millennium \textsc{bce}. $^\ddagger$Provisional OSL dates; see
+text. Lab identifiers: BA~=~Beta Analytic (Miami, FL, USA);
+BSIP~=~Birbal Sahani Institute of Palaeosciences, Lucknow;
+PRL~=~Physical Research Laboratory, Ahmedabad.}
+\label{tab:crosslab}
+\begin{tabular}{@{}
+  p{1.0cm}
+  p{2.0cm}
+  >{\raggedleft\arraybackslash}p{2.4cm}
+  p{3.0cm}
+  p{1.8cm}
+  p{1.8cm}
+@{}}
+\toprule
+\textbf{Lab} & \textbf{Method} & \textbf{BP} &
+\textbf{Calibrated range} & \textbf{Material} & \textbf{Mid BCE} \\
+\midrule
+BA   & AMS $^{14}$C & $4540\pm30$  & 3243--3102\,\textsc{bce}  & Charcoal & 3172 \\
+BSIP & OSL$^\ddagger$ & $4479\pm358$ & 2817--2101\,\textsc{bce} & Ceramic  & 2459 \\
+PRL  & OSL$^\ddagger$ & $4447\pm402$ & 2829--2025\,\textsc{bce} & Ceramic  & 2427 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The three results are independent in every relevant sense: different
+laboratories, different continents (USA; India), different physical
+principles ($^{14}$C nuclear decay counting versus photon-stimulated
+electron release from crystal lattices), and different materials (charcoal
+versus fired ceramic). Any systematic error in one method does not
+propagate to the other.
+
+Let $L_j$ be the event that laboratory $j$ errs by a margin sufficient to
+explain the observed early date. The events $L_1, L_2, L_3$ are
+independent by construction. Assigning a generous single-laboratory error
+probability $q = 0.10$:
+\begin{equation}
+  \prob{L_1 \cap L_2 \cap L_3}
+    = q^3 = (0.10)^3 = 1.0\times10^{-3}
+  \label{eq:labprob}
+\end{equation}
+
+Site disturbance and laboratory error are independent noise sources.
+Combined with the five-site calculation:
+\begin{equation}
+  \prob{\Ho}\times\prob{\text{3 labs wrong}}
+    = 3.2\times10^{-4}\times 1.0\times10^{-3}
+    = 3.2\times10^{-7}
+  \label{eq:combined}
+\end{equation}
+
+Approximately one in three million.
+
+%% ── 6. Multi-material corroboration ───────────────────────────────────────
+\section{Multi-Material Corroboration}
+
+Stratigraphic disturbance and the old wood problem have distinct signatures
+by material type. Charcoal is susceptible to both: it may originate from
+the heartwood of a long-lived tree and may be introduced into younger
+strata through bioturbation. Paddy and millet are annual crops; their
+radiocarbon age cannot exceed one year at harvest---old wood contamination
+is structurally excluded. Ceramics dated by OSL record the last firing of
+the vessel; the contamination pathway is post-firing light exposure,
+entirely independent of $^{14}$C pathways.
+Table~\ref{tab:materials} summarises the independence.
+
+\begin{table}[h!]
+\centering\small
+\caption{Contamination pathways by material type. Each row represents
+an independent error model. Convergent early dates across rows cannot
+be explained by any single disturbance mechanism.}
+\label{tab:materials}
+\begin{tabular}{@{}
+  p{1.9cm}
+  p{2.6cm}
+  p{7.6cm}
+@{}}
+\toprule
+\textbf{Material} & \textbf{Dating basis} & \textbf{Primary disturbance pathway} \\
+\midrule
+Charcoal
+  & $^{14}$C decay
+  & Old wood; bioturbation; root intrusion; alluvial reworking \\[3pt]
+Paddy
+  & $^{14}$C decay
+  & Bulk contamination only; old wood excluded (annual crop) \\[3pt]
+Millet
+  & $^{14}$C decay
+  & Bulk contamination only; old wood excluded (annual crop) \\[3pt]
+Ceramic
+  & OSL (electron traps)
+  & Post-firing light exposure; partial bleaching;
+    independent of $^{14}$C pathways \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At Sivagalai alone, three material types yield early dates: charcoal
+(\BCE{3345}, \BCE{3259}, \BCE{2953}), ceramic by OSL (\BCE{2459},
+\BCE{2450}, \BCE{2427}), and paddy (\BCE{1155} for a later urn
+context).\footnote{The paddy date of \BCE{1155} is from Trench
+A2-Urn-3, a different burial from the charcoal and ceramic samples.
+Its later date is consistent with the site's occupational sequence.}
+At Adichanallur, paddy (\BCE{1149}) and millet (\BCE{1441}) corroborate
+the charcoal date (\BCE{2522}).
+
+Let $M_c$, $M_p$, and $M_\mathrm{osl}$ denote disturbance events for
+charcoal, paddy, and ceramic. These events are independent:
+\begin{equation}
+  \prob{M_c \cap M_p \cap M_\mathrm{osl}}
+    = 0.20\times 0.05\times 0.10
+    = 1.0\times10^{-3}
+  \label{eq:matresult}
+\end{equation}
+
+This argument holds within a single site, independent of the five-site
+calculation.
+
+%% ── 7. Signal versus noise ────────────────────────────────────────────────
+\section{Signal Versus Noise}
+
+In discrete signal processing, the measurement at site $n$ is:
+\begin{equation}
+  y(n) = x(n) + \varepsilon(n)
+  \label{eq:signalmodel}
+\end{equation}
+
+Under $\Ho$, the true signal $x(n) = 0$ for all $n$; what we observe
+is pure noise. The diagnostic property of noise is that it is
+uncorrelated across independent channels:
+\begin{equation}
+  R_{\varepsilon\varepsilon}(n_1, n_2)
+    = \mathbb{E}[\varepsilon(n_1)\,\varepsilon(n_2)] = 0
+    \quad n_1 \neq n_2
+  \label{eq:crosscorr}
+\end{equation}
+
+If disturbance explains the dates, they should scatter across the full
+range of plausible contamination ages with no coherent structure. The
+observed pattern is the opposite: dates cluster in the second and third
+millennia \textsc{bce} across all five sites, with none producing random
+scatter toward other periods. Clustering across independent channels is
+the signature of signal. This is the detection criterion applied in
+every multi-sensor system: when five independent channels register an
+anomaly in the same frequency band, the null hypothesis of pure noise is
+rejected on precisely the grounds formalised in
+equation~\eqref{eq:joint}.
+
+%% ── 8. The strongest objection ────────────────────────────────────────────
+\section{The Strongest Version of the Objection}
+
+The strongest form of $\Ho$ is not independent disturbance but a
+systematic environmental bias---a shared regional mechanism that
+consistently introduces older material into iron-bearing layers across
+Tamil Nadu. This version requires four simultaneous conditions,
+each independently contested.
+
+\textit{First}, the bias must operate across heterogeneous geological
+zones: coastal alluvial Tamirabarani, granite hill terraces in
+Krishnagiri, red laterite in Tiruvannamalai, and Kaveri floodplain in
+Salem. No documented mechanism produces consistent charcoal enrichment
+across this diversity.
+
+\textit{Second}, the bias must operate through annual-crop materials---paddy
+and millet---as well as charcoal. Annual crops cannot carry old wood.
+A systematic environmental mechanism that uniformly ages paddy to the
+second or third millennium \textsc{bce} does not exist in the
+radiocarbon literature.
+
+\textit{Third}, the bias must operate through OSL as well as AMS~$^{14}$C.
+A shared environmental factor that simultaneously biases nuclear decay
+counting and solid-state luminescence in the same direction and by the
+same magnitude is physically implausible.
+
+\textit{Fourth}, the bias must operate consistently across laboratories
+in Miami, Lucknow, and Ahmedabad---institutions sharing no equipment,
+personnel, pre-treatment protocols, or reference standards.
+
+The systematic-bias form of $\Ho$ thus collapses into a requirement for
+multiple simultaneous independent improbabilities. It does not rescue the
+disturbance hypothesis; it reconstructs it with additional terms, each
+multiplying the joint improbability further.
+
+%% ── 9. Scope and limitations ──────────────────────────────────────────────
+\section{Scope and Limitations}
+
+This paper establishes a single limited claim: the universal disturbance
+hypothesis is statistically implausible given the observed pattern of dates.
+
+The paper does not establish the specific date of introduction of iron
+technology in Tamil Nadu. Radiometric dates establish the age of the
+dated material, not directly the age of associated iron objects. Charcoal,
+paddy, and ceramic are proxies for the age of their burial context.
+
+The paper does not claim individual dates are free of error. Some
+measurements may reflect contamination or disturbance. The argument
+requires only that not all of them do---that at least one site has
+genuine early signal.
+
+The paper does not adjudicate between the Tamirabarani and
+non-Tamirabarani components. The strongest dates (third millennium
+\textsc{bce}) come from Sivagalai alone. Whether those specifically
+are genuine requires continued excavation and independent replication
+at new sites.
+
+What the statistical argument establishes is that continued use of
+``stratigraphic disturbance'' as a sufficient refutation---without
+engagement with the multi-site, multi-material, multi-laboratory
+structure of the evidence---is not epistemically defensible. The
+hypothesis requires specific falsification, not generic invocation.
+
+%% ── 10. Civilizational Implications ──────────────────────────────────────
+\section{Civilizational Implications}
+
+The statistical argument in this paper is not a footnote to the archaeological
+debate. If it holds---and the burden of proof now rests on those who would
+dismiss it---the implications are substantial enough to state plainly.
+
+\subsection*{What we are actually saying}
+
+Iron working at the level documented in the Tamil Nadu sites does not appear
+in isolation. It presupposes settled communities, smelting knowledge, fuel
+and ore management, and the transmission of technical skill across
+generations. The presence of iron objects inside burial urns is not
+incidental contamination. It is evidence of a society that assigned iron
+enough cultural value to inter it with its dead---a marker of social
+complexity, not of accident.
+
+The Sivagalai dates place iron-associated activity in Tamil Nadu between
+3000 and 3300~\textsc{bce}. The Adichanallur date places it at
+2522~\textsc{bce}. Taking the conservative anchor---the third millennium
+\textsc{bce} as the working lower bound, supported by three independent
+laboratories and two independent physical methods---Tamil-speaking communities
+in peninsular India were engaged in iron metallurgy contemporaneously with
+the mature phase of the Indus Valley civilization. This is not incremental
+revision. It is a different account of where early technical civilization
+was located.
+
+\subsection*{The world at 2500--3300~\textsc{bce}}
+
+Context makes the significance concrete. At 3300~\textsc{bce}, the Indus
+Valley civilization was in its early Kot Diji phase---pre-urban, not yet
+at Mohenjo-daro. Egypt had not yet built the Step Pyramid of Djoser
+(2650~\textsc{bce}). The Great Pyramid at Giza was not constructed until
+approximately 2560~\textsc{bce}. Mesopotamia was in its Early Dynastic
+period; Sumerian city-states were active, cuneiform was new, and bronze
+was the dominant working metal. Iron working in the ancient Near East
+and the Mediterranean did not become widespread until the Iron Age
+transition of 1200--1500~\textsc{bce}.
+
+Tamil Nadu, on the statistical evidence presented here, was smelting
+and burying iron objects before the Great Pyramid was built.
+
+\subsection*{On the question of Tamil antiquity}
+
+No Tamil script is attested before Tamil Brahmi in the third century
+\textsc{bce}. But script is not the measure of civilization. The Indus
+Valley civilization ran for centuries with a writing system we cannot
+read, or possibly with no script in the conventional sense. Oral
+tradition in Tamil is documented as extraordinarily old; the
+\textit{Tolkappiyam} presupposes a grammatical tradition behind it,
+and the Sangam corpus references earlier lost literature. Linguistic
+and cultural depth does not wait for inscription.
+
+If iron-associated burial practice at this level of consistency and
+geographic spread was present in Tamil Nadu by the third millennium
+\textsc{bce}, the question of how far back the underlying population,
+language, and cultural substrate extends is no longer a fringe inquiry.
+It is a serious historical question that the evidence now compels.
+
+\subsection*{The standard model is under pressure}
+
+The conventional South Asian narrative places the beginning of the
+South Indian iron age at approximately 1000--1200~\textsc{bce}, derived
+from northern influence following the decline of Harappan urbanism.
+The Tamil Nadu radiometric record, taken at face value, inverts this
+picture. The iron tradition in peninsular India may not be a late
+arrival from the north. It may be among the earliest in the subcontinent,
+and possibly in the ancient world.
+
+That claim demands further excavation, independent replication at new
+sites, and continued radiometric work. But the statistical threshold for
+dismissing it has now been crossed. The disturbance hypothesis, applied
+as a blanket refutation without site-specific evidence, is not a
+scientific position. The evidence requires engagement on its own terms.
+
+%% ── 11. What the Evidence Actually Says ──────────────────────────────────
+\section{What the Evidence Actually Says}
+
+Iron was being worked in Tamil Nadu by at least the third millennium
+\textsc{bce}. The Sivagalai complex---three AMS~$^{14}$C dates on charcoal
+at 3345, 3259, and 2953~\textsc{bce}, corroborated by three OSL dates on
+ceramic from the same burial context at 2427--2459~\textsc{bce}---is the
+primary anchor. Adichanallur at 2522~\textsc{bce} is independent
+confirmation from a different excavation team in a different district.
+Together they establish the third millennium \textsc{bce} as the working
+lower bound, with the Sivagalai charcoal dates pushing the evidence into
+the first half of the fourth millennium. This predates the conventional
+South Asian iron consensus of roughly 1000--1200~\textsc{bce} by more than
+a thousand years.
+
+The standard response to this claim is stratigraphic disturbance. This paper
+argues that response is no longer adequate as a blanket refutation.
+Here is the argument in plain terms.
+
+\subsection*{The coin flip}
+
+Think of each excavation as an independent trial. A well-documented
+excavation with sealed urn burials, multiple samples from stratified
+contexts, and published stratigraphy is not going to be completely fooled
+very often. Suppose it happens one time in five. That is already a generous
+allowance --- it implies a 20\% failure rate for professionally conducted
+work. Call that probability $p = 0.20$.
+
+The question is not whether \textit{one} site could be fooled. Of course
+it could. The question is whether \textit{five independent sites} were all
+fooled simultaneously --- different districts, different river basins,
+different excavation teams, different laboratories.
+
+If the sites are independent, the probability of all five returning
+spuriously early dates is just $p$ multiplied by itself five times.
+This is the standard result for five independent Bernoulli trials:
+
+\begin{equation}
+  P(\text{all 5 disturbed})
+    = \underbrace{p \times p \times p \times p \times p}_{5 \text{ independent sites}}
+    = p^5
+  \label{eq:binom_plain}
+\end{equation}
+
+Plug in $p = 0.20$ and work it out step by step:
+
+\begin{align}
+  0.20 \times 0.20 &= 0.04 \notag \\
+  0.04 \times 0.20 &= 0.008 \notag \\
+  0.008 \times 0.20 &= 0.0016 \notag \\
+  0.0016 \times 0.20 &= \mathbf{0.00032} = 3.2 \times 10^{-4}
+  \label{eq:binom_steps}
+\end{align}
+
+One chance in roughly three thousand. Table~\ref{tab:coinflip} shows how
+this figure changes if you adjust your assumption about $p$.
+
+\begin{table}[h!]
+\centering\small
+\caption{Probability that all five sites are simultaneously disturbed,
+for a range of assumptions about the per-site disturbance rate~$p$.
+Even granting a one-in-three failure rate for professional excavations,
+the five-site joint probability falls below one in four hundred.}
+\label{tab:coinflip}
+\begin{tabular}{@{}
+  >{\centering\arraybackslash}p{3.8cm}
+  >{\centering\arraybackslash}p{3.2cm}
+  >{\raggedright\arraybackslash}p{5.0cm}
+@{}}
+\toprule
+\textbf{Per-site chance} $p$ &
+\textbf{All 5 wrong} $p^5$ &
+\textbf{Plain English} \\
+\midrule
+0.30 \quad (1 in 3)  & $0.00243$    & 1 chance in 411        \\
+0.20 \quad (1 in 5)  & $0.00032$    & 1 chance in 3{,}124    \\
+0.10 \quad (1 in 10) & $0.000010$   & 1 chance in 99{,}999   \\
+0.05 \quad (1 in 20) & $0.00000031$ & 1 chance in 3{,}200{,}000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{Then it gets worse for the disturbance hypothesis}
+
+The five-site Bernoulli argument already makes $\Ho$ implausible.
+Two further independent facts compound the problem multiplicatively.
+
+\textit{Three labs, one urn.} Samples from a single Sivagalai burial urn
+were sent independently to Beta Analytic in Miami, the Birbal Sahani
+Institute in Lucknow, and the Physical Research Laboratory in Ahmedabad.
+They used two completely different physical methods: radiocarbon decay
+counting and optically stimulated luminescence. All three converged on the
+third millennium \textsc{bce}. The probability that three independent
+accredited labs each make an error large enough to explain the observed
+dates, all in the same direction, is bounded by $q^3 = (0.10)^3 =
+\num{1.0e-3}$. Multiplied against the five-site figure:
+$3.2 \times 10^{-4} \times 10^{-3} = 3.2 \times 10^{-7}$. One in three
+million.
+
+\textit{Paddy and millet cannot lie.} The old wood problem does not apply
+to annual crops. Paddy and millet record only the year of their harvest.
+Both appear in the Tamil Nadu dataset with early dates at Adichanallur.
+There is no documented contamination pathway that makes annual grain appear
+a thousand years older than it is. Their early dates are genuine, or they
+require a separate mechanism that nobody has named.
+
+\subsection*{The conclusion}
+
+The disturbance hypothesis requires that five independent excavation teams
+were all simultaneously misled; that three independent international
+laboratories using two different physical methods all failed in the same
+direction; and that annual grain crops also returned spuriously early
+results through some unspecified mechanism. The joint probability of all
+of this coinciding by chance is around $10^{-7}$.
+
+The evidence supports a working conclusion that iron technology was present
+in Tamil Nadu by at least 2500~\textsc{bce}, with the Sivagalai dates
+pushing the plausible lower bound to the 3000--3300~\textsc{bce} range.
+Treating ``stratigraphic disturbance'' as a sufficient response to this
+body of evidence --- without identifying a specific mechanism at each
+specific site --- is not a scientific rebuttal. It is a prior dressed as
+a methodology.
+
+%% ── 11. Conclusion ────────────────────────────────────────────────────────
+\section{Conclusion}
+
+The stratigraphic disturbance hypothesis fails on three independent grounds.
+
+Under a generous per-site prior of $p = 0.20$, the probability that all
+five independent Tamil Nadu iron age sites are simultaneously disturbed is
+$(0.20)^5 = 3.20\times10^{-4}$. A skeptic at equipoise who observes five
+concordant independent sites should arrive at the same posterior: fewer
+than one in three thousand.
+
+Three independent laboratories using two different physical methods produce
+convergent third-millennium \textsc{bce} results for samples from a single
+Sivagalai burial urn. The joint probability of three independent laboratory
+errors in the same direction is bounded by $q^3 \leq 1.0\times10^{-3}$.
+
+Multiple organic material types at the same sites---charcoal, paddy,
+millet---yield early dates with fully independent error profiles. Paddy
+and millet structurally exclude the old wood problem.
+
+The combined argument, the product of independent noise probabilities
+across sites, laboratories, and material types, yields a joint probability
+for $\Ho$ on the order of $3.2\times10^{-7}$. This is not a confidence
+interval. It is the probability that coincident independent noise
+processes---all pointing in the same direction---can explain a structured
+pattern that behaves, by every statistical criterion, like a signal.
+
+Noise scatters. Signal clusters. The Tamil Nadu radiometric record clusters.
+
+\bigskip
+\noindent\textit{Data underpinning this paper are stored in a fully
+normalised relational database with constraint-enforced schema
+(ACID-compliant, SQLite WAL mode). The database,
+Alloy structural audit model (15 assertions, all UNSAT), and Z3
+arithmetic verification (10 propositions, all proved) are available
+as Zenodo artifacts at \url{doi:10.5281/zenodo.tba}.}
+
+%% ── Appendices ────────────────────────────────────────────────────────────
+\begin{appendices}
+
+\section{Database Schema}
+\label{app:schema}
+
+The radiometric dates are stored in a SQLite database constructed from
+the primary source document. The schema enforces every structural
+constraint verified by the companion Alloy model and Z3 arithmetic
+proofs. Every constraint fires at write time. The database operates
+in WAL journal mode with \texttt{SYNCHRONOUS=FULL}.
+
+\subsection*{Reference tables}
+
+\begin{lstlisting}
+CREATE TABLE states (
+    state_id   INTEGER PRIMARY KEY,
+    state_name TEXT NOT NULL UNIQUE CHECK(length(state_name) > 0),
+    country    TEXT NOT NULL        CHECK(length(country) > 0)
+);
+CREATE TABLE institutions (
+    inst_id INTEGER PRIMARY KEY,
+    name    TEXT NOT NULL UNIQUE CHECK(length(name) > 0),
+    abbrev  TEXT NOT NULL        CHECK(length(abbrev) > 0),
+    city    TEXT NOT NULL        CHECK(length(city) > 0),
+    country TEXT NOT NULL        CHECK(length(country) > 0)
+);
+CREATE TABLE dating_methods (
+    method_id   INTEGER PRIMARY KEY,
+    code        TEXT NOT NULL UNIQUE,  -- AMS14C|OSL|C14|TL|SAR-OSL
+    full_name   TEXT NOT NULL,
+    description TEXT NOT NULL
+);
+CREATE TABLE materials (
+    material_id   INTEGER PRIMARY KEY,
+    material_name TEXT NOT NULL UNIQUE
+    -- charcoal | paddy | millet | ceramic | iron object (carbon)
+);
+\end{lstlisting}
+
+\subsection*{Domain tables}
+
+\begin{lstlisting}
+CREATE TABLE sites (
+    site_id    INTEGER PRIMARY KEY,
+    site_name  TEXT    NOT NULL,
+    district   TEXT    NOT NULL,
+    state_id   INTEGER NOT NULL REFERENCES states(state_id)
+               ON DELETE RESTRICT ON UPDATE CASCADE,
+    latitude   REAL NOT NULL CHECK(latitude  BETWEEN 8.0 AND 37.5),
+    longitude  REAL NOT NULL CHECK(longitude BETWEEN 68.0 AND 97.5),
+    gps_source TEXT NOT NULL CHECK(gps_source IN
+                 ('report','approximate')),
+    site_type  TEXT NOT NULL CHECK(site_type IN
+                 ('habitation','burial','habitation+burial','smelting')),
+    river      TEXT NOT NULL CHECK(length(river) > 0),
+    notes      TEXT NOT NULL
+);
+CREATE TABLE samples (
+    sample_id   INTEGER PRIMARY KEY,
+    site_id     INTEGER NOT NULL REFERENCES sites(site_id)
+                ON DELETE RESTRICT ON UPDATE CASCADE,
+    sample_no   TEXT    NOT NULL CHECK(length(sample_no) > 0),
+    context     TEXT    NOT NULL CHECK(length(context) > 0),
+    depth_cm    INTEGER NOT NULL CHECK(depth_cm >= -1),
+    material_id INTEGER NOT NULL REFERENCES materials(material_id)
+                ON DELETE RESTRICT ON UPDATE CASCADE,
+    iron_context INTEGER NOT NULL DEFAULT 1
+                 CHECK(iron_context IN (0,1)),
+    notes       TEXT NOT NULL
+);
+CREATE TABLE measurements (
+    meas_id        INTEGER PRIMARY KEY,
+    sample_id      INTEGER NOT NULL REFERENCES samples(sample_id)
+                   ON DELETE RESTRICT ON UPDATE CASCADE,
+    inst_id        INTEGER NOT NULL REFERENCES institutions(inst_id)
+                   ON DELETE RESTRICT ON UPDATE CASCADE,
+    method_id      INTEGER NOT NULL REFERENCES dating_methods(method_id)
+                   ON DELETE RESTRICT ON UPDATE CASCADE,
+    radiometric_bp INTEGER NOT NULL CHECK(radiometric_bp >= -1),
+    error_bp       INTEGER NOT NULL CHECK(error_bp >= -1),
+    cal_bce_lo     INTEGER NOT NULL CHECK(cal_bce_lo >= -1),
+    cal_bce_hi     INTEGER NOT NULL CHECK(cal_bce_hi >= -1),
+    cal_bce_mid    INTEGER NOT NULL CHECK(cal_bce_mid >= -1),
+    probability    REAL    NOT NULL CHECK(probability >= -1.0),
+    source_table   TEXT    NOT NULL,
+    notes          TEXT    NOT NULL,
+    UNIQUE(sample_id, inst_id, method_id),      -- A12
+    CHECK(cal_bce_lo = -1 OR cal_bce_hi = -1
+          OR cal_bce_lo >= cal_bce_hi),         -- P1
+    CHECK(cal_bce_lo = -1 OR cal_bce_hi = -1
+          OR cal_bce_mid = -1
+          OR (cal_bce_mid <= cal_bce_lo
+              AND cal_bce_mid >= cal_bce_hi)),  -- P2
+    CHECK(cal_bce_lo = -1 OR cal_bce_lo > 0)   -- P9
+);
+\end{lstlisting}
+
+\subsection*{Cross-table triggers}
+
+\begin{lstlisting}
+-- A8: AMS14C/C14 only on organic materials (ids 1=charcoal,2=paddy,
+--     3=millet,5=iron-carbon); A9: OSL/TL/SAR-OSL only on ceramic (id 4)
+CREATE TRIGGER trg_method_material_BI
+BEFORE INSERT ON measurements BEGIN
+    SELECT CASE
+      WHEN NEW.method_id IN (1,3)
+           AND (SELECT material_id FROM samples
+                WHERE sample_id = NEW.sample_id) NOT IN (1,2,3,5)
+      THEN RAISE(ABORT,'A8: radiocarbon requires organic material')
+      WHEN NEW.method_id IN (2,4,5)
+           AND (SELECT material_id FROM samples
+                WHERE sample_id = NEW.sample_id) NOT IN (4)
+      THEN RAISE(ABORT,'A9: luminescence requires ceramic material')
+    END;
+END;
+
+-- A13: cross-lab samples must use distinct institutions
+CREATE TRIGGER trg_crosslab_BI
+BEFORE INSERT ON measurements BEGIN
+    SELECT CASE
+      WHEN (SELECT COUNT(*) FROM measurements
+            WHERE sample_id = NEW.sample_id) >= 1
+           AND (SELECT COUNT(DISTINCT inst_id) FROM measurements
+                WHERE sample_id = NEW.sample_id) = 1
+           AND (SELECT inst_id FROM measurements
+                WHERE sample_id = NEW.sample_id LIMIT 1) = NEW.inst_id
+      THEN RAISE(ABORT,
+        'A13: cross-lab measurements must use distinct institutions')
+    END;
+END;
+\end{lstlisting}
+
+\noindent\small\textit{Sentinel convention:}
+\texttt{INTEGER}~$-1$ and \texttt{REAL}~$-1.0$ denote ``not recorded
+in source document''; empty string denotes ``not applicable.''
+No \texttt{NULL} values exist; all columns carry \texttt{NOT NULL}.
+
+%% ── Appendix B ────────────────────────────────────────────────────────────
+\section{Full Radiometric Date Table}
+\label{app:dates}
+
+All primary Tamil Nadu radiometric dates from the database, sorted by
+calibrated midpoint (oldest first). OSL dates marked $\dagger$ are
+provisional pending final dose-rate calibration. \textit{Cal lo} and
+\textit{Cal hi} are the older and younger endpoints of the primary
+high-probability-density range (all BCE).
+
+\scriptsize
+\begin{longtable}{@{}
+  p{2.8cm}
+  p{2.0cm}
+  >{\raggedleft\arraybackslash}p{2.1cm}
+  >{\raggedleft\arraybackslash}p{1.3cm}
+  >{\raggedleft\arraybackslash}p{1.3cm}
+  p{1.6cm}
+  p{1.0cm}
+@{}}
+
+\caption{Tamil Nadu primary radiometric dates. Source:
+\texttt{antiquity\_of\_iron.db}, Tables 2--6 of Rajan and
+Sivanantham (2025).\label{tab:alldates}}\\
+
+\toprule
+\textbf{Site} & \textbf{Sample no.}
+  & \textbf{BP} & \textbf{Cal lo} & \textbf{Cal hi}
+  & \textbf{Material} & \textbf{Lab} \\
+\midrule
+\endfirsthead
+
+\multicolumn{7}{c}{\small\textit{Table~\ref{tab:alldates} continued}}\\
+\toprule
+\textbf{Site} & \textbf{Sample no.}
+  & \textbf{BP} & \textbf{Cal lo} & \textbf{Cal hi}
+  & \textbf{Material} & \textbf{Lab} \\
+\midrule
+\endhead
+
+\midrule
+\multicolumn{7}{r}{\small\textit{continued on next page}}\\
+\endfoot
+\bottomrule
+\endlastfoot
+
+Sivagalai      & Beta 583593      & $4670\pm30$  & 3519 & 3371 & charcoal & Beta \\
+Sivagalai      & Beta 583592      & $4540\pm30$  & 3243 & 3102 & charcoal & Beta \\
+Sivagalai      & Beta 583594      & $4300\pm30$  & 2939 & 2881 & charcoal & Beta \\
+Thelunganur    & AA 104832        & $4208\pm35$  & 2900 & 2627 & iron (C) & Arizona \\
+Sivagalai* & BSIP A2-Urn-1 & $4479\pm358$ & 2817 & 2101 & ceramic & BSIP \\
+Sivagalai* & PRL L13-Urn-5 & $4470\pm308$ & 2758 & 2142 & ceramic & PRL \\
+Sivagalai* & PRL A2-Urn-1  & $4447\pm402$ & 2829 & 2025 & ceramic & PRL \\
+Adichanallur   & Beta 709374      & $4010\pm30$  & 2580 & 2465 & charcoal & Beta \\
+Mayiladumparai & Beta 620259      & $3310\pm30$  & 2172 & 2100 & charcoal & Beta \\
+Sivagalai* & BSIP L13-Urn-8 & $4008\pm411$ & 2399 & 1577 & ceramic & BSIP \\
+Sivagalai* & BSIP L13-Urn-2 & $3929\pm334$ & 2243 & 1575 & ceramic & BSIP \\
+Sivagalai* & BSIP L13-Urn-5 & $3856\pm363$ & 2199 & 1473 & ceramic & BSIP \\
+Adichanallur   & Beta 583589      & $3470\pm30$  & 1900 & 1614 & charcoal & Beta \\
+Kilnamandi     & Beta 666752      & $3400\pm30$  & 1769 & 1615 & charcoal & Beta \\
+Mayiladumparai & Beta 620258      & $3310\pm30$  & 1634 & 1504 & charcoal & Beta \\
+Mangadu        & AA 104114        & $3213\pm34$  & 1604 & 1416 & iron (C) & Arizona \\
+Adichanallur   & IUACD 23C5689   & $3155\pm40$  & 1530 & 1352 & millet   & IUAC \\
+Thelunganur    & AA 99857         & $3089\pm40$  & 1435 & 1233 & iron (C) & Arizona \\
+Sivagalai* & BSIP A2-Urn-3 & $3304\pm561$ & 1845 & 723  & ceramic & BSIP \\
+Sivagalai      & Beta 600726      & $2950\pm30$  & 1260 & 1050 & paddy    & Beta \\
+Adichanallur   & IUACD 23C5692   & $2947\pm46$  & 1250 & 1048 & paddy    & IUAC \\
+Adichanallur   & IUACD 23C5693   & $2840\pm54$  & 1113 &  991 & paddy    & IUAC \\
+Vallam         & PRL 1109         & $2980\pm30$  & 1060 & 1000 & charcoal & TU \\
+Thelunganur    & AA 104113        & $2835\pm34$  & 1109 &  909 & iron (C) & Arizona \\
+Sivagalai      & Beta 600727      & $2560\pm30$  &  800 &  570 & charcoal & Beta \\
+
+\end{longtable}
+\normalsize
+
+
+\noindent\small
+\textit{Abbreviations:}
+Beta~=~Beta Analytic (Miami, FL, USA);
+BSIP~=~Birbal Sahani Institute of Palaeosciences, Lucknow;
+PRL~=~Physical Research Laboratory, Ahmedabad;
+IUAC~=~Inter-University Accelerator Centre, New Delhi;
+Arizona~=~NSF-Arizona AMS Facility, Tucson;
+TU~=~Tamil University, Thanjavur.
+$*$~Provisional OSL dates with large error margins
+(${>}300$\,yr), pending final dose-rate calibration.
+
+\end{appendices}
+\end{document}
