@@ -279,21 +279,21 @@ const sites = [
 // === TRADE ROUTES ===
 const routes = [
   // Export: IVC -> Mesopotamia (via Dilmun or direct)
-  {from:'lothal', via:'dilmun', to:'ur', commodity:'Jar goods', color:'#c4924a', width:8, note:'S-342 = 10% corpus'},
-  {from:'lothal', via:'dilmun', to:'ur', commodity:'Textiles', color:'#8b7355', width:6, note:'Primary bulk export'},
-  {from:'lothal', via:'magan', to:null, commodity:'Copper-bronze', color:'#b87333', width:5, note:'Khetri to Oman route'},
-  {from:'lothal', via:'dilmun', to:null, commodity:'Carnelian', color:'#d4644a', width:4, note:'Luxury export, Gujarat source'},
+  {from:'lothal', via:'dilmun', to:'ur', commodity:'Jar goods', color:'#cc6600', width:8, note:'S-342 = 10% corpus'},
+  {from:'lothal', via:'dilmun', to:'ur', commodity:'Textiles', color:'#8844aa', width:6, note:'Primary bulk export'},
+  {from:'lothal', via:'magan', to:null, commodity:'Copper-bronze', color:'#dd6633', width:5, note:'Khetri to Oman route'},
+  {from:'lothal', via:'dilmun', to:null, commodity:'Carnelian', color:'#cc2222', width:4, note:'Luxury export, Gujarat source'},
   // Supply: Tamil Nadu -> IVC
-  {from:'kodumanal', via:null, to:'lothal', commodity:'Iron', color:'#5a8a5a', width:3, note:'Fish sign supply corridor'},
-  {from:'karur', via:null, to:'lothal', commodity:'Iron', color:'#5a8a5a', width:3, note:'TN iron-working hub'},
-  {from:'keeladi', via:null, to:'lothal', commodity:'Textiles', color:'#8b7355', width:3, note:'Cotton textile supply'},
-  {from:'thulukarpatti', via:null, to:'lothal', commodity:'Ivory/Shell', color:'#d4c8a0', width:2, note:'Southern coast supply'},
-  {from:'teriruveli', via:'magan', to:null, commodity:'Timber', color:'#6b4226', width:2, note:'Timber to Gulf'},
+  {from:'kodumanal', via:null, to:'lothal', commodity:'Iron', color:'#227744', width:3, note:'Fish sign supply corridor'},
+  {from:'karur', via:null, to:'lothal', commodity:'Iron', color:'#227744', width:3, note:'TN iron-working hub'},
+  {from:'keeladi', via:null, to:'lothal', commodity:'Textiles', color:'#8844aa', width:3, note:'Cotton textile supply'},
+  {from:'thulukarpatti', via:null, to:'lothal', commodity:'Ivory/Shell', color:'#997744', width:2, note:'Southern coast supply'},
+  {from:'teriruveli', via:'magan', to:null, commodity:'Timber', color:'#664422', width:2, note:'Timber to Gulf'},
   // Internal: IVC network
-  {from:'harappa', via:null, to:'mohenjodaro', commodity:'Internal', color:'rgba(196,146,74,0.3)', width:2, note:'Indus corridor'},
-  {from:'khetri', via:null, to:'lothal', commodity:'Copper ore', color:'#b87333', width:3, note:'Khetri copper mines'},
-  {from:'dholavira', via:null, to:'lothal', commodity:'Internal', color:'rgba(196,146,74,0.2)', width:1, note:'Gujarat coast'},
-  {from:'shortughai', via:null, to:'harappa', commodity:'Lapis lazuli', color:'#1e3a5f', width:2, note:'Afghanistan trade post'},
+  {from:'harappa', via:null, to:'mohenjodaro', commodity:'Internal', color:'#555555', width:2, note:'Indus corridor'},
+  {from:'khetri', via:null, to:'lothal', commodity:'Copper ore', color:'#dd6633', width:3, note:'Khetri copper mines'},
+  {from:'dholavira', via:null, to:'lothal', commodity:'Internal', color:'#555555', width:1, note:'Gujarat coast'},
+  {from:'shortughai', via:null, to:'harappa', commodity:'Lapis lazuli', color:'#2244aa', width:2, note:'Afghanistan trade post'},
 ];
 
 // === WEIGHT CODEBOOK ===
@@ -442,7 +442,7 @@ function renderMap() {
     const line = L.polyline(points, {
       color: r.color,
       weight: r.width,
-      opacity: 0.6,
+      opacity: 0.8,
       smoothFactor: 1.5,
       lineCap: 'round'
     }).addTo(map);
