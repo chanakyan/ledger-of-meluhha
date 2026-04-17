@@ -143,6 +143,62 @@ const commodities: readonly Commodity[] = [
   {sign:'S-89', name:'Gold', route:'Mesopotamia', pct:'—'},
 ];
 
+// === CODEBOOK LOOKUPS (from indus_codebook.db — embedded to avoid 2-file drop) ===
+
+interface SignRole {
+  readonly role: string;
+  readonly ref_code: string | null;
+}
+
+interface CommodityEntry {
+  readonly label: string;
+}
+
+interface RouteEntry {
+  readonly label: string;
+  readonly destination: string;
+}
+
+const signRoleMap: ReadonlyMap<number, SignRole> = new Map([
+  [1,{role:'weight',ref_code:null}],[2,{role:'weight',ref_code:null}],
+  [3,{role:'weight',ref_code:null}],[4,{role:'weight',ref_code:null}],
+  [5,{role:'weight',ref_code:null}],[6,{role:'weight',ref_code:null}],
+  [7,{role:'weight',ref_code:null}],
+  [10,{role:'quantity',ref_code:null}],[11,{role:'quantity',ref_code:null}],
+  [12,{role:'quantity',ref_code:null}],[13,{role:'quantity',ref_code:null}],
+  [14,{role:'quantity',ref_code:null}],[15,{role:'quantity',ref_code:null}],
+  [59,{role:'terminal',ref_code:'mesopotamia'}],
+  [60,{role:'terminal',ref_code:'dilmun'}],
+  [61,{role:'terminal',ref_code:'magan'}],
+  [62,{role:'terminal',ref_code:'internal_north'}],
+  [63,{role:'terminal',ref_code:'internal_south'}],
+  [89,{role:'commodity',ref_code:'gold'}],
+  [99,{role:'structural',ref_code:null}],
+  [176,{role:'commodity',ref_code:'carnelian'}],
+  [184,{role:'commodity',ref_code:'copper'}],
+  [200,{role:'commodity',ref_code:'timber'}],
+  [211,{role:'commodity',ref_code:'ivory'}],
+  [218,{role:'commodity',ref_code:'iron'}],
+  [267,{role:'structural',ref_code:null}],
+  [301,{role:'commodity',ref_code:'textile'}],
+  [342,{role:'commodity',ref_code:'jar'}],
+]);
+
+const commodityMap: ReadonlyMap<string, CommodityEntry> = new Map([
+  ['jar',{label:'JAR GOODS'}],['iron',{label:'IRON GOODS'}],
+  ['carnelian',{label:'CARNELIAN'}],['copper',{label:'COPPER-BRONZE'}],
+  ['textile',{label:'TEXTILES'}],['timber',{label:'TIMBER'}],
+  ['ivory',{label:'IVORY/SHELL'}],['gold',{label:'GOLD'}],
+]);
+
+const routeMap: ReadonlyMap<string, RouteEntry> = new Map([
+  ['mesopotamia',{label:'MESOPOTAMIA',destination:'Ur / Kish / Tell Asmar'}],
+  ['dilmun',{label:'DILMUN',destination:'Bahrain entrepot'}],
+  ['magan',{label:'MAGAN',destination:'Oman copper return'}],
+  ['internal_north',{label:'NORTH',destination:'Harappa / Mohenjo-daro'}],
+  ['internal_south',{label:'SOUTH',destination:'Tamil Nadu supply'}],
+]);
+
 // === SITE LOOKUP =============================================================
 
 function findSite(id: string): Site | undefined {
@@ -239,6 +295,13 @@ function resolveRoutePoints(route: TradeRoute): LatLon[] | null {
 
 // === MAP =====================================================================
 
+interface RouteLine {
+  readonly line: any;
+  readonly route: TradeRoute;
+}
+
+const routeLines: RouteLine[] = [];
+
 function renderMap(map: any): void {
   // Tile layer
   L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
@@ -247,9 +310,15 @@ function renderMap(map: any): void {
   }).addTo(map);
 
   // Routes FIRST (under sites)
+  let routeCount = 0;
   tradeRoutes.forEach(route => {
     const points = resolveRoutePoints(route);
-    if (!points || points.length === 0) return;
+    if (!points || points.length === 0) {
+      console.warn(`ROUTE SKIPPED: ${route.commodity} (${route.from} -> ${route.via || '-'} -> ${route.to || '-'})`);
+      return;
+    }
+    console.log(`ROUTE OK: ${route.commodity} — ${points.length} points`);
+    routeCount++;
 
     const line = L.polyline(points, {
       color: route.color,
@@ -259,13 +328,18 @@ function renderMap(map: any): void {
       lineCap: 'round'
     }).addTo(map);
 
+    routeLines.push({line, route});
+
     line.bindPopup(
       `<strong>${route.commodity}</strong><br>${route.note}<br>` +
       `<span style="opacity:0.5">width = ${route.width}px (relative volume)</span>`
     );
 
     line.on('mouseover', () => line.setStyle({opacity: 1, weight: route.width + 2}));
-    line.on('mouseout', () => line.setStyle({opacity: 0.8, weight: route.width}));
+    line.on('mouseout', () => {
+      const dimmed = line.options._dimmed;
+      line.setStyle({opacity: dimmed ? 0.15 : 0.8, weight: route.width});
+    });
   });
 
   // Sites ON TOP (after routes)
@@ -298,6 +372,8 @@ function renderMap(map: any): void {
       className: labelClass
     });
   });
+
+  console.log(`ROUTES RENDERED: ${routeCount} / ${tradeRoutes.length}`);
 
   // Legend
   const legend = L.control({position: 'bottomleft'});
@@ -347,35 +423,26 @@ function renderSealCards(db: SqlJsDatabase): void {
       }
     } catch {}
 
-    // Resolve through concordance + codebook
+    // Resolve signs via Parpola number -> codebook (embedded maps)
+    // sign_role.sign_id uses Parpola numbers (P342 -> 342), NOT Mahadevan
     let commName = '—';
     let routeName = 'domestic';
     let resolved = 0;
 
     for (const p of signs) {
-      try {
-        const c = queryRows(db, `SELECT mahadevan_ids FROM sign_concordance WHERE parpola_id='${p}'`);
-        if (c.length === 0) continue;
-        const mIds: string[] = JSON.parse(c[0][0] as string);
-        if (mIds.length === 0) continue;
-        const mNum = parseInt(mIds[0].replace('M', '').replace(/^0+/, '') || '0');
+      const pNum = parseInt(p.replace('P', '') || '0');
+      const sr = signRoleMap.get(pNum);
+      if (!sr) continue;
+      resolved++;
 
-        const s = queryRows(db, `SELECT role, ref_code FROM sign_role WHERE sign_id=${mNum}`);
-        if (s.length === 0) continue;
-
-        const role = s[0][0] as string;
-        const refCode = s[0][1] as string | null;
-        resolved++;
-
-        if (role === 'commodity' && refCode) {
-          const cr = queryRows(db, `SELECT label FROM commodity WHERE code='${refCode}'`);
-          if (cr.length > 0) commName = cr[0][0] as string;
-        }
-        if (role === 'terminal' && refCode) {
-          const rr = queryRows(db, `SELECT label, destination FROM route WHERE code='${refCode}'`);
-          if (rr.length > 0) routeName = `${rr[0][0]} → ${rr[0][1]}`;
-        }
-      } catch {}
+      if (sr.role === 'commodity' && sr.ref_code) {
+        const ce = commodityMap.get(sr.ref_code);
+        if (ce) commName = ce.label;
+      }
+      if (sr.role === 'terminal' && sr.ref_code) {
+        const re = routeMap.get(sr.ref_code);
+        if (re) routeName = `${re.label} → ${re.destination}`;
+      }
     }
 
     const card = document.createElement('div');
@@ -449,6 +516,17 @@ function renderWeightBars(): void {
 
 // === COMMODITY TABLE =========================================================
 
+let selectedCommodity: string | null = null;
+
+function highlightCommodity(name: string | null): void {
+  selectedCommodity = name;
+  routeLines.forEach(({line, route}) => {
+    const match = !name || route.commodity === name;
+    line.setStyle({opacity: match ? 0.8 : 0.15, weight: route.width});
+    line.options._dimmed = !match;
+  });
+}
+
 function renderCommTable(): void {
   const table = document.getElementById('comm-table');
   if (!table) return;
@@ -456,6 +534,12 @@ function renderCommTable(): void {
   commodities.forEach(c => {
     const tr = document.createElement('tr');
     tr.innerHTML = `<td>${c.sign}</td><td>${c.name}</td><td>${c.route}</td>`;
+    tr.addEventListener('click', () => {
+      const next = selectedCommodity === c.name ? null : c.name;
+      highlightCommodity(next);
+      table.querySelectorAll('tr').forEach(r => r.classList.remove('active'));
+      if (next) tr.classList.add('active');
+    });
     table.appendChild(tr);
   });
 }
