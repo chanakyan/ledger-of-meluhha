@@ -73,3 +73,15 @@ _register_cite([[WikiIndus]],
 _register_cite([[RajanSivanantham2025]],
   [[K. Rajan and R. Sivanantham. \textit{Indus Signs and Graffiti Marks of Tamil Nadu: A Morphological Study}. T.N.D.A. pub. no. 357. Department of Archaeology, Government of Tamil Nadu, Chennai, 2025. ISBN 9788197784255.]],
   [[Rajan \& Sivanantham (2025)]])
+
+_register_cite([[MayigCISI]],
+  [[May (mayig). \textit{Indus Valley Script Corpus}. GitHub repository, 2024. Digitisation of Joshi \& Parpola CISI corpus (Mohenjo-daro M-1 through M-199). \url{https://github.com/mayig/indus-valley-script-corpus}. CC BY 4.0.]],
+  [[May/mayig (2024)]])
+
+_register_cite([[WellsFuls2006]],
+  [[Bryan K. Wells and Andreas Fuls. \textit{Interactive Corpus of Indus Texts} (ICIT). Digital database, 2006--2022. 4,660 artefacts, 5,644 texts, 17,957 signs. Wells sign list v2.8 (709 signs). Access: \texttt{andreas.fuls@tu-berlin.de}. \url{https://www.indus.epigraphica.de/}]],
+  [[Wells \& Fuls (2006)]])
+
+_register_cite([[JoshiParpola1987]],
+  [[Jagat Pati Joshi and Asko Parpola (eds.). \textit{Corpus of Indus Seals and Inscriptions}. Vol. 1: Collections in India. Suomalainen Tiedeakatemia, Helsinki, 1987.]],
+  [[Joshi \& Parpola (1987)]])
