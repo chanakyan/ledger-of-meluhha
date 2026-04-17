@@ -8,7 +8,8 @@
 <script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-wasm.js"></script>
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <style>
-:root {
+/* --- Theme: Clay (default, dark) --- */
+:root, [data-theme="clay"] {
   --bg: #0f0c07;
   --sand: #f0e6d0;
   --clay: #c4924a;
@@ -18,14 +19,69 @@
   --water: #0a0d14;
   --land: #1a1610;
   --land-stroke: rgba(196,146,74,0.15);
+  --grain-opacity: 0.3;
 }
+
+/* --- Theme: Parchment (light, high contrast) --- */
+[data-theme="parchment"] {
+  --bg: #f5f0e4;
+  --sand: #1a1610;
+  --clay: #8b5e20;
+  --tba-red: #9a1016;
+  --dim: rgba(26,22,16,0.45);
+  --faint: rgba(26,22,16,0.1);
+  --water: #d8dce6;
+  --land: #ede8da;
+  --land-stroke: rgba(139,94,32,0.2);
+  --grain-opacity: 0.08;
+}
+
+/* --- Theme: High Contrast (WCAG AAA) --- */
+[data-theme="highcontrast"] {
+  --bg: #000000;
+  --sand: #ffffff;
+  --clay: #ffcc00;
+  --tba-red: #ff4444;
+  --dim: rgba(255,255,255,0.6);
+  --faint: rgba(255,255,255,0.2);
+  --water: #0a0a1a;
+  --land: #1a1a1a;
+  --land-stroke: rgba(255,204,0,0.3);
+  --grain-opacity: 0;
+}
+
+/* --- Theme: Seal (blue-grey, reduced eye strain) --- */
+[data-theme="seal"] {
+  --bg: #12161e;
+  --sand: #c8d0dc;
+  --clay: #7ea8c4;
+  --tba-red: #c45858;
+  --dim: rgba(200,208,220,0.35);
+  --faint: rgba(200,208,220,0.1);
+  --water: #0c1018;
+  --land: #181e28;
+  --land-stroke: rgba(126,168,196,0.15);
+  --grain-opacity: 0.2;
+}
+
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background:var(--bg); color:var(--sand); font-family:'Cormorant Garamond',serif; min-height:100vh; overflow-x:hidden; }
+body { background:var(--bg); color:var(--sand); font-family:'Cormorant Garamond',serif; min-height:100vh; overflow-x:hidden; transition: background 0.4s, color 0.4s; }
 
 /* --- Grain texture --- */
 .grain { position:fixed; inset:0; pointer-events:none; z-index:0;
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  opacity:0.3; }
+  opacity:var(--grain-opacity); transition: opacity 0.4s; }
+
+/* --- Theme switcher --- */
+.theme-switcher { position:fixed; top:48px; right:12px; z-index:200; display:flex; flex-direction:column; gap:4px; }
+.theme-btn { width:18px; height:18px; border-radius:50%; border:1.5px solid rgba(240,230,208,0.2); cursor:pointer;
+  transition: border-color 0.3s, transform 0.2s; }
+.theme-btn:hover { transform:scale(1.2); border-color:var(--clay); }
+.theme-btn[data-t="clay"] { background:#0f0c07; }
+.theme-btn[data-t="parchment"] { background:#f5f0e4; }
+.theme-btn[data-t="highcontrast"] { background:#000; border-color:rgba(255,204,0,0.5); }
+.theme-btn[data-t="seal"] { background:#12161e; }
+.theme-btn.active { border-color:var(--tba-red); border-width:2px; }
 
 /* --- Header --- */
 header { position:relative; z-index:10; display:flex; justify-content:space-between; align-items:center;
@@ -106,6 +162,13 @@ footer { position:relative; z-index:10; border-top:1px solid rgba(196,146,74,0.1
 </head>
 <body>
 <div class="grain"></div>
+
+<div class="theme-switcher" title="Accessibility themes">
+  <div class="theme-btn active" data-t="clay" title="Clay (dark)"></div>
+  <div class="theme-btn" data-t="parchment" title="Parchment (light)"></div>
+  <div class="theme-btn" data-t="highcontrast" title="High contrast (WCAG AAA)"></div>
+  <div class="theme-btn" data-t="seal" title="Seal (blue-grey)"></div>
+</div>
 
 <header>
   <a href="https://thirdbuyeradvisory.org/">thirdbuyeradvisory.org</a>
@@ -555,6 +618,31 @@ function renderDating(db) {
   } catch(e) {
     container.innerHTML = '<span style="font-family:JetBrains Mono;font-size:9px;color:var(--dim)">No radiometric data in this DB</span>';
   }
+}
+// === THEME SWITCHER ===
+document.querySelectorAll('.theme-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const theme = btn.dataset.t;
+    document.documentElement.setAttribute('data-theme', theme);
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // Re-render map with new colors if dashboard is visible
+    if (dashboard.style.display === 'block') {
+      const svg = document.getElementById('map');
+      // Update water background
+      const rect = svg.querySelector('rect');
+      if (rect) rect.setAttribute('fill', getComputedStyle(document.documentElement).getPropertyValue('--water'));
+    }
+    localStorage.setItem('ledger-theme', theme);
+  });
+});
+// Restore saved theme
+const saved = localStorage.getItem('ledger-theme');
+if (saved) {
+  document.documentElement.setAttribute('data-theme', saved);
+  document.querySelectorAll('.theme-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.t === saved);
+  });
 }
 </script>
 </body>
