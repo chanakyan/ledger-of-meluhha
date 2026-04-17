@@ -163,6 +163,42 @@ CREATE TABLE tamil_sentence (
     original_tamil  TEXT    NOT NULL,
     logosyllabic    TEXT,
     sign_count      INTEGER
+) STRICT;
+
+CREATE TABLE radiometric_site (
+    site_id     INTEGER PRIMARY KEY,
+    site_name   TEXT    NOT NULL,
+    district    TEXT    NOT NULL,
+    state       TEXT    NOT NULL,
+    latitude    REAL,
+    longitude   REAL,
+    site_type   TEXT,
+    river       TEXT
+) STRICT;
+
+CREATE TABLE radiometric_sample (
+    sample_id    INTEGER PRIMARY KEY,
+    site_id      INTEGER NOT NULL REFERENCES radiometric_site(site_id),
+    sample_no    TEXT    NOT NULL,
+    context      TEXT,
+    depth_cm     INTEGER,
+    material     TEXT,
+    iron_context INTEGER DEFAULT 1
+) STRICT;
+
+CREATE TABLE radiometric_measurement (
+    meas_id        INTEGER PRIMARY KEY,
+    sample_id      INTEGER NOT NULL REFERENCES radiometric_sample(sample_id),
+    institution    TEXT    NOT NULL,
+    method         TEXT    NOT NULL,
+    radiometric_bp INTEGER,
+    error_bp       INTEGER,
+    cal_bce_lo     INTEGER,
+    cal_bce_hi     INTEGER,
+    cal_bce_mid    INTEGER,
+    probability    REAL,
+    source_table   TEXT,
+    notes          TEXT
 ) STRICT
 """
 
@@ -535,6 +571,95 @@ if File.Exists origPath && File.Exists logoPath then
 else
     printfn "  tamil_sentence: SKIP (Original_Tamil_Sentences.csv not found)"
 
+// --- Radiometric dating from antiquity_of_iron.db ---
+let ironDbPath = Path.Combine(
+    Path.GetDirectoryName(Path.GetFullPath dbPath), "data/antiquity_of_iron.db")
+
+if File.Exists ironDbPath then
+    use ironCon = new SqliteConnection(sprintf "Data Source=%s;Mode=ReadOnly" ironDbPath)
+    ironCon.Open()
+
+    // Pure read: DB -> array of records. No side effects.
+    let readRows (srcCon: SqliteConnection) (sql: string) (mapper: SqliteDataReader -> 'T) =
+        use cmd = new SqliteCommand(sql, srcCon)
+        use rdr = cmd.ExecuteReader()
+        [| while rdr.Read() do yield mapper rdr |]
+
+    // Side-effectful write at boundary. Returns count.
+    let writeRows (rows: 'T array) (insertSql: string) (binder: 'T -> SqliteCommand -> unit) =
+        rows |> Array.iter (fun row ->
+            use cmd = new SqliteCommand(insertSql, con, tx)
+            binder row cmd
+            cmd.ExecuteNonQuery() |> ignore)
+        rows.Length
+
+    // Read all three tables (pure)
+    let sites =
+        readRows ironCon
+            "SELECT s.site_id, s.site_name, s.district, st.state_name, s.latitude, s.longitude, s.site_type, s.river FROM sites s JOIN states st ON st.state_id = s.state_id"
+            (fun r -> r.GetInt32 0, r.GetString 1, r.GetString 2, r.GetString 3, r.GetDouble 4, r.GetDouble 5, r.GetString 6, r.GetString 7)
+
+    let samples =
+        readRows ironCon
+            "SELECT sp.sample_id, sp.site_id, sp.sample_no, sp.context, sp.depth_cm, mt.material_name, sp.iron_context FROM samples sp JOIN materials mt ON mt.material_id = sp.material_id"
+            (fun r -> r.GetInt32 0, r.GetInt32 1, r.GetString 2, r.GetString 3, r.GetInt32 4, r.GetString 5, r.GetInt32 6)
+
+    let measurements =
+        readRows ironCon
+            "SELECT m.meas_id, m.sample_id, i.abbrev, dm.code, m.radiometric_bp, m.error_bp, m.cal_bce_lo, m.cal_bce_hi, m.cal_bce_mid, m.probability, m.source_table, m.notes FROM measurements m JOIN institutions i ON i.inst_id = m.inst_id JOIN dating_methods dm ON dm.method_id = m.method_id"
+            (fun r -> r.GetInt32 0, r.GetInt32 1, r.GetString 2, r.GetString 3, r.GetInt32 4, r.GetInt32 5, r.GetInt32 6, r.GetInt32 7, r.GetInt32 8, r.GetDouble 9, r.GetString 10, r.GetString 11)
+
+    ironCon.Close()
+
+    // Write all three (boundary)
+    let siteCount =
+        writeRows sites
+            "INSERT OR IGNORE INTO radiometric_site VALUES (@a,@b,@c,@d,@e,@f,@g,@h)"
+            (fun (a,b,c,d,e,f,g,h) cmd ->
+                cmd.Parameters.AddWithValue("@a", a) |> ignore
+                cmd.Parameters.AddWithValue("@b", b) |> ignore
+                cmd.Parameters.AddWithValue("@c", c) |> ignore
+                cmd.Parameters.AddWithValue("@d", d) |> ignore
+                cmd.Parameters.AddWithValue("@e", e) |> ignore
+                cmd.Parameters.AddWithValue("@f", f) |> ignore
+                cmd.Parameters.AddWithValue("@g", g) |> ignore
+                cmd.Parameters.AddWithValue("@h", h) |> ignore)
+
+    let sampCount =
+        writeRows samples
+            "INSERT OR IGNORE INTO radiometric_sample VALUES (@a,@b,@c,@d,@e,@f,@g)"
+            (fun (a,b,c,d,e,f,g) cmd ->
+                cmd.Parameters.AddWithValue("@a", a) |> ignore
+                cmd.Parameters.AddWithValue("@b", b) |> ignore
+                cmd.Parameters.AddWithValue("@c", c) |> ignore
+                cmd.Parameters.AddWithValue("@d", d) |> ignore
+                cmd.Parameters.AddWithValue("@e", e) |> ignore
+                cmd.Parameters.AddWithValue("@f", f) |> ignore
+                cmd.Parameters.AddWithValue("@g", g) |> ignore)
+
+    let measCount =
+        writeRows measurements
+            "INSERT OR IGNORE INTO radiometric_measurement VALUES (@a,@b,@c,@d,@e,@f,@g,@h,@i,@j,@k,@l)"
+            (fun (a,b,c,d,e,f,g,h,i,j,k,l) cmd ->
+                cmd.Parameters.AddWithValue("@a", a) |> ignore
+                cmd.Parameters.AddWithValue("@b", b) |> ignore
+                cmd.Parameters.AddWithValue("@c", c) |> ignore
+                cmd.Parameters.AddWithValue("@d", d) |> ignore
+                cmd.Parameters.AddWithValue("@e", e) |> ignore
+                cmd.Parameters.AddWithValue("@f", f) |> ignore
+                cmd.Parameters.AddWithValue("@g", g) |> ignore
+                cmd.Parameters.AddWithValue("@h", h) |> ignore
+                cmd.Parameters.AddWithValue("@i", i) |> ignore
+                cmd.Parameters.AddWithValue("@j", j) |> ignore
+                cmd.Parameters.AddWithValue("@k", k) |> ignore
+                cmd.Parameters.AddWithValue("@l", l) |> ignore)
+
+    printfn "  radiometric_site: %d rows (from %s)" siteCount ironDbPath
+    printfn "  radiometric_sample: %d rows" sampCount
+    printfn "  radiometric_measurement: %d rows" measCount
+else
+    printfn "  radiometric: SKIP (%s not found)" ironDbPath
+
 tx.Commit()
 con.Close()
 
@@ -560,6 +685,9 @@ printfn "  sign_concordance : %d" (count "sign_concordance")
 printfn "  cisi_inscription : %d" (count "cisi_inscription")
 printfn "  treebank_token   : %d" (count "treebank_token")
 printfn "  tamil_sentence   : %d" (count "tamil_sentence")
+printfn "  radiometric_site : %d" (count "radiometric_site")
+printfn "  radiometric_sample: %d" (count "radiometric_sample")
+printfn "  radiometric_measurement: %d" (count "radiometric_measurement")
 
 // sign breakdown by source
 printfn ""

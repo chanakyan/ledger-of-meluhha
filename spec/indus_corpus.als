@@ -71,6 +71,38 @@ fact treebankNoDuplicatePosition {
         t1.sentence = t2.sentence implies t1.position != t2.position
 }
 
+-- radiometric_site: archaeological site with dating measurements
+sig RadiometricSite {
+    state: one Source  -- reuse Source as a generic entity
+}
+
+-- radiometric_sample: a dated sample from a site
+sig RadiometricSample {
+    rsite: one RadiometricSite
+}
+
+-- radiometric_measurement: one dating result for a sample
+sig RadiometricMeasurement {
+    sample: one RadiometricSample,
+    institution: one Source  -- reuse Source for institution identity
+}
+
+-- F11: Every measurement belongs to exactly one sample
+fact measurementHasOneSample {
+    all m: RadiometricMeasurement | one m.sample
+}
+
+-- F12: Every sample belongs to exactly one site
+fact sampleHasOneSite {
+    all s: RadiometricSample | one s.rsite
+}
+
+-- F13: No duplicate (sample, institution) pair
+fact noDuplicateMeasurement {
+    all disj m1, m2: RadiometricMeasurement |
+        m1.sample = m2.sample implies m1.institution != m2.institution
+}
+
 -- === FACTS (schema constraints) ===
 
 -- F1: Every artefact's source must match its site's source
@@ -199,7 +231,23 @@ assert cisiSignsValid {
     all ci: CisiInscription | ci.signs.elems in BaseSign
 }
 
--- A13: No duplicate treebank position within a sentence
+-- A13: Every measurement has one sample
+assert measurementOneSample {
+    all m: RadiometricMeasurement | one m.sample
+}
+
+-- A14: Every sample has one site
+assert sampleOneSite {
+    all s: RadiometricSample | one s.rsite
+}
+
+-- A15: No duplicate measurement per (sample, institution)
+assert noDupMeasurement {
+    all disj m1, m2: RadiometricMeasurement |
+        m1.sample = m2.sample implies m1.institution != m2.institution
+}
+
+-- A16: No duplicate treebank position within a sentence
 assert treebankNoDupPosition {
     all disj t1, t2: TreebankToken |
         t1.sentence = t2.sentence implies t1.position != t2.position
@@ -219,6 +267,9 @@ check noSelfParallel for 6
 check concordanceCrossesSources for 6
 check concordanceNoDuplicates for 6
 check cisiSignsValid for 6
+check measurementOneSample for 6
+check sampleOneSite for 6
+check noDupMeasurement for 6
 check treebankNoDupPosition for 6
 
 -- === EXPLORATION ===
