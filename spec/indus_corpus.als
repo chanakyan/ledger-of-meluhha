@@ -57,6 +57,20 @@ sig CisiInscription {
     inscriptionSource: one Source
 }
 
+-- treebank_token: dependency-parsed Tamil tokens (CoNLL format)
+-- Each token belongs to a sentence, has a position, POS, dep relation
+sig TreebankToken {
+    sentence: one CisiInscription,  -- reusing as "any inscription"
+    position: one Int,
+    pos: one BaseSign               -- POS tag modeled as a sign (abstract)
+}
+
+-- F10: No duplicate position within a treebank sentence
+fact treebankNoDuplicatePosition {
+    all disj t1, t2: TreebankToken |
+        t1.sentence = t2.sentence implies t1.position != t2.position
+}
+
 -- === FACTS (schema constraints) ===
 
 -- F1: Every artefact's source must match its site's source
@@ -185,6 +199,12 @@ assert cisiSignsValid {
     all ci: CisiInscription | ci.signs.elems in BaseSign
 }
 
+-- A13: No duplicate treebank position within a sentence
+assert treebankNoDupPosition {
+    all disj t1, t2: TreebankToken |
+        t1.sentence = t2.sentence implies t1.position != t2.position
+}
+
 -- === CHECKS ===
 
 check artefactHasOneSite for 6
@@ -199,6 +219,7 @@ check noSelfParallel for 6
 check concordanceCrossesSources for 6
 check concordanceNoDuplicates for 6
 check cisiSignsValid for 6
+check treebankNoDupPosition for 6
 
 -- === EXPLORATION ===
 

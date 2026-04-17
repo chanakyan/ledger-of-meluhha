@@ -142,6 +142,27 @@ CREATE TABLE cisi_inscription (
     signs       TEXT NOT NULL,
     sign_count  INTEGER NOT NULL,
     source_code TEXT NOT NULL DEFAULT 'CISI' REFERENCES source(code)
+) STRICT;
+
+CREATE TABLE treebank_token (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    sentence_id   INTEGER NOT NULL,
+    position      INTEGER NOT NULL,
+    form          TEXT    NOT NULL,
+    lemma         TEXT    NOT NULL,
+    pos           TEXT    NOT NULL,
+    pos_detail    TEXT,
+    features      TEXT,
+    head          INTEGER,
+    dep_rel       TEXT,
+    UNIQUE(sentence_id, position)
+) STRICT;
+
+CREATE TABLE tamil_sentence (
+    id              INTEGER PRIMARY KEY,
+    original_tamil  TEXT    NOT NULL,
+    logosyllabic    TEXT,
+    sign_count      INTEGER
 ) STRICT
 """
 
@@ -447,6 +468,73 @@ if File.Exists ivDbPath then
 else
     printfn "  CISI: SKIP (%s not found)" ivDbPath
 
+// --- Tamil Treebank CoNLL ---
+let conllPath = Path.Combine(dataDir, "../data/tamil-treebank/TamilTB.v0.1.utf8.conll")
+let conllPathAlt = Path.Combine(
+    Path.GetDirectoryName(Path.GetFullPath dbPath), "data/tamil-treebank/TamilTB.v0.1.utf8.conll")
+let conllFile =
+    if File.Exists conllPath then Some conllPath
+    elif File.Exists conllPathAlt then Some conllPathAlt
+    else None
+
+match conllFile with
+| Some cf ->
+    let lines = File.ReadAllLines(cf)
+    let mutable sentId = 0
+    let mutable tokenCount = 0
+    for line in lines do
+        if line.Trim() = "" then
+            sentId <- sentId + 1
+        elif not (line.StartsWith("#")) then
+            let cols = line.Split('\t')
+            if cols.Length >= 8 then
+                use cmd = new SqliteCommand(
+                    "INSERT INTO treebank_token (sentence_id,position,form,lemma,pos,pos_detail,features,head,dep_rel)
+                     VALUES (@s,@p,@f,@l,@pos,@pd,@ft,@h,@dr)", con, tx)
+                cmd.Parameters.AddWithValue("@s", sentId) |> ignore
+                cmd.Parameters.AddWithValue("@p", cols.[0]) |> ignore
+                cmd.Parameters.AddWithValue("@f", cols.[1]) |> ignore
+                cmd.Parameters.AddWithValue("@l", cols.[2]) |> ignore
+                cmd.Parameters.AddWithValue("@pos", cols.[3]) |> ignore
+                cmd.Parameters.AddWithValue("@pd", cols.[4]) |> ignore
+                cmd.Parameters.AddWithValue("@ft", if cols.Length > 5 then cols.[5] else "") |> ignore
+                cmd.Parameters.AddWithValue("@h", if cols.Length > 6 then (box (cols.[6])) else box System.DBNull.Value) |> ignore
+                cmd.Parameters.AddWithValue("@dr", if cols.Length > 7 then cols.[7] else "") |> ignore
+                cmd.ExecuteNonQuery() |> ignore
+                tokenCount <- tokenCount + 1
+    printfn "  treebank_token: %d tokens, %d sentences (from %s)" tokenCount sentId cf
+| None ->
+    printfn "  treebank_token: SKIP (CoNLL file not found)"
+
+// --- Original Tamil sentences + logosyllabic alignment ---
+let origPath = Path.Combine(dataDir, "Preprocessing/Converted_Tamil/LogoSyllabic/Original_Tamil_Sentences.csv")
+let logoPath = Path.Combine(dataDir, "Preprocessing/Converted_Tamil/LogoSyllabic/logo_syllabic_tamil_sentences.csv")
+if File.Exists origPath && File.Exists logoPath then
+    let origLines = parseCsv origPath
+    let logoLines = parseCsv logoPath
+    let mutable sentCount = 0
+    for i in 0 .. min origLines.Length logoLines.Length - 1 do
+        let origFields = splitCsvLine origLines.[i]
+        let logoFields = splitCsvLine logoLines.[i]
+        if origFields.Length >= 2 && logoFields.Length >= 2 then
+            let tamil = origFields.[1]
+            let logo = logoFields.[1]
+            let signCount =
+                logo.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                |> Array.filter (fun t -> t.Length > 0 && t <> "(" && t <> ")" && t <> "," && t <> "." && t <> ":" && t <> ";")
+                |> Array.length
+            use cmd = new SqliteCommand(
+                "INSERT OR IGNORE INTO tamil_sentence VALUES (@i,@t,@l,@c)", con, tx)
+            cmd.Parameters.AddWithValue("@i", i) |> ignore
+            cmd.Parameters.AddWithValue("@t", tamil) |> ignore
+            cmd.Parameters.AddWithValue("@l", logo) |> ignore
+            cmd.Parameters.AddWithValue("@c", signCount) |> ignore
+            cmd.ExecuteNonQuery() |> ignore
+            sentCount <- sentCount + 1
+    printfn "  tamil_sentence: %d rows (original + logosyllabic aligned)" sentCount
+else
+    printfn "  tamil_sentence: SKIP (Original_Tamil_Sentences.csv not found)"
+
 tx.Commit()
 con.Close()
 
@@ -470,6 +558,8 @@ printfn "  inscription      : %d" (count "inscription")
 printfn "  morphological_parallel: %d" (count "morphological_parallel")
 printfn "  sign_concordance : %d" (count "sign_concordance")
 printfn "  cisi_inscription : %d" (count "cisi_inscription")
+printfn "  treebank_token   : %d" (count "treebank_token")
+printfn "  tamil_sentence   : %d" (count "tamil_sentence")
 
 // sign breakdown by source
 printfn ""
