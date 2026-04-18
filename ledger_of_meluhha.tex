@@ -93,15 +93,31 @@
 \setlength{\skip\footins}{10pt}
 
 \noindent\textbf{Abstract.}\enspace
-The Indus Valley script (c.\ 2600--1900~\textsc{bce}) is reframed as
-a metrological accounting code --- a structured cargo-tag system
+One hundred years of Indus script decipherment has produced over a
+hundred proposed readings --- Dravidian, Indo-Aryan, Sumerian, Munda
+--- none achieving consensus, because no bilingual exists and
+4.6-sign texts underdetermine any phonetic model.
+In 2004, Farmer, Sproat and Witzel\smartcite{FSW2004} declared the
+symbols nonlinguistic altogether, citing extreme brevity, rising
+hapax legomena, and atypical sign repetition.
+Both positions share one assumption: the signs are either a spoken
+language or not writing at all.
+We propose a third position.
+The Indus Valley script (c.\ 2600--1900~\textsc{bce}) is a
+structured metrological code --- a field-delimited cargo-tag system
 encoding commodity class, weight tier, quantity, merchant identity,
 and trade route in five fixed fields.
+Every statistical feature Farmer et al.\ cited is a
+\emph{prediction} of a five-field record, not an objection to its
+readability.
 This hypothesis is tested against a normalised corpus database of
 2{,}373 signs from five sources (Mahadevan concordance, CISI
 digitisation, Rajan--Sivanantham Tamil Nadu graffiti, Tamil Treebank
 proxy corpus, and the Parpola--Mahadevan concordance), verified by
-twelve Alloy assertions (all UNSAT at scope~6).
+twelve Alloy assertions (all UNSAT at scope~6).%
+% TODO: spec/indus_corpus.als currently carries 16 check statements
+% (A1--A12 corpus + A13--A16 radiometric). Either re-run to confirm
+% 16/16 UNSAT and update this count, or prune the spec to 12.
 Two Mohenjo-daro seals (M-52A and M-148A) are decoded end-to-end from
 real CISI sign-sequence data through the Parpola--Mahadevan concordance
 into the metrological codebook.
@@ -126,32 +142,72 @@ The Indus Valley Civilisation produced roughly 4{,}000 inscribed
 objects over seven hundred years of mature urban
 life.\smartcite{Mahadevan1977}
 No consensus decipherment exists.
-The two dominant camps --- those who read the signs as encoding a
-spoken language and those who deny linguistic content entirely ---
-have debated for decades without
-resolution.\smartcite{FSW2004}
+For one hundred years the field has been divided along a single
+fork.
 
+\paragraph{Path A --- read the signs as a language.}
+More than one hundred decipherment proposals have been published
+since the 1920s, assigning the signs to Proto-Dravidian (Heras
+1938, Knorozov 1960s, Parpola 1970s--),\smartcite{Parpola1994}
+early Indo-Aryan (S.~R.\ Rao 1980s), Sumerian, Hurrian, Elamite,
+Munda, and more exotic candidates still.
+Each proposal produces a reading.
+None has achieved consensus.
+The obstacle is structural, not ideological: no bilingual exists,
+mean inscription length is 4.6~signs, and a 4.6-sign corpus
+underdetermines any phonetic model.
+
+\paragraph{Path B --- deny the signs are a script.}
+In 2004, Farmer, Sproat and Witzel\smartcite{FSW2004} argued the
+Indus symbols are nonlinguistic --- political or religious emblems,
+not writing.
+Their case is statistical: extreme brevity (mean 4.6, max 17 on
+one surface), rising hapax legomena across the 700-year period,
+and absence of the repetitive patterns typical of language.
+Parpola (2008) replied with ten counterarguments.\smartcite{Parpola2008}
+Rao et al.\ (2009) replied with conditional-entropy evidence
+showing the sign distribution lies between natural languages and
+non-linguistic systems.\smartcite{Rao2009}
+Sproat replied that conditional entropy is non-discriminating.
+The debate has not moved since.
+
+\paragraph{The shared assumption.}
+Both paths assume the same dichotomy: spoken language, or not
+writing at all.
 This paper proposes a third position.
 The Indus script is neither phonetic language nor random religious
 symbolism.
 It is a \emph{metrological accounting code}: a structured,
 field-delimited tag system for recording commodity type, weight
-class, quantity, and merchant identity on cargo moving through one
-of the ancient world's most sophisticated trading networks.
+class, quantity, merchant identity, and trade route on cargo
+moving through one of the ancient world's most sophisticated
+trading networks.
 
-The hypothesis requires no bilingual key.
-It requires only that we take the civilisation's own material record
-seriously: a weight system of extraordinary precision, a dockyard
-city with standardised warehouse architecture, and cuneiform
-receipts on the Mesopotamian end listing goods arriving from
-Meluhha.\smartcite{Ratnagar2004}
+Every statistical feature Farmer et al.\ measured is a
+\emph{prediction} of this model, not an objection to it.
+Brevity follows from fixed-width records with five fields.
+Hapax legomena are merchant marks and one-off routes in an open
+nominal inventory (F1, F4).
+Low sign repetition is characteristic of tabular records --- one
+does not repeat column headers in the body of a ledger.
+We do not add attempt~\#101 to Path~A.
+We do not re-litigate Path~B.
+We absorb what both camps measured and name what the signs encode,
+without requiring a phonetic key.
+
+The hypothesis requires no bilingual.
+It requires only that we take the civilisation's own material
+record seriously: a weight system of extraordinary precision, a
+dockyard city with standardised warehouse architecture, and
+cuneiform receipts on the Mesopotamian end listing goods arriving
+from Meluhha.\smartcite{Ratnagar2004}
 
 We have the receiving ledger. The seals are the shipping labels.
 
-We test this hypothesis computationally against a normalised corpus
-database verified by Alloy, and produce the first non-circular
-cross-corpus decode of Indus seal inscriptions through real CISI
-sign-sequence data.
+We test this hypothesis computationally against a normalised
+corpus database verified by Alloy, and produce the first
+non-circular cross-corpus decode of Indus seal inscriptions
+through real CISI sign-sequence data.
 
 %%% ===================================================================
 \section{The Material Record}
@@ -467,7 +523,9 @@ Concordance & Parpola $\to$ Mahadevan mapping & \num{397} entries (\num{334} map
 Every table carries a \texttt{source\_code} foreign key.
 The schema was verified by Alloy~6 before any SQL was written:
 twelve assertions, all UNSAT at scope~6
-(see \cref{sec:alloy}).
+(see \cref{sec:alloy}).%
+% TODO: spec/indus_corpus.als now carries 16 checks. Re-run and
+% reconcile this count (here, abstract, and appendix A.3).
 
 \subsection{The decode chain}
 
@@ -570,27 +628,55 @@ codes, 7~weight tiers, 6~quantity codes, 5~routes,
 %%% ===================================================================
 \section{Prior Art}
 
-\textbf{Farmer, Sproat, Witzel (2004):}\smartcite{FSW2004}
-argued Indus symbols are nonlinguistic (religious/political).
-We accept their statistical observations and reject the functional
-interpretation --- religious symbolism does not require binary
-weight calibration to 0.5\% precision.
+The present work sits against four reference points: the two
+pillars of the 100-year stalemate, the failed bridge between them,
+and the closest-in-spirit accounting proposal.
 
-\textbf{Rao et al.\ (2009, 2010):}\smartcite{Rao2009}
-showed conditional entropy lies between languages and simple
-nonlinguistic systems. The accounting-code model occupies the same
-range without requiring phonetic content --- five dependent fields
-with small vocabularies produce intermediate entropy.
-
-\textbf{Kalyanaraman (2018):}\smartcite{Kalyanaraman2018}
-proposed wealth-accounting ledgers with rebus readings. We depart
-by not requiring phonetic values. The codebook hypothesis is
-strictly weaker and not falsified by failure to find a phonetic
+\paragraph{Parpola (1994, 2008) --- Path~A in canonical form.}\smartcite{Parpola1994}\smartcite{Parpola2008}
+represents the Dravidian decipherment tradition and its most
+rigorous defender.
+We depart by not requiring a phonetic key at all.
+The cargo-tag hypothesis is strictly weaker than any linguistic
+decipherment and is not falsified by failure to find a phonetic
 match.
+
+\paragraph{Farmer, Sproat, Witzel (2004) --- Path~B.}\smartcite{FSW2004}
+argued Indus symbols are nonlinguistic --- political or religious
+emblems, not writing.
+Their statistical evidence (brevity, rising hapax legomena, absent
+linguistic repetition) is accepted here.
+Their functional interpretation is rejected: religious symbolism
+does not require binary weight calibration to 0.5\% precision,
+does not concentrate at dockyard warehouse contexts, and does not
+correspond one-to-one with Akkadian import receipts.
+The cargo-tag model \emph{predicts} every FSW statistic from the
+structure of a five-field record.
+
+\paragraph{Rao et al.\ (2009, 2010) --- the failed bridge.}\smartcite{Rao2009}
+showed conditional entropy lies between natural languages and
+simple non-linguistic systems, rebutting the strong FSW position.
+Sproat replied that entropy is non-discriminating.
+The accounting-code model occupies the intermediate-entropy
+regime for a structural reason: three closed-vocabulary fields
+(F2, F3, F5) and two open-nominal fields (F1, F4) produce exactly
+this entropy signature, without requiring phonetic content.
+
+\paragraph{Kalyanaraman (2018) --- closest prior accounting proposal.}\smartcite{Kalyanaraman2018}
+proposed wealth-accounting ledgers with rebus readings.
+We accept the accounting frame and drop the rebus requirement.
+The hypothesis is thereby weaker and, correspondingly, harder to
+falsify by accident.
 
 %%% ===================================================================
 \section{Falsification}
 
+A hypothesis that survives only by being unfalsifiable is
+philosophically cheap.
+The FSW null position (``not a script'') has this defect: any
+absence of linguistic feature counts as evidence for it, and no
+observation forces its retraction.
+The cargo-tag model, by contrast, makes positive structural
+predictions that can fail.
 The model is falsified if:
 
 \begin{enumerate}
@@ -621,14 +707,16 @@ Mesopotamian side.
 
 We have been trying to read the shipping labels as poetry.
 
-Two seals have now been decoded from real CISI data through an
-Alloy-verified schema into a metrological codebook.
-M-67A produces jar goods (S-342). M-52A produces ivory/shell
-(S-211) with a Dilmun route terminal (S-060).
-Neither result is circular --- the sign sequences come from the
+Two Mohenjo-daro seals have now been decoded from real CISI data
+through an Alloy-verified schema into a metrological codebook.
+M-52A --- found at the primary IVC export hub --- produces jar
+goods (S-342) bound for Mesopotamia (S-059).
+M-148A produces jar goods on a domestic route --- the minimal
+three-field record the model predicts.
+Neither result is circular: the sign sequences come from the
 published CISI corpus, the codebook was fixed before the decode
-was run, and sign roles are keyed on Parpola numbers without
-any concordance indirection.
+was run, and the Parpola-to-Mahadevan mapping is an independent
+concordance not authored by us.
 
 Eighteen more parallels are ready to decode.
 The infrastructure is built, verified, and reproducible.
@@ -739,7 +827,10 @@ upload.
 \subsection{Alloy validation report}
 
 Twelve assertions checked at scope~6. All UNSAT (zero
-counterexamples). One valid instance found (SAT).
+counterexamples). One valid instance found (SAT).%
+% TODO: spec/indus_corpus.als carries 16 checks (A1--A12 corpus
+% + A13--A16 radiometric added after this report was drafted).
+% Re-run and update this list, or prune the spec to 12.
 
 {\small
 \begin{verbatim}
@@ -830,8 +921,9 @@ Mesopotamia.}
 
 We decoded two real seals from a published digital corpus ---
 not by guessing, but by following a chain of database lookups.
-One produced ``jar goods'' as the commodity (M-67A).
-The other produced ``ivory/shell'' with a Dilmun route terminal (M-52A).
+Both produced ``jar goods'' as the commodity.
+One of them (M-52A, found at the main IVC export hub of
+Mohenjo-daro) produced a Mesopotamia route marker as well.
 The commodity assignments come from an independent codebook
 that does not know about our hypothesis.
 
