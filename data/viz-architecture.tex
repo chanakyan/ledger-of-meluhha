@@ -1,0 +1,243 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1.1in]{geometry}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Pagella}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{fancyvrb}
+\usepackage{longtable,booktabs,array}
+\usepackage{titlesec}
+\titleformat{\section}{\large\bfseries}{}{0em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{}{0em}{}
+\setlength{\parskip}{0.4em}
+\setlength{\parindent}{1.5em}
+
+\title{\textbf{Visualization Architecture}\\
+  \large\texttt{ledger-of-meluhha.html} --- Single-File Dashboard}
+\author{Third Buyer Advisory}
+\date{April 2026}
+
+\begin{document}
+\maketitle
+
+%%% ===================================================================
+\section{Delivery model}
+
+A single self-contained HTML file. User drops
+\texttt{indus\_corpus.db} onto the page. Everything renders
+live --- geographic trade map, decoded seals, sign frequency,
+weight codebook, radiometric dates. No server. No build chain.
+No framework. Just a browser and a database file.
+
+Build chain: \texttt{src/ledger.ts} $\to$ \texttt{npx tsc}
+$\to$ \texttt{dist/ledger.js} $\to$ paste into HTML
+\texttt{<script>} block.
+
+External dependencies loaded from CDN at runtime:
+sql.js (SQLite WASM), Leaflet (map tiles + polylines),
+D3.js (frequency chart), Google Fonts (Cormorant Garamond,
+JetBrains Mono). Map tiles require internet (OpenTopoMap).
+
+%%% ===================================================================
+\section{Design language}
+
+\subsection{Visual identity}
+
+\begin{itemize}[nosep]
+\item Background: \texttt{\#0f0c07} (near-black, warm)
+\item Accent: \texttt{\#b5121b} (TBA red)
+\item Primary text: \texttt{\#f0e6d0} (warm sand)
+\item Data colour: \texttt{\#c4924a} (clay)
+\item Display font: Cormorant Garamond --- narrative,
+  conclusions, titles. Weight 300 for headings. Italic for
+  emphasis.
+\item Data font: JetBrains Mono --- sign numbers, field labels,
+  weights, coordinates.
+\item Font is epistemological status. Cormorant = interpretation.
+  JetBrains Mono = fact.
+\end{itemize}
+
+\subsection{Four themes}
+
+Clay (dark default), parchment (light), high contrast
+(WCAG AAA), seal (blue-grey). All colours via CSS custom
+properties (\texttt{--clay}, \texttt{--sand}, \texttt{--tba-red}).
+
+%%% ===================================================================
+\section{Layout --- three columns}
+
+\subsection{Left panel (\texttildelow20\%)}
+
+Decoded seals M-52A and M-148A. Each as a field card:
+F1~merchant mark, F2~commodity, F3~weight tier, F4~quantity,
+F5~route. Sign numbers in JetBrains Mono. Resolved values
+in Cormorant.
+
+Below the cards: Alloy verification badge in TBA red ---
+``16 assertions UNSAT at scope 6.''
+
+Radiometric dating panel: top-5 calibrated dates from corpus DB.
+
+\subsection{Centre panel (\texttildelow55\%)}
+
+Leaflet map centred on IVC trade zone. OpenTopoMap tiles.
+22~archaeological sites as circle markers. 13~trade route
+polylines as quadratic Bezier curves. Width proportional to
+relative trade volume.
+
+Period annotation top-left: ``c.\ 2600--1900 BCE --- Bronze
+Age Trade Network'' in JetBrains Mono, dim.
+
+\subsection{Right panel (\texttildelow25\%)}
+
+Three panels stacked:
+
+\begin{enumerate}[nosep]
+\item Sign frequency cumulative curve (D3). Claim: ``67 signs
+  carry 80\% of all inscriptions. A codebook, not a phonology.''
+\item Weight codebook horizontal bars --- binary series then
+  decimal. 11~tiers from base unit 0.856\,g. Claim: ``Zero not
+  invented until 628 CE. The weight object is the digit.''
+\item Commodity manifest table --- sign, commodity, route.
+  Click a row to filter matching routes on the map. Active
+  row highlighted.
+\end{enumerate}
+
+%%% ===================================================================
+\section{Width encoding --- trade routes}
+
+Route stroke-width proportional to relative trade volume:
+
+\begin{center}\small
+\begin{tabular}{@{}lrl@{}}
+\toprule
+\textbf{Route} & \textbf{Width} & \textbf{Basis} \\
+\midrule
+Jar goods $\to$ Mesopotamia & 8\,px & S-342 = 10\% corpus \\
+Textiles $\to$ Mesopotamia & 6\,px & Primary bulk export \\
+Copper-bronze $\to$ Magan & 5\,px & Khetri to Oman \\
+Carnelian $\to$ Dilmun & 4\,px & Luxury export \\
+Iron: TN $\to$ IVC & 3\,px & Fish sign supply corridor \\
+Timber and Ivory & 2\,px & Sporadic high-value \\
+Internal & 1--2\,px & Indus corridor \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Routes render before sites (z-order: routes under, sites on top).
+Polyline refs stored in \texttt{routeLines[]} for commodity
+filtering.
+
+%%% ===================================================================
+\section{Codebook embedding}
+
+The codebook tables (\texttt{sign\_role}, \texttt{commodity},
+\texttt{route}) are embedded as JavaScript \texttt{Map}
+constants in \texttt{src/ledger.ts}. These must match
+\texttt{IndusCodebookTypes.fsx} exactly --- same sign IDs,
+same codes, same values. Sign IDs are Mahadevan numbers.
+
+Weight application labels must match
+\texttt{indus\_seed\_codebook.fsx} verbatim. No abbreviations.
+
+\begin{center}\small
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Embedded map} & \textbf{Entries} \\
+\midrule
+\texttt{signRoleMap} & 28 \\
+\texttt{commodityMap} & 8 \\
+\texttt{routeMap} & 5 \\
+Weights array & 11 tiers \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+%%% ===================================================================
+\section{Seal decode in the browser}
+
+The dashboard decodes seals by parsing Parpola sign IDs from
+\texttt{cisi\_inscription} rows in the dropped corpus DB,
+then looking up the Mahadevan number in the embedded
+\texttt{signRoleMap}. The seal IDs must match the paper
+(currently M-52A and M-148A).
+
+Resolution chain:
+\begin{enumerate}[nosep]
+\item \texttt{cisi\_inscription} $\to$ Parpola sign list
+\item Parpola number $\to$ \texttt{signRoleMap} (Mahadevan keyed)
+\item \texttt{role=commodity} $\to$ \texttt{commodityMap}
+\item \texttt{role=terminal} $\to$ \texttt{routeMap}
+\end{enumerate}
+
+%%% ===================================================================
+\section{Interactions}
+
+\begin{itemize}[nosep]
+\item Hover route: popup with commodity name, note, width.
+\item Hover site: popup with name, period, coordinates.
+\item Click commodity table row: highlight matching routes
+  (non-matching dim to 15\% opacity). Click again to deselect.
+\item Route mouseover: weight +2, opacity 1.0. Mouseout
+  restores (respects commodity filter state).
+\end{itemize}
+
+%%% ===================================================================
+\section{Two states}
+
+\subsection{State 1 --- Landing}
+
+Full-screen dark field. TBA wordmark top-left linked to
+\texttt{thirdbuyeradvisory.org}. Title centred: ``The Ledger
+of Meluhha'' in Cormorant. Drop zone with dashed TBA-red
+border. Drop or click to load \texttt{.db} file.
+
+\subsection{State 2 --- Dashboard}
+
+Crossfade from landing (600\,ms opacity transition).
+Dashboard \texttt{display:block}. Leaflet \texttt{invalidateSize}
+at 100\,ms. All panels render from live DB queries.
+
+%%% ===================================================================
+\section{Data flow}
+
+Database file dropped $\to$ \texttt{FileReader} $\to$
+\texttt{ArrayBuffer} $\to$ sql.js WASM opens in memory $\to$
+queries execute against live schema $\to$ Leaflet + D3 render.
+
+No intermediate files. No server. No JSON export.
+The HTML file is the artifact.
+
+%%% ===================================================================
+\section{Zenodo artifact}
+
+\begin{Verbatim}[fontsize=\small,frame=single]
+ledger_of_meluhha.pdf        — paper (22 pages)
+ledger_of_meluhha_overleaf.zip — tex + citations.lua
+ledger_of_meluhha_dashboard.zip:
+  ledger-of-meluhha.html     — single-file dashboard
+  indus_corpus.db            — Alloy-verified corpus
+\end{Verbatim}
+
+%%% ===================================================================
+\section{Data acquisition roadmap}
+
+Each dataset unlocks more decoded seals on the map:
+
+\begin{enumerate}[nosep]
+\item ICIT database (Wells and Fuls, TU Berlin) --- unlocks
+  18 pending TN-IVC parallels.
+\item Ratnagar (2003) Mesopotamian findspot table --- unlocks
+  the falsification test (sign distribution at export sites).
+\item Lothal context data from Rao (1973) --- unlocks BC-1
+  confirmation (warehouse vs residential context).
+\item CISI volumes 2--3 digitisation --- long term, full
+  Harappa/Kalibangan corpus.
+\end{enumerate}
+
+New corpus data = one command:
+\texttt{cmake --build build --target corpus}.
+No script, codebook, paper, or dashboard changes needed.
+
+\end{document}
