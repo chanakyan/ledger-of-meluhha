@@ -20,142 +20,90 @@ Reproducibility artifact for the working paper
 Metrological Accounting Code} (Venugopal 2026).
 
 Every claim in the paper is backed by data in the SQLite
-databases below.
-Every computation is reproducible with the F\# scripts below.
-No proprietary tools, no cloud services, no API keys.
+databases. Every computation is reproducible with the F\#
+scripts. No proprietary tools, no cloud services, no API keys.
 
-\section{Compile the paper (easiest: Overleaf)}
+Build instructions are in \texttt{CMakeLists.txt}. Read it.
+It checks every dependency, tells you what is missing, and
+gives the install command. Run:
 
-If you only want to read, edit, or recompile the paper,
-Overleaf is the fastest path. No local install required.
+\begin{verbatim}
+cmake -S . -B build -DINDUS_VALLEY_DIR=../indus-valley
+cmake --build build
+\end{verbatim}
 
-\begin{enumerate}
+\section{Compile the paper (Overleaf)}
+
+\begin{enumerate}[nosep]
 \item Go to \url{https://www.overleaf.com} (free account).
-\item \textbf{New Project} $\to$ \textbf{Upload Project} $\to$
-      upload the zip of this artifact (or just
-      \texttt{indus\_accounting.tex} + \texttt{citations.lua}).
-\item \textbf{Menu} (top-left) $\to$ \textbf{Compiler} $\to$
-      select \textbf{LuaLaTeX}.
-      This is required --- the paper uses \texttt{fontspec},
-      \texttt{luacode}, and \texttt{\textbackslash directlua}
-      which only work under LuaLaTeX.
-\item Click \textbf{Recompile}. Two passes resolve
-      cross-references automatically.
+\item Upload \texttt{ledger\_of\_meluhha.tex} +
+      \texttt{citations.lua}.
+\item Set compiler to \textbf{LuaLaTeX} (Menu $\to$ Compiler).
+\item Recompile.
 \end{enumerate}
-
-\noindent
-Overleaf's free tier includes LuaLaTeX, TeX Gyre Pagella,
-and every package this paper uses. No credit card, no install.
-
-\section{Full reproducibility (local)}
-
-To run the F\# scripts and rebuild the databases locally:
-
-\begin{itemize}
-\item \texttt{sqlite3} --- query any database directly
-\item \texttt{dotnet fsi} (F\# 8+ / .NET 8+) --- run the scripts
-\item \texttt{lualatex} (TeX Live 2024+) --- compile the paper locally
-\item \texttt{java} (17+) + \texttt{alloy.jar} --- verify the schema
-\item \texttt{cmake} (3.20+) --- build system
-\end{itemize}
-
-\noindent
-macOS: \texttt{brew install dotnet texlive sqlite openjdk@17 cmake}\\
-Linux: \texttt{sudo apt install dotnet-sdk-8.0 sqlite3 texlive-full default-jdk cmake}\\
-Windows: not supported --- use WSL~2 (Ubuntu). See \texttt{CMakeLists.txt}.
 
 \section{Files}
 
 \begin{description}[style=nextline,leftmargin=2em]
 
-\item[\texttt{indus\_accounting.tex}]
-  The paper. LuaLaTeX source. Tables generated via embedded Lua.
-  Compile with \texttt{lualatex -shell-escape indus\_accounting.tex}
-  (two passes for cross-references).
-
-\item[\texttt{indus\_accounting.pdf}]
-  Compiled paper (26 pages).
+\item[\texttt{ledger\_of\_meluhha.tex}]
+  The paper. LuaLaTeX. 22 pages.
 
 \item[\texttt{citations.lua}]
-  Lua citation engine loaded by the paper. Implements first-use
-  full citation, subsequent \textit{op.\ cit.}
+  Lua citation engine. First-use full citation, subsequent
+  \textit{op.\ cit.}
 
-\item[\texttt{indus\_codebook.db}]
-  SQLite. The metrological codebook: 11 weight tiers, 8 commodity
-  codes, 5 routes, 6 quantity codes, 5 merchant marks, 28
-  sign-to-role mappings, 3 positional fallback rules.
-  Created by \texttt{indus\_seed\_codebook.fsx}.
-
-\item[\texttt{indus\_corpus.db}]
-  SQLite. Normalised corpus database: 2{,}373 signs from 3 sources
-  (Rajan--Sivanantham 42, Tamil Treebank 1{,}929, Mahadevan 402),
-  7{,}644 sign occurrences, 600 inscriptions, 18 sites, 20
-  morphological parallels. Schema verified by Alloy (9/9 UNSAT).
-  Created by \texttt{indus\_ingest\_corpus.fsx}.
-
-\item[\texttt{indus\_lssc.db}]
-  SQLite. Transition entropy and LSSC scores per sign and per
-  inscription for the Tamil proxy corpus.
-  Created by \texttt{indus\_lssc.fsx}.
+\item[\texttt{IndusCodebookTypes.fsx}]
+  Frozen typed F\# records for the metrological codebook:
+  28~sign roles, 8~commodities, 5~routes, 11~weight tiers,
+  5~merchant marks. Generated once by SqlHydra v4 from
+  \texttt{indus\_codebook.db}. Zero runtime DB dependency.
+  All decoder scripts \texttt{\#load} this file.
 
 \item[\texttt{indus\_seed\_codebook.fsx}]
-  F\# script. Seeds \texttt{indus\_codebook.db} from the paper's
-  schema. Usage: \texttt{dotnet fsi indus\_seed\_codebook.fsx codebook.db}
+  Seeds \texttt{indus\_codebook.db}. Source of truth for
+  the codebook schema. Raw ADO.NET (write path).
 
 \item[\texttt{indus\_decoder.fsx}]
-  F\# script. Cargo-tag decoder. Reads all configuration from
-  \texttt{indus\_codebook.db}. Zero hardcoded values.
-  Usage: \texttt{dotnet fsi indus\_decoder.fsx codebook.db}
-
-\item[\texttt{indus\_ingest\_corpus.fsx}]
-  F\# script. Builds the corpus database from Tamil Treebank CSVs,
-  Rajan--Sivanantham base sign table, and Mahadevan histogram signs.
-  Usage: \texttt{dotnet fsi indus\_ingest\_corpus.fsx <indus-valley-dir> corpus.db}
-
-\item[\texttt{indus\_lssc.fsx}]
-  F\# script. Computes transition entropy, closure/option
-  classification, LSSC scores, and TSF Condition~2 check.
-  Usage: \texttt{dotnet fsi indus\_lssc.fsx <corpus.csv> lssc.db}
+  Cargo-tag decoder. Uses frozen types, no arguments, no DB.
+  \texttt{dotnet fsi indus\_decoder.fsx}
 
 \item[\texttt{indus\_tn\_decoder.fsx}]
-  F\# script. Cross-corpus Tamil Nadu potsherd decoder. Resolves
-  TN graffiti through IVC codebook via morphological parallels.
-  Usage: \texttt{dotnet fsi indus\_tn\_decoder.fsx corpus.db codebook.db}
+  Tamil Nadu cross-corpus decoder. Frozen codebook +
+  corpus DB for CISI/concordance/parallels.
+  \texttt{dotnet fsi indus\_tn\_decoder.fsx indus\_corpus.db}
+
+\item[\texttt{indus\_ingest\_corpus.fsx}]
+  Builds \texttt{indus\_corpus.db} from external sources.
+
+\item[\texttt{indus\_lssc.fsx}]
+  Transition entropy, LSSC scores, TSF Condition~2 check.
+
+\item[\texttt{indus\_bernoulli.fsx}]
+  Bernoulli independence argument. MathNet.Numerics.
+  Analytic + Monte Carlo ($10^7$ trials) + Fisher's combined
+  test + Bayesian update + sensitivity analysis.
+  \texttt{dotnet fsi indus\_bernoulli.fsx}
+
+\item[\texttt{ledger-of-meluhha.html}]
+  Interactive dashboard. Single HTML file. Drop
+  \texttt{indus\_corpus.db} onto the page.
 
 \item[\texttt{spec/indus\_corpus.als}]
-  Alloy 6 specification. Nine structural assertions on the corpus
-  schema. All UNSAT at scope~6 (zero counterexamples).
-  Run: \texttt{java -jar alloy.jar exec spec/indus\_corpus.als}
+  Alloy 6 specification. 16~assertions, all UNSAT at scope~6.
 
-\item[\texttt{data/morphological-parallels/rs2025\_plate\_parallels.csv}]
-  CSV. Twenty morphological parallels transcribed from
-  Rajan--Sivanantham (2025) comparison plates pp.~6--7.
-  Each row cites the specific plate, panel, and row position.
+\item[\texttt{spec/}]
+  AI instruction contracts: F\# coding standard, TypeScript
+  dashboard rules, LaTeX paper standard, CMake build rules,
+  data contract.
+
+\item[\texttt{hydra/}]
+  SqlHydra v4 configuration and generated \texttt{.fs} types.
+  Run once to regenerate if codebook schema changes.
 
 \end{description}
 
-\section{Quick start (CMake)}
-
-\begin{verbatim}
-# Configure (point to the indus-valley data directory)
-cmake -S . -B build -DINDUS_VALLEY_DIR=../indus-valley
-
-# Build everything: codebook + corpus + LSSC
-cmake --build build
-
-# Individual targets:
-cmake --build build --target codebook    # seed codebook DB
-cmake --build build --target corpus      # ingest corpus + parallels
-cmake --build build --target lssc        # LSSC transition entropy
-cmake --build build --target decode      # run IVC cargo-tag decoder
-cmake --build build --target tn-decode   # TN cross-corpus decoder
-cmake --build build --target verify      # Alloy schema verification
-cmake --build build --target paper       # compile the paper (lualatex)
-cmake --build build --target readme      # compile the README
-cmake --build build --target clean-db    # remove generated DBs
-\end{verbatim}
-
-\section{Query the results directly}
+\section{Query the results}
 
 \begin{verbatim}
 sqlite3 indus_codebook.db "SELECT * FROM sign_role WHERE role='commodity'"
@@ -167,17 +115,15 @@ sqlite3 indus_lssc.db "SELECT class, COUNT(*), ROUND(AVG(entropy),4)
 \section{License}
 
 CC~BY~4.0. Data from Rajan and Sivanantham (2025, 2026) used
-under fair academic use for morphological comparison.
-Tamil Treebank v0.1 under CC~BY-NC-SA~3.0 (Ramasamy \&
-Abokrtsk 2011).
+under fair academic use. Tamil Treebank v0.1 under
+CC~BY-NC-SA~3.0 (Ramasamy \& \v{Z}abokrtsk\'{y} 2011).
 
 \section{Citation}
 
 \begin{verbatim}
 Venugopal, R. (2026). The Ledger of Meluhha: Indus Valley
 Script as Metrological Accounting Code. Working Paper.
-Third Buyer Advisory LLC. Zenodo.
-doi: [to be assigned]
+Third Buyer Advisory LLC.
 \end{verbatim}
 
 \end{document}
