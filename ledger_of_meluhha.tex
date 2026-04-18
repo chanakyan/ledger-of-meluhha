@@ -869,6 +869,33 @@ drop \texttt{indus\_corpus.db} onto the page to render the
 full trade network, decode two seals live, and filter routes
 by commodity.
 
+\subsection{Data update policy}
+
+The codebook and corpus are separated by design.
+
+\paragraph{New corpus data} (additional CISI seals, new
+archaeological sites, new morphological parallels) requires only
+re-running the ingest pipeline:
+\texttt{cmake --build build --target corpus}.
+No script, codebook, or paper change is needed.
+
+\paragraph{New codebook entries} (a new commodity, route, or sign
+role assignment) propagate through a four-step chain:
+\begin{enumerate}[nosep]
+\item Edit \texttt{indus\_seed\_codebook.fsx} (the single source
+  of truth).
+\item Re-seed: \texttt{cmake --build build --target codebook}.
+\item Re-generate typed records: \texttt{cd hydra \&\& sqlhydra
+  sqlite}.
+\item Update the frozen F\# types in
+  \texttt{IndusCodebookTypes.fsx} and the embedded JavaScript maps
+  in \texttt{ledger.ts}.
+\end{enumerate}
+The codebook has been stable at 28~sign roles, 8~commodities, and
+5~routes since the initial seeding. By construction the open
+inventory (merchant marks, artefact IDs) lives in the corpus, not
+the codebook.
+
 %%% ===================================================================
 \clearpage
 \section{Plain-Language Summary}
