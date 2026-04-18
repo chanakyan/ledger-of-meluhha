@@ -236,26 +236,25 @@ add_custom_target(lssc DEPENDS ${SRC}/indus_lssc.db)
 # ─── Target: decode ──────────────────────────────────────────────────────────
 
 add_custom_target(decode
-    COMMAND ${DOTNET} fsi ${SRC}/indus_decoder.fsx ${SRC}/indus_codebook.db
-    DEPENDS codebook
+    COMMAND ${DOTNET} fsi ${SRC}/indus_decoder.fsx
     WORKING_DIRECTORY ${SRC}
-    COMMENT "Running Indus cargo-tag decoder")
+    COMMENT "Running Indus cargo-tag decoder (frozen codebook)")
 
 # ─── Target: tn-decode ───────────────────────────────────────────────────────
 
 add_custom_target(tn-decode
     COMMAND ${DOTNET} fsi ${SRC}/indus_tn_decoder.fsx
-            ${SRC}/indus_corpus.db ${SRC}/indus_codebook.db
-    DEPENDS codebook corpus
+            ${SRC}/indus_corpus.db
+    DEPENDS corpus
     WORKING_DIRECTORY ${SRC}
-    COMMENT "Running Tamil Nadu cross-corpus decoder")
+    COMMENT "Running Tamil Nadu cross-corpus decoder (frozen codebook)")
 
 # ─── Target: verify ──────────────────────────────────────────────────────────
 
 add_custom_target(verify
     COMMAND ${JAVA} -jar ${ALLOY_JAR} exec ${SRC}/spec/indus_corpus.als
     WORKING_DIRECTORY ${SRC}
-    COMMENT "Alloy schema verification (9 assertions)")
+    COMMENT "Alloy schema verification (16 assertions)")
 
 # ─── Target: paper ───────────────────────────────────────────────────────────
 
