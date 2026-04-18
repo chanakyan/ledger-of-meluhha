@@ -214,67 +214,64 @@ Same treatment for \texttt{Series}
 (\texttt{first}\,/\,\texttt{last}\,/\,\texttt{other}),
 \texttt{FormType}, \texttt{Confidence}, \texttt{SignClass}.
 
-\paragraph{P2.3 Stop using ADO.NET for reads.  Use SqlHydra + \texttt{query \{ \}}.}
-Every script repeats the pattern
-\texttt{use cmd = new SqliteCommand(...); cmd.Parameters.AddWithValue(...); use rdr = cmd.ExecuteReader(); r.GetString~0; r.GetInt32~1}
-30--40 times.  This is 2003 technology.  F\# has had its own
-native SQL DSL since F\# 3.0 (\texttt{query \{ \}}); the 2026
-idiomatic stack for typed access is
-\textbf{SqlHydra}\footnote{\url{https://github.com/JordanMarr/SqlHydra}}
---- a code generator (not a type provider) recommended by the
-\href{https://fsharp.org/guides/data-access/}{fsharp.org data
-access guide}.
+\paragraph{P2.3 Raw SQL is banned on the read path.  Codebook is frozen typed records.}
 
-Workflow:
+\textbf{Rule.}  No \texttt{SqliteCommand}, \texttt{ExecuteReader},
+or \texttt{GetString(n)} in any script that \emph{reads} codebook
+data.  The codebook schema is frozen.  All read-path scripts use
+\texttt{\#load "IndusCodebookTypes.fsx"} and typed F\# records
+with prebuilt lookup maps.  No SQL at runtime.  No database
+connection for the codebook.
 
-\begin{Verbatim}[fontsize=\small,frame=single]
-# One-time, after seeding indus_codebook.db:
-dotnet tool install --global SqlHydra.Cli
-dotnet sqlhydra sqlite
-# → writes IndusCodebook.fs (committed to the repo)
-\end{Verbatim}
-
-Then every read script becomes:
+\textbf{How it works.}
+SqlHydra\footnote{\url{https://github.com/JordanMarr/SqlHydra}}
+v4 was run \emph{once} against \texttt{indus\_codebook.db} to
+generate typed records matching the schema
+(\texttt{hydra/IndusCodebook.fs}).  Those records were then frozen
+--- with literal data arrays --- into
+\texttt{IndusCodebookTypes.fsx}.  The generator was discarded.
+No \texttt{SqlHydra.Query} runtime dependency exists.
 
 \begin{Verbatim}[fontsize=\small,frame=single]
-#load "IndusCodebook.fs"
-open IndusCodebook
+#load "IndusCodebookTypes.fsx"
+open IndusCodebookTypes
 
-let ctx = Sqlite.CreateContext(connStr)
-
-let jarCommodity =
-    query {
-        for c in ctx.Commodity do
-        where (c.code = "jar")
-        select (c.code, c.label, c.description)
-    } |> Seq.tryHead
+// Typed record, prebuilt map, zero DB:
+let jar = commodityByCode |> Map.find "jar"
+// jar.Label = "JAR GOODS", jar.Description = "sesame oil/grain/resin"
 \end{Verbatim}
 
-\texttt{c.code} is a typed string, not \texttt{r.GetString 0}.
-Rename a column $\to$ compile error.  No placeholder mismatches.
-No \texttt{AddWithValue} type sniffing.  Reads like SQL.
+\texttt{jar.Label} is a typed string field, not
+\texttt{r.GetString 0}.  Rename a field $\to$ compile error.
+The professor opens \texttt{IndusCodebookTypes.fsx}, reads
+28~sign roles, 8~commodities, 5~routes as plain F\# records.
+The schema \emph{is} the documentation.
 
-Why SqlHydra and not a type provider: type providers generate
-phantom types at compile time --- the professor cannot see them.
-SqlHydra generates \texttt{IndusCodebook.fs} on disk.  The
-professor opens it, reads the record declarations, sees the
-schema in F\#.  The schema becomes \emph{documentation}, not
-compiler magic.
+\textbf{Two exceptions} (write-path scripts that create databases):
 
-Why not replace ADO.NET everywhere: SqlHydra reads an existing
-schema.  The seed script (\texttt{indus\_seed\_codebook.fsx})
-creates tables --- DDL work --- and stays on
-\texttt{Microsoft.Data.Sqlite} with raw
-\texttt{CREATE TABLE} statements.  After the seed runs,
-regenerate \texttt{IndusCodebook.fs} with \texttt{dotnet
-sqlhydra sqlite} and every consumer script uses
-\texttt{query \{ \}}.
+\begin{enumerate}[nosep]
+\item \texttt{indus\_seed\_codebook.fsx} --- DDL +
+  \texttt{INSERT}.  Creates the codebook.  Raw ADO.NET is the
+  only option for schema creation.
+\item \texttt{indus\_ingest\_corpus.fsx} --- ETL pipeline, bulk
+  inserts from external sources into \texttt{indus\_corpus.db}.
+  Same reason.
+\end{enumerate}
 
-Scope of this P2.3 change: \texttt{indus\_decoder.fsx},
-\texttt{indus\_tn\_decoder.fsx}, \texttt{indus\_lssc.fsx}, the
-radiometric-ingestion block in
-\texttt{indus\_ingest\_corpus.fsx}.  The seed and the DDL blocks
-stay on ADO.NET.
+\noindent
+Both are write-path.  Every script that reads codebook data is
+banned from raw SQL.  This is enforced by the pre-commit hook
+(coding standard audit on staged \texttt{.fsx} files).
+
+\textbf{When the codebook changes} (rare --- stable at 28~signs,
+8~commodities, 5~routes since initial seeding):
+
+\begin{Verbatim}[fontsize=\small,frame=single]
+# 1. Edit indus_seed_codebook.fsx (source of truth)
+# 2. cmake --build build --target codebook
+# 3. cd hydra && sqlhydra sqlite   (re-generate .fs)
+# 4. Update IndusCodebookTypes.fsx (frozen data + types)
+\end{Verbatim}
 
 \subsection{P3 --- behavioural changes (run decoder before/after)}
 

@@ -1,0 +1,24 @@
+The Indus Valley script (c. 2600-1900 BCE) is a metrological cargo-tag system, not a phonetic language. Five fields: merchant mark, commodity class, weight tier, quantity multiplier, trade route.
+
+Two Mohenjo-daro seals (M-52A, M-148A) decoded end-to-end from real CISI sign-sequence data through the Parpola-Mahadevan concordance into a metrological codebook. Both produce jar goods as commodity -- independently the most frequent sign in the Mahadevan corpus (~10% of all occurrences). M-52A produces a Mesopotamia route marker, consistent with its findspot at the primary IVC export hub. Neither result is circular.
+
+20 morphological parallels between Tamil Nadu Iron Age potsherds and IVC seals transcribed from Rajan & Sivanantham (2025). 18 pending -- Harappa/Kalibangan/Rojdi data not yet in the open CISI corpus.
+
+Normalised SQLite corpus database: 2,373 signs from 5 sources, 179 CISI inscriptions, 397 concordance entries, 600 Tamil proxy inscriptions. Schema verified by Alloy 6: 16 assertions, all UNSAT at scope 6, zero counterexamples.
+
+Five F# scripts (dotnet fsi): codebook seeder, corpus ingestion, LSSC transition entropy analysis, IVC cargo-tag decoder, Tamil Nadu cross-corpus decoder. Codebook frozen as typed F# records generated once by SqlHydra v4 -- decoder runs with zero database dependency. CMake build system with loud dependency checks. All claims queryable with sqlite3. All computations reproducible with dotnet fsi.
+
+The Indus decode pipeline produces its result through five independent data paths: corpus frequency, concordance shape matching, findspot geography, cross-corpus overlap, and physical weight calibration. None shares a common error source. Under generous per-path bounds favouring the null hypothesis, the joint probability that all five convergences are coincidental is 3.1 x 10^-5, one chance in thirty-two thousand. The same Bernoulli independence structure that rules out universal stratigraphic disturbance across Tamil Nadu at 10^-7 rules out coincidental decode at 10^-5. The cargo-tag model is not proven. But the hypothesis that these convergences are accidental requires a one-in-thirty-two-thousand coincidence across data sources that do not talk to each other. Noise scatters. Signal clusters. The decode clusters.
+
+Interactive dashboard: ledger-of-meluhha.html (single file, drop indus_corpus.db to render trade network, decode seals live, filter routes by commodity).
+
+Peer review requested.
+
+Keywords: Indus Valley, Harappan script, metrological accounting, Bronze Age trade, Meluhha, CISI, Alloy, SQLite, F#, SqlHydra, cargo tag, Tamil Nadu, Rajan-Sivanantham, formal verification
+
+License: CC BY 4.0
+
+Upload files:
+1. ledger_of_meluhha.pdf (21 pages)
+2. ledger_of_meluhha_overleaf.zip (tex + citations.lua -- set compiler to LuaLaTeX)
+3. ledger_of_meluhha_dashboard.zip (html + corpus db)
