@@ -1,0 +1,9 @@
+[general]
+connection = "Data Source=../indus_codebook.db"
+output = "IndusCodebook.fs"
+namespace = "IndusCodebook"
+cli_mutable = true
+
+[filters]
+include = ["*"]
+exclude = []
