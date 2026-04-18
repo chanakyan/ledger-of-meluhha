@@ -15,8 +15,8 @@ pdfa.xmpi
 # Alloy output dir
 indus_corpus/
 
-# CMake build dir
-build/
+# CMake build dir (root-level only, not spec/build/)
+/build/
 
 # macOS
 .DS_Store

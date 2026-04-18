@@ -1,0 +1,111 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1.1in]{geometry}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Pagella}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{fancyvrb}
+\usepackage{titlesec}
+\titleformat{\section}{\large\bfseries}{}{0em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{}{0em}{}
+\setlength{\parskip}{0.4em}
+\setlength{\parindent}{1.5em}
+
+\title{\textbf{CMake Build Standard for \textit{The Ledger of Meluhha}}\\
+  \large Build System Rules}
+\author{Third Buyer Advisory}
+\date{April 2026}
+
+\begin{document}
+\maketitle
+
+\section{Philosophy}
+
+The build system exists so that a reviewer can reproduce every
+claim in the paper with two commands:
+
+\begin{Verbatim}[fontsize=\small,frame=single]
+cmake -S . -B build -DINDUS_VALLEY_DIR=../indus-valley
+cmake --build build
+\end{Verbatim}
+
+If either command fails, the failure message must tell the
+reviewer exactly what is missing and how to install it.
+
+\section{Loud failure}
+
+Every dependency is checked at configure time with
+\texttt{find\_program} or \texttt{find\_file}.
+Every missing dependency produces a \texttt{FATAL\_ERROR}
+with:
+
+\begin{enumerate}[nosep]
+\item What is missing
+\item Why it is needed
+\item The exact install command (\texttt{brew install ...}
+  or \texttt{apt install ...})
+\item The verification command (\texttt{--version})
+\end{enumerate}
+
+No silent fallbacks. No optional targets. If a tool is
+needed, it is required.
+
+\section{Required tools}
+
+\begin{enumerate}[nosep]
+\item \texttt{dotnet} --- F\# Interactive (\texttt{dotnet fsi})
+\item \texttt{sqlite3} --- SQL inserts for morphological parallels
+\item \texttt{lualatex} --- paper and README compilation
+\item \texttt{java} --- Alloy 6 schema verification
+\item \texttt{alloy.jar} --- searched in known paths
+\end{enumerate}
+
+\section{Platform gate}
+
+Windows is not supported. \texttt{WIN32}, \texttt{CYGWIN},
+\texttt{MSYS}, and \texttt{MINGW} all produce
+\texttt{FATAL\_ERROR} with WSL~2 instructions.
+
+\section{Named targets}
+
+Every target has a clear name and a one-line comment:
+
+\begin{Verbatim}[fontsize=\small,frame=single]
+codebook   — seed indus_codebook.db
+corpus     — ingest indus_corpus.db
+lssc       — LSSC entropy analysis
+decode     — run IVC decoder (frozen codebook, no DB arg)
+tn-decode  — run TN decoder (corpus DB only)
+verify     — Alloy 16 assertions
+paper      — lualatex 2 passes
+readme     — lualatex README
+clean-db   — remove generated DBs
+clean-tex  — remove LaTeX artifacts
+clean-all  — full clean
+\end{Verbatim}
+
+\section{Dependency chain}
+
+\begin{itemize}[nosep]
+\item \texttt{decode} depends on nothing (frozen codebook).
+\item \texttt{tn-decode} depends on \texttt{corpus}.
+\item \texttt{corpus} depends on its \texttt{.fsx} and
+  \texttt{.sql} inputs.
+\item \texttt{codebook} depends on
+  \texttt{indus\_seed\_codebook.fsx}.
+\item \texttt{all-targets} (default) builds
+  \texttt{codebook}, \texttt{corpus}, \texttt{lssc}.
+\end{itemize}
+
+\section{Clean targets}
+
+\texttt{clean-all} removes databases, TeX artifacts, PDFs,
+and the build directory. After \texttt{clean-all}, the
+build directory must be re-created with \texttt{cmake -S . -B build}.
+
+Generated files (\texttt{.db}, \texttt{.pdf}, \texttt{.aux},
+\texttt{.log}) are in \texttt{.gitignore}. They are never
+committed.
+
+\end{document}

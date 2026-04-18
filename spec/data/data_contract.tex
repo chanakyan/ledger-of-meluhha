@@ -1,0 +1,171 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1.1in]{geometry}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Pagella}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{fancyvrb}
+\usepackage{longtable,booktabs,array}
+\usepackage{titlesec}
+\titleformat{\section}{\large\bfseries}{}{0em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{}{0em}{}
+\setlength{\parskip}{0.4em}
+\setlength{\parindent}{1.5em}
+
+\title{\textbf{Data Contract for \textit{The Ledger of Meluhha}}\\
+  \large Database Schema Guarantees}
+\author{Third Buyer Advisory}
+\date{April 2026}
+
+\begin{document}
+\maketitle
+
+\section{Three databases}
+
+The project produces three SQLite databases. Each is generated
+from scratch by an F\# script. None is hand-edited.
+
+\begin{enumerate}[nosep]
+\item \texttt{indus\_codebook.db} --- metrological codebook
+  (7 tables, 66 rows). Source of truth:
+  \texttt{indus\_seed\_codebook.fsx}.
+  Frozen as \texttt{IndusCodebookTypes.fsx} for read-path
+  scripts.
+\item \texttt{indus\_corpus.db} --- normalised corpus
+  (14 tables, 2{,}373+ signs). Source of truth:
+  \texttt{indus\_ingest\_corpus.fsx} + external data.
+\item \texttt{indus\_lssc.db} --- LSSC entropy analysis
+  (2 tables). Source of truth: \texttt{indus\_lssc.fsx}.
+\end{enumerate}
+
+\section{Codebook schema (frozen)}
+
+The codebook has been stable at 28~sign roles, 8~commodities,
+5~routes, 11~weight tiers, 5~merchant marks, 6~quantity codes,
+3~positional rules since initial seeding.
+
+\begin{center}
+\small
+\begin{tabular}{@{}llrl@{}}
+\toprule
+\textbf{Table} & \textbf{Primary key} & \textbf{Rows} & \textbf{Purpose} \\
+\midrule
+\texttt{sign\_role} & \texttt{sign\_id} (Mahadevan) & 28 & sign $\to$ field role + ref \\
+\texttt{commodity} & \texttt{code} & 8 & commodity labels \\
+\texttt{route} & \texttt{code} & 5 & trade route destinations \\
+\texttt{weight\_tier} & \texttt{multiplier} & 11 & binary/decimal weight tiers \\
+\texttt{merchant\_mark} & \texttt{code} & 5 & guild identifiers \\
+\texttt{quantity\_code} & \texttt{sign\_id} & 6 & quantity multipliers \\
+\texttt{positional\_rule} & \texttt{position} & 3 & default role by position \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Sign ID numbering}
+
+\texttt{sign\_role.sign\_id} uses \textbf{Mahadevan numbers}.
+Not Parpola. The concordance table in the corpus DB bridges
+Parpola $\to$ Mahadevan. All codebook lookups go through
+Mahadevan numbers.
+
+This applies to the frozen F\# types
+(\texttt{IndusCodebookTypes.fsx}) and the embedded JavaScript
+maps in \texttt{ledger.ts}.
+
+\subsection{Nullable fields}
+
+The codebook uses \texttt{Option<string>} / \texttt{Option<int>}
+for nullable columns (\texttt{ref\_code},
+\texttt{ref\_multiplier}, \texttt{application},
+\texttt{destination}, \texttt{note}).
+
+The frozen F\# types use plain \texttt{string} with empty
+string for absent values (simpler for downstream consumption).
+
+\section{Corpus schema}
+
+14 tables. All carry \texttt{STRICT} mode. Key tables:
+
+\begin{center}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Table} & \textbf{Source} & \textbf{Purpose} \\
+\midrule
+\texttt{source} & hardcoded & data provenance \\
+\texttt{site} & hardcoded & archaeological sites \\
+\texttt{base\_sign} & Mahadevan, RS2025, Tamil TB & sign inventory \\
+\texttt{sign\_form} & external & variant/composite forms \\
+\texttt{sign\_occurrence} & external & sign positions in artefacts \\
+\texttt{inscription} & Tamil TB & sign sequences \\
+\texttt{morphological\_parallel} & RS2025 plates & TN--IVC cross-refs \\
+\texttt{sign\_concordance} & CISI/Parpola & Parpola $\to$ Mahadevan map \\
+\texttt{cisi\_inscription} & CISI digitisation & real seal sign sequences \\
+\texttt{treebank\_token} & Tamil Treebank & CoNLL tokens \\
+\texttt{tamil\_sentence} & Tamil TB + logosyllabic & proxy corpus \\
+\texttt{radiometric\_site} & antiquity\_of\_iron.db & TN excavation sites \\
+\texttt{radiometric\_sample} & antiquity\_of\_iron.db & dated samples \\
+\texttt{radiometric\_measurement} & antiquity\_of\_iron.db & calibrated dates \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Alloy verification}
+
+The corpus schema is verified by \texttt{spec/indus\_corpus.als}
+before any SQL is written. 16 assertions, all UNSAT at scope 6.
+The assertions cover:
+
+\begin{itemize}[nosep]
+\item Artefact uniqueness (one site per artefact)
+\item Occurrence integrity (one artefact per occurrence)
+\item Form hierarchy (no form-of-form, parent source match)
+\item Parallel constraints (cross-source only, no self-parallel)
+\item Position collision prevention
+\item Concordance cross-source requirement
+\item CISI sign validity
+\item Radiometric integrity (one sample per measurement,
+  one site per sample, no duplicate measurements)
+\item Treebank position uniqueness
+\end{itemize}
+
+No SQL is written until all assertions return UNSAT.
+
+\section{Data update rules}
+
+\subsection{New corpus data}
+
+New CISI seals, new sites, new morphological parallels:
+\begin{Verbatim}[fontsize=\small,frame=single]
+cmake --build build --target corpus
+\end{Verbatim}
+No script, codebook, paper, or dashboard changes needed.
+
+\subsection{New codebook entries}
+
+New commodity, route, or sign role:
+\begin{enumerate}[nosep]
+\item Edit \texttt{indus\_seed\_codebook.fsx}
+\item \texttt{cmake --build build --target codebook}
+\item \texttt{cd hydra \&\& sqlhydra sqlite}
+\item Update \texttt{IndusCodebookTypes.fsx} (frozen data)
+\item Update \texttt{signRoleMap}/\texttt{commodityMap}/\texttt{routeMap}
+  in \texttt{src/ledger.ts}
+\item Recompile TS and rebuild HTML
+\end{enumerate}
+
+\section{Sentinel conventions}
+
+No \texttt{NULL} values in any database. All columns carry
+\texttt{NOT NULL}. Absent data uses:
+\begin{itemize}[nosep]
+\item \texttt{INTEGER}: $-1$ means ``not recorded in source''
+\item \texttt{REAL}: $-1.0$ means ``not recorded in source''
+\item \texttt{TEXT}: empty string means ``not applicable''
+\end{itemize}
+
+This convention is inherited from the Tamil radiometric database
+(\texttt{antiquity\_of\_iron.db}).
+
+\end{document}

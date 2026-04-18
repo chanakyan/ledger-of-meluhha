@@ -1,0 +1,114 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1.1in]{geometry}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Pagella}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{fancyvrb}
+\usepackage{titlesec}
+\titleformat{\section}{\large\bfseries}{}{0em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{}{0em}{}
+\setlength{\parskip}{0.4em}
+\setlength{\parindent}{1.5em}
+
+\title{\textbf{LaTeX Paper Standard for \textit{The Ledger of Meluhha}}\\
+  \large Typesetting and Citation Rules}
+\author{Third Buyer Advisory}
+\date{April 2026}
+
+\begin{document}
+\maketitle
+
+\section{Compiler}
+
+\textbf{LuaLaTeX only.} The paper uses \texttt{fontspec},
+\texttt{luacode}, and \texttt{pdfx} (PDF/A compliance).
+XeLaTeX will not work (no \texttt{luacode}).
+pdfLaTeX will not work (no \texttt{fontspec}).
+
+Two passes required for cross-references:
+\begin{Verbatim}[fontsize=\small,frame=single]
+lualatex -interaction=nonstopmode ledger_of_meluhha.tex
+lualatex -interaction=nonstopmode ledger_of_meluhha.tex
+\end{Verbatim}
+
+\section{No markdown}
+
+No \texttt{.md} files anywhere in the repository.
+No \texttt{CLAUDE.md}. No \texttt{README.md}.
+All documentation is LaTeX. This is a universal project rule,
+not specific to the paper.
+
+\section{Citations}
+
+Citations use \texttt{citations.lua} with
+\texttt{\textbackslash smartcite\{Key\}}.
+No BibTeX. No \texttt{.bib} files. No \texttt{biblatex}.
+
+The citation registry is a Lua table loaded via
+\texttt{\textbackslash directlua}. Each entry has a full
+bibliographic string and a short inline form.
+
+To add a citation:
+\begin{Verbatim}[fontsize=\small,frame=single]
+_register_cite([[NewKey2026]],
+  [[Author. \textit{Title}. Publisher, Year.]],
+  [[Author (Year)]])
+\end{Verbatim}
+
+\section{Structure}
+
+\begin{enumerate}[nosep]
+\item Abstract (one paragraph, all claims stated)
+\item Introduction (Path A / Path B / Path C framing)
+\item Material Record (weights, dockyard, cuneiform)
+\item Corpus (tables, sources, sign counts)
+\item Schema (SQL, Alloy, decode chain, results)
+\item Prior Art (Parpola, FSW, Rao, Kalyanaraman)
+\item Falsification (four conditions that kill the model)
+\item Conclusion
+\item Appendix A: Schema + Alloy report
+\item Appendix B: Codebook schema
+\item Appendix C: Reproducibility + data update policy
+\item Plain-Language Summary
+\end{enumerate}
+
+\section{Numbers and consistency}
+
+\begin{itemize}[nosep]
+\item Alloy assertion count: \textbf{16} everywhere (abstract,
+  \S5, appendix, HTML badge). Verified by
+  \texttt{cmake --build build --target verify}.
+\item Seal IDs in paper must match dashboard
+  (\texttt{sealIds} in \texttt{ledger.ts}).
+\item Weight table must include all 11 tiers from
+  \texttt{indus\_seed\_codebook.fsx} (including $\times200$).
+\item Statistical results must match
+  \texttt{indus\_bernoulli.fsx} output.
+\item Sign counts, source counts, concordance counts in the
+  abstract must match \texttt{indus\_corpus.db} actual row
+  counts.
+\end{itemize}
+
+\section{Tables}
+
+Weight table and citation table use \texttt{longtable} with
+\texttt{\textbackslash directlua} row generation.
+Other tables use standard \texttt{tabular}.
+All tables have \texttt{\textbackslash caption} and
+\texttt{\textbackslash label}.
+
+\section{Dates and conventions}
+
+\begin{itemize}[nosep]
+\item BCE dates use \texttt{\textbackslash textsc\{bce\}}
+  (small caps).
+\item Thousands separator: \texttt{2\{,\}373} (thin space).
+\item Units: \texttt{siunitx} ---
+  \texttt{\textbackslash SI\{137\}\{\textbackslash gram\}}.
+\item ORCID: \texttt{\textbackslash orcidlink\{...\}} from
+  \texttt{orcidlink} package.
+\end{itemize}
+
+\end{document}

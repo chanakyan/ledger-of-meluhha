@@ -1,0 +1,109 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1.1in]{geometry}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Pagella}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{fancyvrb}
+\usepackage{titlesec}
+\titleformat{\section}{\large\bfseries}{}{0em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{}{0em}{}
+\setlength{\parskip}{0.4em}
+\setlength{\parindent}{1.5em}
+
+\title{\textbf{TypeScript Coding Standard for \textit{The Ledger of Meluhha}}\\
+  \large Dashboard and Interactive Visualization}
+\author{Third Buyer Advisory}
+\date{April 2026}
+
+\begin{document}
+\maketitle
+
+\section{Delivery model}
+
+The dashboard ships as a \textbf{single HTML file}
+(\texttt{ledger-of-meluhha.html}) with all JavaScript inlined.
+No bundler, no node\_modules, no build server.
+The user drops \texttt{indus\_corpus.db} onto the page.
+
+Build chain: \texttt{src/ledger.ts} $\to$ \texttt{npx tsc}
+$\to$ \texttt{dist/ledger.js} $\to$ paste into HTML
+\texttt{<script>} block.
+
+\section{External dependencies (CDN only)}
+
+Four CDN-loaded libraries. No local copies.
+
+\begin{enumerate}[nosep]
+\item \texttt{sql.js} --- SQLite WASM (loads \texttt{.db} in browser)
+\item \texttt{Leaflet} --- map tiles + polylines
+\item \texttt{D3.js} --- frequency chart
+\item Google Fonts --- Cormorant Garamond, JetBrains Mono
+\end{enumerate}
+
+Map tiles require internet (OpenTopoMap). No offline mode.
+
+\section{Codebook embedding}
+
+The codebook tables (\texttt{sign\_role}, \texttt{commodity},
+\texttt{route}) are embedded as typed JavaScript \texttt{Map}
+constants. These \textbf{must match}
+\texttt{IndusCodebookTypes.fsx} exactly --- same sign IDs,
+same codes, same values. The sign IDs are \textbf{Mahadevan
+numbers}, not Parpola numbers.
+
+When the frozen F\# types change, update:
+\begin{itemize}[nosep]
+\item \texttt{signRoleMap} (28 entries)
+\item \texttt{commodityMap} (8 entries)
+\item \texttt{routeMap} (5 entries)
+\item Weight array (11 tiers)
+\end{itemize}
+
+\section{Seal decode in the browser}
+
+The dashboard decodes seals by parsing Parpola sign IDs from
+\texttt{cisi\_inscription} rows in the dropped corpus DB,
+then looking up the Mahadevan number in the embedded
+\texttt{signRoleMap}. The decode chain must match the paper's
+description in \S6.2.
+
+The seal IDs shown in the dashboard must match the seals
+discussed in the paper. Currently: M-52A and M-148A.
+
+\section{CSS rules}
+
+\begin{itemize}[nosep]
+\item Four themes: clay (dark default), parchment (light),
+  high contrast (WCAG AAA), seal (blue-grey).
+\item All colours via CSS custom properties (\texttt{--clay},
+  \texttt{--sand}, \texttt{--tba-red}, etc.).
+\item Do not apply CSS \texttt{width}/\texttt{height} to
+  Leaflet's internal SVG elements. Leaflet manages its own
+  SVG overlay dimensions.
+\item Commodity table rows have \texttt{cursor:pointer} and
+  \textbf{must} have click handlers that highlight matching
+  trade routes on the map.
+\end{itemize}
+
+\section{Route rendering}
+
+Trade routes render as Leaflet polylines with quadratic Bezier
+curves. Four cases handled:
+\begin{enumerate}[nosep]
+\item \texttt{from} $\to$ \texttt{to} (direct)
+\item \texttt{from} $\to$ \texttt{via} $\to$ \texttt{to} (multi-segment)
+\item \texttt{from} $\to$ \texttt{via} (terminates at via)
+\item \texttt{from} only (skip --- no geometry)
+\end{enumerate}
+
+Routes render before sites (z-order: routes under, sites on top).
+Polyline refs stored in \texttt{routeLines[]} for commodity filtering.
+
+\section{Weight labels}
+
+Weight application labels in the JS must match the seed data
+in \texttt{indus\_seed\_codebook.fsx} verbatim. No abbreviations.
+
+\end{document}
