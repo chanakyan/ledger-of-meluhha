@@ -139,16 +139,16 @@ const tradeRoutes: readonly TradeRoute[] = [
 const BASE_UNIT = 0.856;
 
 const weights: readonly Weight[] = [
-  {mult:1, g:BASE_UNIT, series:'binary', app:'Gold dust'},
+  {mult:1, g:BASE_UNIT, series:'binary', app:'Gold dust, gem weights'},
   {mult:2, g:BASE_UNIT*2, series:'binary', app:''},
-  {mult:4, g:BASE_UNIT*4, series:'binary', app:'Carnelian'},
+  {mult:4, g:BASE_UNIT*4, series:'binary', app:'Silver, carnelian'},
   {mult:8, g:BASE_UNIT*8, series:'binary', app:''},
-  {mult:16, g:BASE_UNIT*16, series:'binary', app:'Copper ref'},
+  {mult:16, g:BASE_UNIT*16, series:'binary', app:'Copper ingot reference unit'},
   {mult:32, g:BASE_UNIT*32, series:'binary', app:''},
   {mult:64, g:BASE_UNIT*64, series:'binary', app:''},
-  {mult:160, g:137, series:'decimal', app:'Cotton bale'},
+  {mult:160, g:137, series:'decimal', app:'Cotton bale tier 1'},
   {mult:200, g:171.2, series:'decimal', app:''},
-  {mult:500, g:685, series:'decimal', app:'Oil jar'},
+  {mult:500, g:685, series:'decimal', app:'Sesame oil jar class'},
   {mult:1000, g:1370, series:'decimal', app:'Bulk grain'},
 ];
 
@@ -438,7 +438,7 @@ function renderSealCards(db: SqlJsDatabase): void {
   const container = document.getElementById('seal-cards');
   if (!container) return;
 
-  const sealIds = ['M-67A', 'M-52A'] as const;
+  const sealIds = ['M-52A', 'M-148A'] as const;
 
   for (const sealId of sealIds) {
     let signs: string[] = [];
@@ -453,7 +453,7 @@ function renderSealCards(db: SqlJsDatabase): void {
     } catch {}
 
     // Resolve signs via Parpola number -> codebook (embedded maps)
-    // sign_role.sign_id uses Parpola numbers (P342 -> 342), NOT Mahadevan
+    // sign_role.sign_id uses Mahadevan numbers (M342 = jar, etc.)
     let commName = '—';
     let routeName = 'domestic';
     let resolved = 0;

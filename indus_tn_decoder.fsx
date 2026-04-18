@@ -12,7 +12,7 @@
 //     -> morphological_parallel (cross to IVC artefact)
 //     -> cisi_inscription (real sign sequence, Parpola IDs)
 //     -> sign_concordance (Parpola -> Mahadevan)
-//     -> signRoleBySign (frozen codebook — Parpola keyed)
+//     -> signRoleBySign (frozen codebook — Mahadevan keyed)
 //     -> commodity / weight / route (frozen lookups)
 //
 // ZERO hardcoded sign sequences. Corpus from the DB, codebook frozen.
