@@ -1,0 +1,447 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1.1in]{geometry}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Pagella}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{fancyvrb}
+\usepackage{titlesec}
+\titleformat{\section}{\large\bfseries}{}{0em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{}{0em}{}
+\setlength{\parskip}{0.4em}
+\setlength{\parindent}{1.5em}
+
+\title{\textbf{F\# Coding Standard for \textit{The Ledger of Meluhha}}\\
+  \large Handoff --- Code Fix Plan}
+\author{Third Buyer Advisory}
+\date{Drafted April 2026 by the audit session on branch \texttt{claude/check-location-context-E8VFz}}
+
+\begin{document}
+\maketitle
+
+%%% ===================================================================
+\section{The one rule}
+
+\textbf{The code is the paper.}
+
+The audience for every \texttt{.fsx} script in this repository is the
+reader of \textit{The Ledger of Meluhha} --- specifically, an
+archaeology professor who has never written F\#.
+The professor flips from paper \S N to script X, line Y, and must
+recognise what the paper claims in what the code does.
+
+This is the only rule.
+Every other guideline below is a consequence.
+
+Specifically:
+
+\begin{itemize}[leftmargin=2em]
+\item Names in code match vocabulary in the paper
+  (\texttt{F1\_Merchant}, \texttt{F2\_Commodity}, not
+  \texttt{field1}, \texttt{f2}).
+\item Comments cite paper sections
+  (\texttt{// Ledger of Meluhha §6.2 step 3}), not abstract
+  engineering principles.
+\item Data tables in code cite the paper table they mirror
+  (\texttt{// Table 1, §2.2}).
+\item The decode pipeline (\S6.2) reads as five named functions,
+  ordered as the paper orders them.
+\item Defensive code that manufactures unknowns or silently
+  defaults is \emph{not} readable --- it hides the very
+  decode-failures the research wants to surface.
+\item Idiomatic F\# is a means, not an end.  Prefer legibility
+  over type-level cleverness.
+\end{itemize}
+
+What the professor \emph{can} read: records, arrays, maps, pattern
+matches on strings, SQL string literals, simple
+\texttt{let}\,/\,\texttt{match} pipelines.
+What the professor \emph{cannot} read without help: computation
+expressions, type providers, active patterns, custom operators,
+monads.
+The first kind stays; the second kind is not introduced.
+
+%%% ===================================================================
+\section{Current state}
+
+Five scripts implement the computational work:
+
+\begin{itemize}[leftmargin=2em]
+\item \texttt{indus\_seed\_codebook.fsx} --- seeds
+  \texttt{indus\_codebook.db} from F\# literals.
+  Mirrors \S6 Codebook.
+\item \texttt{indus\_ingest\_corpus.fsx} --- ingests five sources
+  into \texttt{indus\_corpus.db}.
+  Mirrors \S6.1.
+\item \texttt{indus\_decoder.fsx} --- demonstration decoder on
+  hardcoded sign sequences.
+  Not cited in \S7 Results.
+\item \texttt{indus\_tn\_decoder.fsx} --- real CISI decode of TN
+  parallels.
+  Mirrors \S7.1.
+\item \texttt{indus\_lssc.fsx} --- LSSC analysis.
+  Mirrors \S6.3.
+\end{itemize}
+
+The code works and the numbers in the paper come from it.
+What follows is readability-and-consistency work, not
+bug-fixing.
+
+%%% ===================================================================
+\section{Priority-ordered fix list}
+
+Fixes are grouped by how much risk running-without-a-compiler
+carries.  P1 is safe to apply anywhere; P4 requires
+\texttt{dotnet fsi} on a workstation.
+
+\subsection{P1 --- blind-safe text edits (no compiler needed)}
+
+\paragraph{P1.1 Rename \texttt{CargoTag} fields.}
+In \texttt{indus\_decoder.fsx} lines 63--68, rename the record
+fields so the record itself becomes Table~2 of the paper:
+
+\begin{Verbatim}[fontsize=\small,frame=single]
+type CargoTag = {
+    F1_Merchant   : MerchantMark   // §4.1 Table 2
+    F2_Commodity  : Commodity
+    F3_WeightTier : WeightTier
+    F4_Quantity   : int
+    F5_Route      : Route }
+\end{Verbatim}
+
+Propagate the rename through \texttt{parseSeal} (the record
+construction at \texttt{indus\_decoder.fsx:186--187}) and
+\texttt{printTag} (\texttt{indus\_decoder.fsx:205--213}).
+
+\paragraph{P1.2 Delete phantom header references.}
+Every script header currently says:
+
+\begin{Verbatim}[fontsize=\small]
+// Conforms to: spec/fsharp/reference/fsharp_coding_standard.tex
+\end{Verbatim}
+
+Replace with a paper-section reference appropriate to the script:
+
+\begin{Verbatim}[fontsize=\small]
+// Implements: Ledger of Meluhha §6 (codebook seed)
+// Coding standard: spec/fsharp/reference/fsharp_coding_standard.tex
+\end{Verbatim}
+
+(The standard file now exists at that path.  This is the one
+pointing you read right now.)
+
+\paragraph{P1.3 Cite paper tables in codebook literals.}
+In \texttt{indus\_seed\_codebook.fsx} above each literal array,
+add a comment pinning it to the paper:
+
+\begin{Verbatim}[fontsize=\small]
+// Table 1 (§2.2): Harappan weight progression.
+// Base unit = 0.856 g [Hemmy 1931].  Binary series (×1…×64)
+// for precious/indivisible goods; decimal (×160…×1000) for
+// bulk cargo.
+let weightTiers = [| ... |]
+\end{Verbatim}
+
+Do this for \texttt{weightTiers}, \texttt{commodities},
+\texttt{routes}, \texttt{merchantMarks}, \texttt{signRoles},
+\texttt{positionalRules}.
+
+\paragraph{P1.4 Mark the demonstration decoder.}
+\texttt{indus\_decoder.fsx} is not cited in \S7.1 (those results
+come from \texttt{indus\_tn\_decoder.fsx}).  Either delete the
+hardcoded seal data (lines 191--201), or prepend a clear banner:
+
+\begin{Verbatim}[fontsize=\small]
+// DEMONSTRATION only.  The results in §7.1 of the paper come
+// from indus_tn_decoder.fsx over real CISI data.  This script
+// exists to exercise the codebook on synthetic sign sequences.
+\end{Verbatim}
+
+\subsection{P2 --- structural alignment (compile-check required)}
+
+\paragraph{P2.1 Extract the decode chain as a named pipeline.}
+The paper (\S6.2) lists five steps:
+
+\begin{enumerate}[leftmargin=2em]
+\item Morphological parallel --- TN potsherd $\to$ IVC seal.
+\item CISI inscription --- seal $\to$ Parpola sign sequence.
+\item Concordance --- Parpola $\to$ Mahadevan.
+\item Codebook --- Mahadevan $\to$ field role.
+\item Lookup --- field role $\to$ content.
+\end{enumerate}
+
+Currently these five steps are inlined in the body of a
+\texttt{for} loop at \texttt{indus\_tn\_decoder.fsx:248--293}.
+Replace with a named function per step, composed in order:
+
+\begin{Verbatim}[fontsize=\small,frame=single]
+// Ledger of Meluhha §6.2: The decode chain
+let decodeParallel (p: Parallel) : DecodedSeal =
+    p
+    |> findMorphologicalParallel   // §6.2 step 1
+    |> loadCisiInscription         // §6.2 step 2
+    |> mapParpolaToMahadevan       // §6.2 step 3
+    |> lookupSignRole              // §6.2 step 4
+    |> lookupFieldContent          // §6.2 step 5
+\end{Verbatim}
+
+The professor should be able to grep for ``step 3'' and find the
+line.
+
+\paragraph{P2.2 Eliminate stringly-typed roles.}
+The SQL \texttt{CHECK(role IN
+('commodity','weight','quantity','terminal','structural'))} is
+a closed set.  In F\# it should be a DU parsed once at the SQL
+read boundary:
+
+\begin{Verbatim}[fontsize=\small,frame=single]
+type Role =
+    | Commodity  of CommodityCode
+    | Weight     of WeightMultiplier
+    | Quantity   of int
+    | Terminal   of RouteCode
+    | Structural
+\end{Verbatim}
+
+This replaces the string compares at
+\texttt{indus\_decoder.fsx:160--178} and
+\texttt{indus\_tn\_decoder.fsx:160--174}.
+
+Same treatment for \texttt{Series}
+(\texttt{binary}\,/\,\texttt{decimal}), \texttt{Position}
+(\texttt{first}\,/\,\texttt{last}\,/\,\texttt{other}),
+\texttt{FormType}, \texttt{Confidence}, \texttt{SignClass}.
+
+\paragraph{P2.3 Consolidate the ADO.NET boilerplate.}
+Every script repeats the pattern
+\texttt{use cmd = new SqliteCommand(...); cmd.Parameters.AddWithValue(...); cmd.ExecuteNonQuery() |> ignore}
+30--40 times.  Collapse into one helper per script (or per
+shared module if you introduce one):
+
+\begin{Verbatim}[fontsize=\small,frame=single]
+let exec (con: SqliteConnection) (tx: SqliteTransaction)
+         (sql: string) (parameters: (string * obj) list) =
+    use cmd = new SqliteCommand(sql, con, tx)
+    for (k, v) in parameters do
+        cmd.Parameters.AddWithValue(k, v) |> ignore
+    cmd.ExecuteNonQuery() |> ignore
+\end{Verbatim}
+
+The payoff is not abstraction --- it is noise removal.  The
+meaningful SQL stops being buried.
+
+\subsection{P3 --- behavioural changes (run decoder before/after)}
+
+\paragraph{P3.1 Remove defensive unknowns.}
+\texttt{indus\_decoder.fsx:133--136} manufactures
+\texttt{unknownCommodity}, \texttt{unknownRoute},
+\texttt{unknownMerchant} so \texttt{parseSeal} always returns a
+\texttt{CargoTag}.  Replace with a DU that distinguishes success
+from partial resolution:
+
+\begin{Verbatim}[fontsize=\small,frame=single]
+type Decoded =
+    | CargoTag of F1_Merchant * F2_Commodity * F3_WeightTier
+                * F4_Quantity * F5_Route
+    | OwnershipMarkOnly of MerchantMark
+    | PartiallyResolved of MerchantMark
+                         * (Role * Resolution) list
+\end{Verbatim}
+
+A partial decode is a research output (§7.4: ``Expanding the
+codebook is the next phase''), not glue to hide.
+
+Run before: \texttt{dotnet fsi indus\_tn\_decoder.fsx
+indus\_corpus.db indus\_codebook.db > before.txt}.
+Run after, \texttt{diff before.txt after.txt} --- the decoded
+M-52A and M-148A cargo contents must be identical.  Only the
+unresolved-sign reporting format should differ.
+
+\paragraph{P3.2 Verify M-52A and M-148A decode.}
+The paper's current \S7.1 says:
+
+\begin{itemize}[leftmargin=2em]
+\item M-52A $\to$ jar goods / Mesopotamia
+\item M-148A $\to$ jar goods / domestic
+\end{itemize}
+
+After P1 and P2 are applied, rerun the decoder and confirm this
+output.  If it differs, either the paper or the code is wrong
+--- flag and stop.
+
+\subsection{P4 --- schema fixes (touches ingest + reader)}
+
+\paragraph{P4.1 JSON blob $\to$ join table.}
+\texttt{cisi\_inscription.signs TEXT} and
+\texttt{sign\_concordance.mahadevan\_ids TEXT} store collections
+as JSON-ish strings.  Alloy specifies them as \texttt{seq
+BaseSign} and \texttt{set BaseSign}.  The corresponding F\#
+readers hand-parse with \texttt{.Trim('[', ']').Split(',')}
+(\texttt{indus\_tn\_decoder.fsx:100--104, 116--119}) --- a
+parser for a format with no grammar.
+
+Add two join tables in \texttt{indus\_ingest\_corpus.fsx}:
+
+\begin{Verbatim}[fontsize=\small,frame=single]
+CREATE TABLE cisi_inscription_sign (
+    inscription_id TEXT NOT NULL
+        REFERENCES cisi_inscription(id),
+    position       INTEGER NOT NULL,
+    parpola_id     TEXT NOT NULL,
+    PRIMARY KEY (inscription_id, position)
+) STRICT;
+
+CREATE TABLE sign_concordance_mahadevan (
+    parpola_id      TEXT NOT NULL
+        REFERENCES sign_concordance(parpola_id),
+    mahadevan_id    TEXT NOT NULL,
+    PRIMARY KEY (parpola_id, mahadevan_id)
+) STRICT;
+\end{Verbatim}
+
+Keep the JSON TEXT columns for one release (migration path) or
+drop them immediately and update the readers.  Alloy checks A10
+(concordance crosses sources) and A12 (CISI signs valid) become
+enforceable.
+
+\paragraph{P4.2 Add the \texttt{artefact} table.}
+Alloy \S A1/A2 assert \texttt{Artefact.site: one Site} and
+\texttt{SignOccurrence.artefact: one Artefact}.  Currently
+\texttt{sign\_occurrence.artefact\_id} is an orphan TEXT ---
+no target table exists.  Add:
+
+\begin{Verbatim}[fontsize=\small,frame=single]
+CREATE TABLE artefact (
+    id          TEXT PRIMARY KEY,
+    site_id     TEXT NOT NULL REFERENCES site(id),
+    source_code TEXT NOT NULL REFERENCES source(code)
+) STRICT;
+\end{Verbatim}
+
+Make \texttt{sign\_occurrence.artefact\_id} an FK to it.
+
+\paragraph{P4.3 Preserve iron-DB invariants on re-projection.}
+\texttt{indus\_ingest\_corpus.fsx:168--202} re-emits
+\texttt{radiometric\_site}, \texttt{radiometric\_sample},
+\texttt{radiometric\_measurement} into the corpus DB with all
+\texttt{CHECK} constraints stripped (P1/P2/P4/P5/P9 from
+\texttt{data/audit\_iron\_db.als}).  Two options:
+
+\begin{enumerate}[leftmargin=2em]
+\item Re-declare the same CHECKs on the target tables.
+\item Replace the copy with \texttt{ATTACH DATABASE
+  'antiquity\_of\_iron.db' AS iron} and query through the attach,
+  so the frozen DSL is never duplicated.
+\end{enumerate}
+
+Option 2 is cleaner but changes the deployment surface.  Prefer
+1 unless attach is acceptable.
+
+\paragraph{P4.4 Add \texttt{UNIQUE(sample, institution, method)}}
+on \texttt{radiometric\_measurement}, matching A12 of the iron
+DSL.  Promote \texttt{institution} from TEXT to an FK to an
+\texttt{institution} table.
+
+\paragraph{P4.5 Write \texttt{spec/indus\_codebook.als}.}
+The codebook has real invariants (a sign has one role; a
+\texttt{commodity}-role sign has a \texttt{ref\_code} but no
+\texttt{ref\_multiplier}; a \texttt{weight}-role sign has a
+\texttt{ref\_multiplier} but no \texttt{ref\_code}).  Today
+these are enforced only by the CHECK IN string on
+\texttt{role}.  Add an Alloy spec and bring codebook
+verification up to the iron-DB tier.
+
+%%% ===================================================================
+\section{Verification protocol}
+
+Before and after \emph{every} P2, P3, or P4 change:
+
+\begin{enumerate}[leftmargin=2em]
+\item \texttt{dotnet fsi indus\_seed\_codebook.fsx indus\_codebook.db}
+\item \texttt{dotnet fsi indus\_ingest\_corpus.fsx
+  ../indus-valley indus\_corpus.db}
+\item \texttt{dotnet fsi indus\_tn\_decoder.fsx
+  indus\_corpus.db indus\_codebook.db > decode.txt}
+\item Confirm \texttt{decode.txt} contains M-52A $\to$ jar
+  goods / Mesopotamia and M-148A $\to$ jar goods / domestic.
+\item \texttt{dotnet fsi indus\_lssc.fsx <corpus.csv> lssc.db}
+  and confirm the paper's \S6.3 numbers: 7{,}637 tokens,
+  3{,}726 unique signs, 7{,}037 transitions, LSSC mean 0.69.
+\end{enumerate}
+
+If any of these shift after a P2/P3/P4 change, stop and
+reconcile before continuing.
+
+For Alloy (P4.5 and the count reconciliation flagged in the
+paper):
+
+\begin{Verbatim}[fontsize=\small]
+java -jar alloy.jar spec/indus_corpus.als
+java -jar alloy.jar data/audit_iron_db.als
+\end{Verbatim}
+
+The paper's abstract, \S6.1, and \S A.3 claim twelve assertions
+UNSAT at scope~6.  The current spec has sixteen.  Either
+re-run and update the count (to sixteen) or prune the spec back
+to twelve --- probably by moving the four radiometric
+assertions (A13--A16) into a separate
+\texttt{spec/indus\_radiometric.als} since they are really
+about the iron-DB subsumption, not the corpus qua corpus.
+
+%%% ===================================================================
+\section{What's already done (on branch \texttt{claude/check-location-context-E8VFz})}
+
+Commit \texttt{5089ffe} reframes the paper:
+
+\begin{itemize}[leftmargin=2em]
+\item Abstract, \S1, \S7, \S9 rewritten to name the 100-year
+  impasse and position the paper as Path~C between Path~A
+  (linguistic decipherment, $\sim$100 failed attempts) and Path~B
+  (Farmer--Sproat--Witzel 2004).
+\item \S8 and \S11 cleaned up: the phantom M-67A reference
+  removed; M-52A and M-148A decodes made consistent with \S7.1
+  (both jar goods; M-52A $\to$ Mesopotamia; M-148A $\to$
+  domestic).
+\item Parpola 1994 and Parpola 2008 added to
+  \texttt{citations.lua}.
+\item TODO markers placed at the three locations that claim
+  twelve Alloy checks, pending a re-run on a machine with
+  \texttt{java} and \texttt{alloy.jar}.
+\end{itemize}
+
+No code changes on this branch yet.  The code fixes P1--P4
+above are the next session's work.
+
+%%% ===================================================================
+\section{Handoff notes}
+
+This document lives at
+\texttt{spec/fsharp/reference/fsharp\_coding\_standard.tex},
+which is exactly the path every \texttt{.fsx} script header
+cites.  Until now that path was vapour.  It now exists.
+
+The workstation Claude with \texttt{dotnet fsi} available
+should:
+
+\begin{enumerate}[leftmargin=2em]
+\item Read this file.
+\item Read the paper (\texttt{ledger\_of\_meluhha.tex}) ---
+  especially \S1, \S4, \S6, \S7.
+\item Apply P1 in one commit (mechanical, low risk).
+\item Apply P2 in one commit per sub-item, with compile-check
+  after each.
+\item Apply P3 with the before/after \texttt{diff} protocol.
+\item Apply P4 last, one sub-item per commit, each gated on the
+  verification protocol of \S4 above.
+\item When P4 is done and all 16 Alloy checks are UNSAT, update
+  the paper's count claims (abstract, \S6.1, \S A.3) and remove
+  the TODO comments.
+\end{enumerate}
+
+Do not introduce type providers, computation expressions,
+active patterns, or custom operators.  The professor reads the
+code.  She does not read Wlaschin.
+
+\end{document}
