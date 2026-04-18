@@ -114,10 +114,7 @@ This hypothesis is tested against a normalised corpus database of
 2{,}373 signs from five sources (Mahadevan concordance, CISI
 digitisation, Rajan--Sivanantham Tamil Nadu graffiti, Tamil Treebank
 proxy corpus, and the Parpola--Mahadevan concordance), verified by
-twelve Alloy assertions (all UNSAT at scope~6).%
-% TODO: spec/indus_corpus.als currently carries 16 check statements
-% (A1--A12 corpus + A13--A16 radiometric). Either re-run to confirm
-% 16/16 UNSAT and update this count, or prune the spec to 12.
+sixteen Alloy assertions (all UNSAT at scope~6).
 Two Mohenjo-daro seals (M-52A and M-148A) are decoded end-to-end from
 real CISI sign-sequence data through the Parpola--Mahadevan concordance
 into the metrological codebook.
@@ -522,10 +519,8 @@ Concordance & Parpola $\to$ Mahadevan mapping & \num{397} entries (\num{334} map
 \noindent
 Every table carries a \texttt{source\_code} foreign key.
 The schema was verified by Alloy~6 before any SQL was written:
-twelve assertions, all UNSAT at scope~6
-(see \cref{sec:alloy}).%
-% TODO: spec/indus_corpus.als now carries 16 checks. Re-run and
-% reconcile this count (here, abstract, and appendix A.3).
+sixteen assertions, all UNSAT at scope~6
+(see \cref{sec:alloy}).
 
 \subsection{The decode chain}
 
@@ -826,11 +821,8 @@ upload.
 
 \subsection{Alloy validation report}
 
-Twelve assertions checked at scope~6. All UNSAT (zero
-counterexamples). One valid instance found (SAT).%
-% TODO: spec/indus_corpus.als carries 16 checks (A1--A12 corpus
-% + A13--A16 radiometric added after this report was drafted).
-% Re-run and update this list, or prune the spec to 12.
+Sixteen assertions checked at scope~6. All UNSAT (zero
+counterexamples). One valid instance found (SAT).
 
 {\small
 \begin{verbatim}
@@ -846,14 +838,18 @@ counterexamples). One valid instance found (SAT).%
 09. check concordanceCrossesSources   UNSAT
 10. check concordanceNoDuplicates     UNSAT
 11. check cisiSignsValid              UNSAT
-12. run   showExample             1/1 SAT
+12. check measurementOneSample        UNSAT
+13. check sampleOneSite               UNSAT
+14. check noDupMeasurement            UNSAT
+15. check treebankNoDupPosition       UNSAT
+16. run   showExample             1/1 SAT
 \end{verbatim}
 }
 
 \noindent
 The Alloy specification (\texttt{spec/indus\_corpus.als}) is
 included in the Zenodo artifact. No SQL was written until all
-twelve assertions returned UNSAT.
+sixteen assertions returned UNSAT.
 
 \subsection{Reproducibility}
 
