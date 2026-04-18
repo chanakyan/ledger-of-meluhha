@@ -423,13 +423,9 @@ java -jar alloy.jar spec/indus_corpus.als
 java -jar alloy.jar data/audit_iron_db.als
 \end{Verbatim}
 
-The paper's abstract, \S6.1, and \S A.3 claim twelve assertions
-UNSAT at scope~6.  The current spec has sixteen.  Either
-re-run and update the count (to sixteen) or prune the spec back
-to twelve --- probably by moving the four radiometric
-assertions (A13--A16) into a separate
-\texttt{spec/indus\_radiometric.als} since they are really
-about the iron-DB subsumption, not the corpus qua corpus.
+The paper, dashboard, and Alloy spec are now consistent:
+sixteen assertions, all UNSAT at scope~6.  Verified by
+\texttt{cmake --build build --target verify}.
 
 %%% ===================================================================
 \section{What's already done (on branch \texttt{claude/check-location-context-E8VFz})}

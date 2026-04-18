@@ -107,7 +107,7 @@ F1 merchant mark, F2 commodity, F3 weight tier,
 F4 quantity, F5 route. Sign numbers and concordance
 paths in JetBrains Mono. Resolved values in Cormorant.
 Below the cards: Alloy verification badge in TBAred —
-"12 assertions UNSAT at scope 6."
+"16 assertions UNSAT at scope 6."
 Claim sentence above: "Two seals decoded from real CISI data.
 Neither result is circular."
 
@@ -196,7 +196,7 @@ TBAred 1px rule below header.
 
 
 Footer: "No statistical model. Deterministic join chain.
-Alloy verified. 12 assertions UNSAT at scope 6."
+Alloy verified. 16 assertions UNSAT at scope 6."
 JetBrains Mono, 9px, dim. The methodology as colophon.
 
 
