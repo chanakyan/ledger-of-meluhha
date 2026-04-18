@@ -85,3 +85,11 @@ _register_cite([[WellsFuls2006]],
 _register_cite([[JoshiParpola1987]],
   [[Jagat Pati Joshi and Asko Parpola (eds.). \textit{Corpus of Indus Seals and Inscriptions}. Vol. 1: Collections in India. Suomalainen Tiedeakatemia, Helsinki, 1987.]],
   [[Joshi \& Parpola (1987)]])
+
+_register_cite([[Parpola1994]],
+  [[Asko Parpola. \textit{Deciphering the Indus Script}. Cambridge University Press, Cambridge, 1994.]],
+  [[Parpola (1994)]])
+
+_register_cite([[Parpola2008]],
+  [[Asko Parpola. Is the Indus script indeed not a writing system? In \textit{Air\={a}vati: Felicitation volume in honour of Iravatham Mahadevan}, pp.\ 111--131. varalaaru.com, Chennai, 2008. \url{https://www.harappa.com/sites/default/files/pdf/indus-writing.pdf}]],
+  [[Parpola (2008)]])
