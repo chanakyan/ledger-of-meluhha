@@ -1,0 +1,9 @@
+[general]
+connection = "Data Source=../indus_corpus.db"
+output = "IndusCorpus.fs"
+namespace = "IndusCorpus"
+cli_mutable = true
+
+[filters]
+include = ["*"]
+exclude = []
