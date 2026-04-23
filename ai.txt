@@ -1,0 +1,7 @@
+User-Agent: *
+Disallow: /
+
+# No AI training, scraping, indexing, or inference permitted.
+# All repositories owned by Rajeshkumar Venugopal / Third Buyer Advisory.
+# Human use under BSD-2-Clause. AI use requires separate written license.
+# Contact copyright holder for licensing.
