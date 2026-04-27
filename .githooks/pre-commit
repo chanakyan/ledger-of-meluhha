@@ -1,0 +1,23 @@
+#!/usr/bin/env zsh
+# SPDX-License-Identifier: BSD-2-Clause
+# Pre-commit hook for ledger-of-meluhha.
+setopt NO_UNSET
+fail=0
+
+staged=$(git diff --cached --name-only --diff-filter=ACM -- '*.fsx' '*.fs' '*.tex' '*.py')
+for f in ${(f)staged}; do
+    [[ -z "$f" || ! -f "$f" ]] && continue
+    [[ "$f" == vendor/* || "$f" == lib/* || "$f" == .githooks/* ]] && continue
+    if ! head -5 "$f" | grep -q 'BSD-2-Clause'; then
+        echo "FAIL: $f — missing SPDX-License-Identifier: BSD-2-Clause"
+        fail=1
+    fi
+done
+
+if [[ $fail -ne 0 ]]; then
+    echo "Commit blocked."
+    exit 1
+fi
+
+echo "All pre-commit checks passed."
+exit 0
