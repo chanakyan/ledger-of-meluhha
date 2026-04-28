@@ -1568,6 +1568,150 @@ No randomness. No model.
 
 %%% ===================================================================
 \clearpage
+\section{Querying the Data}\label{sec:queries}
+
+Every claim in this book can be verified with \texttt{sqlite3} on
+the command line, or explored interactively in Excel, Google Sheets,
+or any tool that reads SQLite or CSV.
+
+\subsection{Command-line queries}
+
+All queries run against the two database files:
+\texttt{indus\_corpus.db} (corpus, concordance, inscriptions) and
+\texttt{indus\_codebook.db} (metrological codebook).
+
+\paragraph{List all CISI inscriptions with sign counts.}
+\begin{verbatim}
+sqlite3 indus_corpus.db \
+  "SELECT id, signs, sign_count
+   FROM cisi_inscription
+   ORDER BY sign_count DESC;"
+\end{verbatim}
+
+\paragraph{Decode M-52A through the concordance.}
+\begin{verbatim}
+sqlite3 indus_corpus.db \
+  "SELECT ci.id, ci.signs,
+          sc.parpola_id, sc.mahadevan_ids,
+          sc.description
+   FROM cisi_inscription ci,
+        json_each('[\""' ||
+          replace(ci.signs, ',', '"",""') ||
+          '""]') j
+   LEFT JOIN sign_concordance sc
+     ON sc.parpola_id = j.value
+   WHERE ci.id = 'M-52A';"
+\end{verbatim}
+
+\paragraph{Cross-reference concordance with codebook.}
+Attach both databases and join:
+\begin{verbatim}
+sqlite3 indus_corpus.db \
+  "ATTACH 'indus_codebook.db' AS cb;
+   SELECT sc.parpola_id, sc.mahadevan_ids,
+          substr(sc.description, 1, 40),
+          sr.role, sr.ref_code
+   FROM sign_concordance sc
+   JOIN cb.sign_role sr
+     ON sc.mahadevan_ids =
+        'M' || printf('%03d', sr.sign_id)
+   ORDER BY sr.role, sr.sign_id;"
+\end{verbatim}
+
+\paragraph{Count signs by source.}
+\begin{verbatim}
+sqlite3 indus_corpus.db \
+  "SELECT source_code, COUNT(*)
+   FROM base_sign
+   GROUP BY source_code;"
+\end{verbatim}
+
+\paragraph{List morphological parallels with sites.}
+\begin{verbatim}
+sqlite3 indus_corpus.db \
+  "SELECT sign_a_id AS ivc_seal,
+          sign_b_id AS tn_potsherd,
+          confidence, note
+   FROM morphological_parallel
+   ORDER BY sign_a_id;"
+\end{verbatim}
+
+\paragraph{Spot-check M-52A decode: P324 $\to$ M342 (jar goods).}
+\begin{verbatim}
+sqlite3 indus_corpus.db \
+  "SELECT parpola_id, mahadevan_ids,
+          description
+   FROM sign_concordance
+   WHERE parpola_id = 'P324';"
+\end{verbatim}
+
+\subsection{Export to CSV}
+
+Any query can be exported to CSV for use in Excel, Google Sheets,
+R, pandas, or any other tool:
+
+\begin{verbatim}
+sqlite3 -header -csv indus_corpus.db \
+  "SELECT * FROM cisi_inscription;" \
+  > cisi_inscriptions.csv
+
+sqlite3 -header -csv indus_corpus.db \
+  "SELECT * FROM sign_concordance;" \
+  > concordance.csv
+
+sqlite3 -header -csv indus_codebook.db \
+  "SELECT * FROM sign_role;" \
+  > codebook_roles.csv
+\end{verbatim}
+
+\subsection{Excel / Google Sheets workflow}
+
+For researchers who prefer spreadsheets over the command line:
+
+\begin{enumerate}
+\item Export the three core tables to CSV (commands above).
+\item Open each CSV in Excel or Google Sheets.
+\item To reproduce the decode chain:
+  \begin{enumerate}[nosep]
+  \item Open \texttt{cisi\_inscriptions.csv}. Find M-52A. The
+    \texttt{signs} column contains:
+    \texttt{P324,P172,P145,P050,...}
+  \item Open \texttt{concordance.csv}. Filter the
+    \texttt{parpola\_id} column to each sign.
+    P324~$\to$~\texttt{mahadevan\_ids}~= M342.
+  \item Open \texttt{codebook\_roles.csv}. Filter
+    \texttt{sign\_id}~= 342. The \texttt{role} column reads
+    \texttt{commodity}; the \texttt{ref\_code} reads
+    \texttt{jar}.
+  \item The decode is complete: P324~$\to$~M342~$\to$~jar goods.
+  \end{enumerate}
+\item Use \texttt{VLOOKUP} or \texttt{INDEX/MATCH} across the
+  three sheets to automate the chain for all 179~inscriptions.
+\end{enumerate}
+
+\subsection{Programmatic access (F\#, Python, R)}
+
+The databases are standard SQLite files. Any language with a
+SQLite driver can query them directly:
+
+\begin{itemize}
+\item \textbf{F\#:} \texttt{dotnet fsi} with
+  \texttt{Microsoft.Data.Sqlite} (as used in all \texttt{.fsx}
+  scripts in this repository).
+\item \textbf{Python:} \texttt{import sqlite3} (standard library,
+  no install needed).
+\item \textbf{R:} \texttt{library(RSQLite)} with
+  \texttt{dbConnect(SQLite(), "indus\_corpus.db")}.
+\item \textbf{JavaScript:} sql.js (WASM, as used in the
+  interactive dashboard).
+\end{itemize}
+
+\noindent
+No API. No authentication. No server. The databases are files.
+Download them and query.
+
+%%% ===================================================================
+\clearpage
 \section{Plain-Language Summary}
 
 \textit{For journalists, educators, and general readers.}
