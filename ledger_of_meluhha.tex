@@ -1420,6 +1420,154 @@ the codebook.
 
 %%% ===================================================================
 \clearpage
+\section{Interactive Dashboard User Guide}\label{sec:dashboard}
+
+The file \texttt{ledger-of-meluhha.html} is a self-contained
+interactive visualisation of the entire trade network, decoded
+seals, and codebook. It requires no server, no build chain, and no
+framework --- only a modern browser and the corpus database file.
+
+\subsection{Getting started}
+
+\begin{enumerate}
+\item Open \texttt{ledger-of-meluhha.html} in any modern browser
+  (Chrome, Firefox, Safari, Edge).
+\item The landing page shows the title and a dashed drop zone:
+  \textit{``drag indus\_corpus.db to begin.''}
+\item Drag \texttt{indus\_corpus.db} from any folder onto the drop
+  zone. The file is loaded entirely in-browser via sql.js (WASM).
+  No data leaves your machine.
+\item The dashboard renders immediately.
+\end{enumerate}
+
+\subsection{Layout}
+
+The dashboard is a three-column grid:
+
+\paragraph{Left panel --- Decoded seals.}
+Two seal cards for M-52A and M-148A. Each card shows the five-field
+decode: F1~(merchant mark), F2~(commodity), F3~(weight tier),
+F4~(quantity), F5~(route). Parpola sign numbers and concordance
+paths are displayed in \texttt{JetBrains Mono}; resolved values in
+\textit{Cormorant Garamond}. Below the cards, the Alloy
+verification badge: \textit{``16 ASSERTIONS UNSAT AT SCOPE~6.''}
+A radiometric dating panel shows calibrated dates from the corpus.
+
+\paragraph{Center panel --- Trade network map.}
+A Leaflet map centered on the IVC trade zone, showing 22
+archaeological sites across four categories:
+
+\begin{itemize}
+\item IVC sites (Mohenjo-daro, Harappa, Lothal, Kalibangan,
+  Dholavira, Rojdi, Shortughai)
+\item Tamil Nadu supply sites (Kodumanal, Keeladi, Thulukarpatti,
+  Karur, Teriruveli, Adichanallur, Sivagalai)
+\item Mesopotamian destinations (Ur, Kish, Tell Asmar, Susa)
+\item Gulf hubs (Dilmun/Bahrain, Magan/Oman)
+\item Resource sites (Khetri copper mines)
+\end{itemize}
+
+Trade routes are drawn as curved polylines. Route stroke width
+is proportional to relative trade volume derived from cuneiform
+Meluhha records. Hover over any route to see the commodity,
+sign number, and evidence basis in the tooltip.
+
+\paragraph{Right panel --- Reference charts.}
+Three stacked panels:
+
+\begin{enumerate}
+\item \textbf{Sign frequency} --- D3 bar chart of cumulative sign
+  distribution. A dashed TBA-red line marks the 80\% threshold at
+  67~signs. Hover over any bar for the exact count.
+\item \textbf{Weight codebook} --- horizontal bars for all 11 weight
+  tiers. Binary tiers (clay colour) and decimal tiers (TBA-red)
+  are visually distinguished. Each bar shows the gram value.
+\item \textbf{Commodity manifest} --- clickable table of 8
+  commodity classes with sign number, name, primary route, and
+  corpus share. Click a row to highlight the corresponding trade
+  route on the map; click again to deselect. The active row is
+  marked in TBA-red.
+\end{enumerate}
+
+\subsection{Themes}
+
+Four accessibility themes are available via the coloured dots in the
+upper-right corner:
+
+\begin{longtable}{@{}llp{7cm}@{}}
+\toprule
+Theme & Background & Notes \\
+\midrule
+\endfirsthead
+\bottomrule
+\endlastfoot
+Clay (default) & Dark (\texttt{\#0f0c07}) & Warm sand text, clay data, grain texture. Designed for extended reading in low ambient light. \\
+\midrule
+Parchment & Light (\texttt{\#f5f0e4}) & High-contrast dark text on cream. For projection, printing, or bright-room reading. \\
+\midrule
+High Contrast & Black (\texttt{\#000000}) & WCAG~AAA compliant. Yellow data on black. No grain texture. For visually impaired users. \\
+\midrule
+Seal & Dark blue-grey (\texttt{\#12161e}) & Reduced eye strain with blue-grey tones. For long sessions. \\
+\end{longtable}
+
+\noindent
+Theme selection persists for the session. All data visualisations
+adapt to the selected theme.
+
+\subsection{How the decode works live}
+
+When the database loads, the dashboard executes the full decode
+chain in real time:
+
+\begin{enumerate}[nosep]
+\item Query \texttt{cisi\_inscription} for M-52A and M-148A sign
+  sequences.
+\item For each Parpola sign ID, query \texttt{sign\_concordance} to
+  resolve the Mahadevan number.
+\item Look up the Mahadevan number in the embedded
+  \texttt{signRoleMap} (the codebook, frozen as JavaScript
+  \texttt{Map} constants).
+\item Resolve the role to a commodity name, weight tier, or route
+  destination via \texttt{commodityMap} and \texttt{routeMap}.
+\item Render the five-field card.
+\end{enumerate}
+
+\noindent
+The decode is deterministic and reproducible. The same database
+produces the same cards every time. No server-side computation.
+No randomness. No model.
+
+\subsection{What the user can do}
+
+\begin{itemize}
+\item \textbf{Pan and zoom} the map to explore site locations and
+  route geometries.
+\item \textbf{Hover} over trade routes to see commodity, evidence,
+  and sign numbers.
+\item \textbf{Click} commodity rows to filter the map to a single
+  trade corridor.
+\item \textbf{Switch themes} for accessibility or presentation.
+\item \textbf{Inspect the decode} --- every sign number, concordance
+  path, and codebook lookup is visible on the seal cards.
+  Nothing is hidden.
+\end{itemize}
+
+\subsection{Technical requirements}
+
+\begin{itemize}
+\item Any modern browser with WebAssembly support (all major
+  browsers since 2017).
+\item The \texttt{indus\_corpus.db} file (produced by
+  \texttt{indus\_ingest\_corpus.fsx} and
+  \texttt{indus\_ingest\_cisi.fsx}).
+\item Internet connection for CDN resources (sql.js WASM, D3.js,
+  Leaflet, Google Fonts). For fully offline use, bundle the
+  dependencies locally.
+\item No installation. No build step. No server.
+\end{itemize}
+
+%%% ===================================================================
+\clearpage
 \section{Plain-Language Summary}
 
 \textit{For journalists, educators, and general readers.}
