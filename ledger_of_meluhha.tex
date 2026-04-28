@@ -627,33 +627,169 @@ The concordance mapped P324 to M342 on \emph{shape}, not frequency.
 The frequency match is a structural prediction confirmed by an
 independent data path.
 
+\subsection{Concordance bridge}
+
+The direct JSON ingest from the mayig CISI digitisation
+(396~Parpola sign definitions, each carrying
+\texttt{mahadevan\_graphemes} and \texttt{wells\_graphemes} fields)
+enables a systematic cross-reference between the concordance and
+the metrological codebook.
+A single SQL join resolves 21~Parpola signs to codebook roles:
+
+\begin{longtable}{@{}llll@{}}
+\caption{Parpola signs resolved to codebook roles via concordance bridge.}
+\label{tab:bridge}\\
+\toprule
+Role & Parpola & Mahadevan & Description \\
+\midrule
+\endfirsthead
+\bottomrule
+\endlastfoot
+Commodity & P324 & M342 & Jar goods (classic jar symbol) \\
+\midrule
+Commodity & P147 & M089 & Gold (three vertical strokes) \\
+\midrule
+Commodity & P098 & M176 & Carnelian (vertical + horizontals) \\
+\midrule
+Commodity & P217 & M211 & Ivory (triangle on vertical) \\
+\midrule
+Commodity & P165 & M301 & Textile (parenthesis + semicircle) \\
+\midrule
+Commodity & P292 & M199/M200 & Timber (tall table) \\
+\midrule
+Terminal & P050 & M059 & Mesopotamia (plain fish) \\
+\midrule
+Terminal & P051 & M060 & Dilmun (fish + four strokes) \\
+\midrule
+Terminal & P052 & M061 & Magan (fish + table + strokes) \\
+\midrule
+Terminal & P053 & M062 & North internal (fish in parentheses) \\
+\midrule
+Weight & P013 & M001 & $\times 1$ (person) \\
+\midrule
+Weight & P015/P016 & M002 & $\times 2$ (two persons) \\
+\midrule
+Weight & P014 & M003 & $\times 4$ (person + stroke) \\
+\midrule
+Weight & P007 & M004 & $\times 8$ (person + flag) \\
+\midrule
+Weight & P008 & M005 & $\times 16$ (person + two flags) \\
+\midrule
+Weight & P012 & M007 & $\times 32$ (person + raised arm) \\
+\midrule
+Quantity & P001 & M012 & Burden-carrier \\
+\midrule
+Quantity & P002 & M013 & Burden-carrier + stroke \\
+\midrule
+Quantity & P004 & M015 & Burden-carrier + jar handles \\
+\midrule
+Structural & P119 & M099 & Two vertical strokes \\
+\midrule
+Structural & P385 & M267 & Diamond/leaf shape \\
+\end{longtable}
+
+\noindent
+Three codebook gaps remain unbridged: copper (M184), iron (M218),
+and the South route terminal (M063).
+None of these three Mahadevan numbers appear in the mayig
+concordance.
+
+\paragraph{A structural prediction.}
+The South route terminal (M063) is absent from the entire
+Mohenjo-daro corpus.
+This absence is predicted by the cargo-tag model: Mohenjo-daro
+is the primary \emph{export} hub --- goods leave for Mesopotamia,
+Dilmun, Magan, and the northern interior.
+The South terminal marks supply-direction shipments (Tamil Nadu
+corridor), which would appear on seals at \emph{southern} sites,
+not at the port.
+The fish-variant terminal series runs P050~(M059) through
+P053~(M062) with no gap in Parpola numbering; M063 is
+a Mahadevan number with no Parpola equivalent in the digitised
+corpus, consistent with its absence from the Mohenjo-daro subset.
+Confirmation requires seal data from Lothal or Dholavira.
+
 \subsection{Pending parallels}
 
-18 of 20 parallels reference Harappa, Kalibangan, or Rojdi seals
-not in the open CISI corpus.
-These decode with zero code changes when:
-(a) the mayig CISI digitisation (now forked and ingested directly
-via \texttt{indus\_ingest\_cisi.fsx}: 396~sign definitions,
-179~inscriptions, 1{,}003~sign occurrences) extends beyond
-Mohenjo-daro,\smartcite{MayigCISI} or
-(b) sign sequences are extracted from the purchased Fuls
-print corpus.\smartcite{Fuls2022}
-Both volumes --- \textit{Corpus of Indus Inscriptions} (Vol.~1,
-3{,}898 artefacts from 73~sites with Wells-numbered sign sequences)
-and \textit{A Catalog of Indus Signs} (Vol.~2, 709-sign Wells~v2.8
-inventory with concordance tables) --- were purchased by the author
-and are used here as reference material under fair scholarly use.
-The ICIT online database is no longer freely
-available.\smartcite{WellsFuls2006}
+13 of the 20 morphological parallels reference seals at sites
+not covered by the open CISI corpus.
+The seals are now identified by site:
+
+\begin{longtable}{@{}llll@{}}
+\caption{Pending parallels by site and seal.}
+\label{tab:pending}\\
+\toprule
+Site & IVC Seal & TN Parallel & Motif \\
+\midrule
+\endfirsthead
+\bottomrule
+\endlastfoot
+Harappa & H-6A   & Kodumanal & circle \\
+\midrule
+Harappa & H-9A   & Kodumanal & diamond/cross \\
+\midrule
+Harappa & H-71A  & Karur & bull sign \\
+\midrule
+Harappa & H-93A  & Kodumanal & U-form \\
+\midrule
+Harappa & H-174A & Thulukarpatti & E-form \\
+\midrule
+Harappa & H-1482A & Karur & animal+incised \\
+\midrule
+Harappa & H-1487A & Teriruveli & angular \\
+\midrule
+Harappa & H-1488A & Thulukarpatti & stroke \\
+\midrule
+Kalibangan & K-180A & Keedali & incised \\
+\midrule
+Kalibangan & K-292A & Kodumanal & cross/saltire \\
+\midrule
+Rojdi & Rj-129A & Keedali & incised \\
+\midrule
+Rojdi & Rj-325A & Kodumanal & cross/saltire \\
+\midrule
+Rojdi & Rj-347A & Teriruveli & angular \\
+\end{longtable}
+
+\noindent
+The Fuls \textit{Corpus of Indus Inscriptions}\smartcite{Fuls2022}
+contains Wells-numbered sign sequences for all 13~seals
+(Harappa: p.~62--255; Kalibangan: p.~258--272; Rojdi: p.~444).
+Both volumes were purchased by the author.
+The Wells-to-Parpola concordance is already in the database
+(\texttt{wells\_graphemes} field, 396~entries).
+Extraction of the 13~sign sequences and decode through the
+existing pipeline is the immediate next step.
+
+Five additional Mohenjo-daro parallels (M-264A, M-272A, M-321A,
+M-615A, M-751A) are already in the ingested CISI corpus and
+decode with zero code changes --- these results will be reported
+in the next revision.
+
+\paragraph{Data provenance.}
+The ICIT online database is no longer freely available (Fuls,
+personal communication, April~2026).\smartcite{WellsFuls2006}
+Temporal server access is available at 25~EUR/month.
+The author has purchased both Fuls print volumes and holds
+a Kindle copy of \textit{A Catalog of Indus Signs}.
+The full \textit{Corpus of Indus Inscriptions} is also available
+on the Internet Archive.
+All sign-sequence data extracted from these sources will be
+deposited in the Zenodo artifact as a reproducible SQLite
+database update.
 
 \subsection{Codebook coverage}
 
 28 of $\approx$417 Mahadevan signs are mapped to field roles.
-The two real decodes surfaced 7~unmapped signs from M-52A alone.
-Expanding the codebook is the next phase.
-The 28 mapped signs cover the structural skeleton: 8~commodity
-codes, 7~weight tiers, 6~quantity codes, 5~routes,
-2~structural delimiters.
+Of these, 21 now have Parpola-to-Mahadevan bridges confirmed
+through the concordance (see \cref{tab:bridge}):
+6~of 8~commodity codes, 4~of 5~routes, 7~of 7~binary weight
+tiers, 3~of 6~quantity codes, and 2~structural delimiters.
+The two real decodes surfaced 7~additional unmapped signs from
+M-52A alone (P172, P145, P092, P060, P364, P211, P320 --- all
+have Mahadevan numbers but no codebook role).
+Expanding the codebook to cover the remaining 7~unbridged roles
+and the 7~M-52A unknowns is the next phase.
 
 \subsection{Statistical independence of the decode}
 
