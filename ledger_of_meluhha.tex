@@ -1688,9 +1688,8 @@ All data and code are deposited under CC~BY~4.0:
 \texttt{indus\_corpus.db} (corpus),
 \texttt{indus\_codebook.db} (codebook),
 \texttt{indus\_lssc.db} (LSSC analysis),
-six F\# scripts (\texttt{.fsx}, including
-\texttt{indus\_ingest\_cisi.fsx} for direct JSON ingest from the
-forked mayig CISI digitisation),
+seven F\# scripts (\texttt{.fsx}; see \cref{sec:queries} for the
+complete list and usage),
 Alloy specification, CMakeLists.txt,
 the interactive dashboard (\texttt{ledger-of-meluhha.html}),
 and this book.
@@ -1879,147 +1878,169 @@ No randomness. No model.
 
 %%% ===================================================================
 \clearpage
-\section{Querying the Data}\label{sec:queries}
+\section{Reproducing Every Claim}\label{sec:queries}
 
-Every claim in this book can be verified with \texttt{sqlite3} on
-the command line, or explored interactively in Excel, Google Sheets,
-or any tool that reads SQLite or CSV.
+Every claim in this book is reproduced by an F\# script. The
+scripts are the source of truth. They read from SQLite, perform
+the computation, and print the result. No raw SQL is required ---
+the scripts embed it.
 
-\subsection{Command-line queries}
+\subsection{The seven scripts}
 
-All queries run against the two database files:
-\texttt{indus\_corpus.db} (corpus, concordance, inscriptions) and
-\texttt{indus\_codebook.db} (metrological codebook).
+\begin{longtable}{@{}lp{8cm}@{}}
+\toprule
+Script & What it reproduces \\
+\midrule
+\endfirsthead
+\bottomrule
+\endlastfoot
+\texttt{indus\_ingest\_corpus.fsx}
+  & Builds \texttt{indus\_corpus.db} from four sources
+    (Mahadevan, Rajan--Sivanantham, Tamil Treebank,
+    radiometric dating). \\
+\midrule
+\texttt{indus\_ingest\_cisi.fsx}
+  & Ingests 396~Parpola sign definitions, 179~CISI inscriptions,
+    1{,}003~sign occurrences, and 334~Mahadevan concordance
+    mappings from the mayig JSON corpus into
+    \texttt{indus\_corpus.db}. Spot-checks M-52A decode. \\
+\midrule
+\texttt{indus\_seed\_codebook.fsx}
+  & Builds \texttt{indus\_codebook.db}: 28~sign roles,
+    8~commodities, 5~routes, 11~weight tiers, 6~quantity codes,
+    5~merchant marks, 3~positional rules. \\
+\midrule
+\texttt{indus\_decoder.fsx}
+  & Full decode chain for M-52A and M-148A: CISI inscription
+    $\to$ concordance $\to$ codebook $\to$ field assignment.
+    Prints the five-field cargo tag. \\
+\midrule
+\texttt{indus\_tn\_decoder.fsx}
+  & Tamil Nadu cross-corpus decode: 20~morphological parallels
+    through the concordance bridge. \\
+\midrule
+\texttt{indus\_bernoulli.fsx}
+  & Five-path Bernoulli independence test ($p = 3.125 \times
+    10^{-5}$), Monte Carlo validation ($10^7$ trials),
+    Fisher's combined test, Bayesian update, sensitivity
+    analysis. \\
+\midrule
+\texttt{indus\_lssc.fsx}
+  & Transition entropy and LSSC (Latent Structural State
+    Contraction) analysis on the Tamil proxy corpus.
+    Closure/option sign classification. \\
+\midrule
+\texttt{indus\_bigram.fsx}
+  & Mass decode of all 179~inscriptions (117~commodity hits,
+    37~route hits, South terminal = 0). Bigram structure
+    analysis: mapped vs unmapped signs. Conclusion: no
+    alphabet detected (1.1~successors/sign, 71\% unique
+    bigrams = open inventory, not phonetic layer). \\
+\end{longtable}
 
-\paragraph{List all CISI inscriptions with sign counts.}
-\begin{verbatim}
-sqlite3 indus_corpus.db \
-  "SELECT id, signs, sign_count
-   FROM cisi_inscription
-   ORDER BY sign_count DESC;"
-\end{verbatim}
+\subsection{Running a script}
 
-\paragraph{Decode M-52A through the concordance.}
-\begin{verbatim}
-sqlite3 indus_corpus.db \
-  "SELECT ci.id, ci.signs,
-          sc.parpola_id, sc.mahadevan_ids,
-          sc.description
-   FROM cisi_inscription ci,
-        json_each('[\""' ||
-          replace(ci.signs, ',', '"",""') ||
-          '""]') j
-   LEFT JOIN sign_concordance sc
-     ON sc.parpola_id = j.value
-   WHERE ci.id = 'M-52A';"
-\end{verbatim}
-
-\paragraph{Cross-reference concordance with codebook.}
-Attach both databases and join:
-\begin{verbatim}
-sqlite3 indus_corpus.db \
-  "ATTACH 'indus_codebook.db' AS cb;
-   SELECT sc.parpola_id, sc.mahadevan_ids,
-          substr(sc.description, 1, 40),
-          sr.role, sr.ref_code
-   FROM sign_concordance sc
-   JOIN cb.sign_role sr
-     ON sc.mahadevan_ids =
-        'M' || printf('%03d', sr.sign_id)
-   ORDER BY sr.role, sr.sign_id;"
-\end{verbatim}
-
-\paragraph{Count signs by source.}
-\begin{verbatim}
-sqlite3 indus_corpus.db \
-  "SELECT source_code, COUNT(*)
-   FROM base_sign
-   GROUP BY source_code;"
-\end{verbatim}
-
-\paragraph{List morphological parallels with sites.}
-\begin{verbatim}
-sqlite3 indus_corpus.db \
-  "SELECT sign_a_id AS ivc_seal,
-          sign_b_id AS tn_potsherd,
-          confidence, note
-   FROM morphological_parallel
-   ORDER BY sign_a_id;"
-\end{verbatim}
-
-\paragraph{Spot-check M-52A decode: P324 $\to$ M342 (jar goods).}
-\begin{verbatim}
-sqlite3 indus_corpus.db \
-  "SELECT parpola_id, mahadevan_ids,
-          description
-   FROM sign_concordance
-   WHERE parpola_id = 'P324';"
-\end{verbatim}
-
-\subsection{Export to CSV}
-
-Any query can be exported to CSV for use in Excel, Google Sheets,
-R, pandas, or any other tool:
+Every script follows the same pattern:
 
 \begin{verbatim}
-sqlite3 -header -csv indus_corpus.db \
-  "SELECT * FROM cisi_inscription;" \
-  > cisi_inscriptions.csv
-
-sqlite3 -header -csv indus_corpus.db \
-  "SELECT * FROM sign_concordance;" \
-  > concordance.csv
-
-sqlite3 -header -csv indus_codebook.db \
-  "SELECT * FROM sign_role;" \
-  > codebook_roles.csv
+dotnet fsi <script> <input-args>
 \end{verbatim}
+
+\noindent
+Examples:
+
+\begin{verbatim}
+# Build the corpus from source data
+dotnet fsi indus_ingest_corpus.fsx \
+  ~/indus-valley indus_corpus.db
+
+# Ingest CISI from the mayig fork
+dotnet fsi indus_ingest_cisi.fsx \
+  ~/indus-valley-script-corpus indus_corpus.db
+
+# Mass decode + bigram analysis
+dotnet fsi indus_bigram.fsx \
+  indus_corpus.db indus_codebook.db
+
+# Bernoulli independence test
+dotnet fsi indus_bernoulli.fsx
+\end{verbatim}
+
+\noindent
+Each script prints its results to stdout. No intermediate files
+are required. The only dependency is \texttt{dotnet fsi} (the
+F\# interactive compiler, included with the .NET SDK) and
+\texttt{Microsoft.Data.Sqlite} (pulled automatically via NuGet
+on first run).
+
+\subsection{Why F\# scripts, not raw SQL}
+
+SQL is embedded inside the F\# scripts. The scripts are the
+reproducibility layer because:
+
+\begin{itemize}
+\item A script is a \emph{complete computation}: it opens the
+  database, runs the query, processes the results, and prints
+  the conclusion. A raw SQL query produces a table that still
+  requires interpretation.
+\item Scripts are versioned in git. Every commit that changes a
+  claim also changes the script that produces it.
+\item Scripts can be composed: \texttt{indus\_bigram.fsx} runs the
+  mass decode, the commodity distribution, the route distribution,
+  and the bigram analysis in a single invocation.
+\item Scripts carry the interpretation: the ``CONCLUSION: No
+  alphabet detected'' line is printed by the script, not inferred
+  by the reader from a table of numbers.
+\end{itemize}
 
 \subsection{Excel / Google Sheets workflow}
 
-For researchers who prefer spreadsheets over the command line:
+For researchers who prefer spreadsheets, run the CSV export
+script:
+
+\begin{verbatim}
+# Export via the build system
+cmake --build build --target csv-export
+\end{verbatim}
+
+\noindent
+This produces three CSV files:
+\texttt{cisi\_inscriptions.csv},
+\texttt{concordance.csv}, and
+\texttt{codebook\_roles.csv}.
+
+To reproduce the decode chain in Excel:
 
 \begin{enumerate}
-\item Export the three core tables to CSV (commands above).
-\item Open each CSV in Excel or Google Sheets.
-\item To reproduce the decode chain:
-  \begin{enumerate}[nosep]
-  \item Open \texttt{cisi\_inscriptions.csv}. Find M-52A. The
-    \texttt{signs} column contains:
-    \texttt{P324,P172,P145,P050,...}
-  \item Open \texttt{concordance.csv}. Filter the
-    \texttt{parpola\_id} column to each sign.
-    P324~$\to$~\texttt{mahadevan\_ids}~= M342.
-  \item Open \texttt{codebook\_roles.csv}. Filter
-    \texttt{sign\_id}~= 342. The \texttt{role} column reads
-    \texttt{commodity}; the \texttt{ref\_code} reads
-    \texttt{jar}.
-  \item The decode is complete: P324~$\to$~M342~$\to$~jar goods.
-  \end{enumerate}
+\item Open \texttt{cisi\_inscriptions.csv}. Find M-52A. The
+  \texttt{signs} column contains:
+  \texttt{P324,P172,P145,P050,...}
+\item Open \texttt{concordance.csv}. Filter
+  \texttt{parpola\_id} to P324.
+  Result: \texttt{mahadevan\_ids}~= M342.
+\item Open \texttt{codebook\_roles.csv}. Filter
+  \texttt{sign\_id}~= 342.
+  Result: \texttt{role}~= commodity,
+  \texttt{ref\_code}~= jar.
+\item Decode complete: P324~$\to$~M342~$\to$~jar goods.
 \item Use \texttt{VLOOKUP} or \texttt{INDEX/MATCH} across the
   three sheets to automate the chain for all 179~inscriptions.
 \end{enumerate}
 
-\subsection{Programmatic access (F\#, Python, R)}
+\subsection{Other languages}
 
 The databases are standard SQLite files. Any language with a
-SQLite driver can query them directly:
+SQLite driver can query them:
 
 \begin{itemize}
-\item \textbf{F\#:} \texttt{dotnet fsi} with
-  \texttt{Microsoft.Data.Sqlite} (as used in all \texttt{.fsx}
-  scripts in this repository).
-\item \textbf{Python:} \texttt{import sqlite3} (standard library,
-  no install needed).
-\item \textbf{R:} \texttt{library(RSQLite)} with
-  \texttt{dbConnect(SQLite(), "indus\_corpus.db")}.
-\item \textbf{JavaScript:} sql.js (WASM, as used in the
-  interactive dashboard).
+\item \textbf{Python:} \texttt{import sqlite3} (standard library).
+\item \textbf{R:} \texttt{library(RSQLite)}.
+\item \textbf{JavaScript:} sql.js (WASM, as used in the dashboard).
 \end{itemize}
 
 \noindent
-No API. No authentication. No server. The databases are files.
-Download them and query.
+But the F\# scripts are the canonical form. If the script says
+``117 commodity hits'' and your SQL says 116, the script is right.
 
 %%% ===================================================================
 \clearpage
