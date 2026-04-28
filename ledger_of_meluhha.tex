@@ -133,9 +133,10 @@ Every statistical feature Farmer et al.\ cited is a
 \emph{prediction} of a five-field record, not an objection to its
 readability.
 This hypothesis is tested against a normalised corpus database of
-2{,}373 signs from five sources (Mahadevan concordance, CISI
-digitisation, Rajan--Sivanantham Tamil Nadu graffiti, Tamil Treebank
-proxy corpus, and the Parpola--Mahadevan concordance), verified by
+2{,}769 signs from four sources (Mahadevan concordance, CISI
+digitisation with 396~Parpola sign definitions ingested directly
+from the mayig JSON corpus, Rajan--Sivanantham Tamil Nadu graffiti,
+and the Tamil Treebank proxy corpus), verified by
 sixteen Alloy assertions (all UNSAT at scope~6).
 Two Mohenjo-daro seals (M-52A and M-148A) are decoded end-to-end from
 real CISI sign-sequence data through the Parpola--Mahadevan concordance
@@ -533,10 +534,12 @@ RS2025 & Rajan--Sivanantham 42 base signs & \num{42} signs \\
 \midrule
 TAMIL\_TB & Tamil Treebank logo-syllabic & \num{1929} signs, \num{600} inscriptions \\
 \midrule
-CISI & Joshi \& Parpola corpus\smartcite{JoshiParpola1987}\smartcite{MayigCISI}
-     & \num{179} inscriptions \\
+CISI\_MAYIG & Joshi \& Parpola corpus,\smartcite{JoshiParpola1987} mayig
+  digitisation\smartcite{MayigCISI} (forked, ingested directly from JSON)
+     & \num{396} signs, \num{179} inscriptions, \num{1003} occurrences \\
 \midrule
-Concordance & Parpola $\to$ Mahadevan mapping & \num{397} entries (\num{334} mapped) \\
+Concordance & Parpola $\to$ Mahadevan/Wells mapping (from mayig features/)
+     & \num{396} entries (\num{334} Mahadevan-mapped) \\
 \end{longtable}
 
 \noindent
@@ -629,14 +632,19 @@ independent data path.
 18 of 20 parallels reference Harappa, Kalibangan, or Rojdi seals
 not in the open CISI corpus.
 These decode with zero code changes when:
-(a) the mayig CISI digitisation extends beyond
+(a) the mayig CISI digitisation (now forked and ingested directly
+via \texttt{indus\_ingest\_cisi.fsx}: 396~sign definitions,
+179~inscriptions, 1{,}003~sign occurrences) extends beyond
 Mohenjo-daro,\smartcite{MayigCISI} or
-(b) ICIT database access is
-obtained.\smartcite{WellsFuls2006}
-The corresponding print monograph (\textit{Corpus of Indus Inscriptions},
-Vol.~1, with companion sign catalogue Vol.~2) is the
-canonical citable form of the same 709-sign Wells~v2.8 inventory used
-by ICIT.\smartcite{Fuls2022}
+(b) sign sequences are extracted from the purchased Fuls
+print corpus.\smartcite{Fuls2022}
+Both volumes --- \textit{Corpus of Indus Inscriptions} (Vol.~1,
+3{,}898 artefacts from 73~sites with Wells-numbered sign sequences)
+and \textit{A Catalog of Indus Signs} (Vol.~2, 709-sign Wells~v2.8
+inventory with concordance tables) --- were purchased by the author
+and are used here as reference material under fair scholarly use.
+The ICIT online database is no longer freely
+available.\smartcite{WellsFuls2006}
 
 \subsection{Codebook coverage}
 
@@ -673,6 +681,9 @@ categories).
 \paragraph{Path~2: concordance independence.}
 The Parpola--Mahadevan concordance maps signs on
 \emph{morphological shape}, not on trade semantics.
+The concordance is now ingested directly from the mayig CISI
+digitisation (396~sign definitions, 334~with Mahadevan mapping),
+eliminating one intermediate database step.
 The codebook was fixed before any decode was run.
 Two seals decoded through this independent shape-based bridge
 produce meaningful commodity assignments.
@@ -862,7 +873,9 @@ goods (S-342) bound for Mesopotamia (S-059).
 M-148A produces jar goods on a domestic route --- the minimal
 three-field record the model predicts.
 Neither result is circular: the sign sequences come from the
-published CISI corpus, the codebook was fixed before the decode
+published CISI corpus (now ingested directly from the forked mayig
+JSON digitisation: 396~sign definitions, 179~inscriptions,
+1{,}003~sign occurrences), the codebook was fixed before the decode
 was run, and the Parpola-to-Mahadevan mapping is an independent
 concordance not authored by us.
 
@@ -1010,7 +1023,9 @@ All data and code are deposited under CC~BY~4.0:
 \texttt{indus\_corpus.db} (corpus),
 \texttt{indus\_codebook.db} (codebook),
 \texttt{indus\_lssc.db} (LSSC analysis),
-five F\# scripts (\texttt{.fsx}),
+six F\# scripts (\texttt{.fsx}, including
+\texttt{indus\_ingest\_cisi.fsx} for direct JSON ingest from the
+forked mayig CISI digitisation),
 Alloy specification, CMakeLists.txt,
 the interactive dashboard (\texttt{ledger-of-meluhha.html}),
 and this paper.
