@@ -24,10 +24,10 @@
 \Title{The Ledger of Meluhha --- Indus Valley Script as Metrological Accounting Code}
 \Author{Rajeshkumar Venugopal}
 \Language{en-US}
-\Subject{The Indus Valley script is a metrological cargo-tag system encoding commodity class, weight tier, and merchant identity. Cross-corpus decode of Tamil Nadu potsherds through IVC seal codebook confirms jar goods and Mesopotamia route from real CISI data.}
+\Subject{The Indus Valley script is a metrological cargo-tag system encoding commodity class, weight tier, and merchant identity. Cross-corpus decode of Tamil Nadu potsherds through IVC seal codebook confirms jar goods and Mesopotamia route from real CISI data. 21 Parpola signs bridged to codebook roles. 13 pending seals identified at Harappa, Kalibangan, and Rojdi.}
 \Keywords{Indus Valley, Harappan script, metrological accounting, Bronze Age trade, Meluhha, weight systems, sign frequency, cargo tag, CISI, Alloy, SQLite}
 \Publisher{Third Buyer Advisory}
-\Date{2026-04-16}
+\Date{2026-04-28}
 \end{filecontents*}
 
 \RequirePackage{luatex85}
@@ -124,7 +124,7 @@ symbols nonlinguistic altogether, citing extreme brevity, rising
 hapax legomena, and atypical sign repetition.
 Both positions share one assumption: the signs are either a spoken
 language or not writing at all.
-We propose a third position.
+This book proposes a third position.
 The Indus Valley script (c.\ 2600--1900~\textsc{bce}) is a
 structured metrological code --- a field-delimited cargo-tag system
 encoding commodity class, weight tier, quantity, merchant identity,
@@ -132,22 +132,25 @@ and trade route in five fixed fields.
 Every statistical feature Farmer et al.\ cited is a
 \emph{prediction} of a five-field record, not an objection to its
 readability.
-This hypothesis is tested against a normalised corpus database of
-2{,}769 signs from four sources (Mahadevan concordance, CISI
-digitisation with 396~Parpola sign definitions ingested directly
-from the mayig JSON corpus, Rajan--Sivanantham Tamil Nadu graffiti,
-and the Tamil Treebank proxy corpus), verified by
-sixteen Alloy assertions (all UNSAT at scope~6).
-Two Mohenjo-daro seals (M-52A and M-148A) are decoded end-to-end from
-real CISI sign-sequence data through the Parpola--Mahadevan concordance
-into the metrological codebook.
-Both produce \textbf{jar goods} as commodity --- independently the most
-frequent sign in the Mahadevan corpus ($\approx$10\% of all
-occurrences).
+The hypothesis is tested against a normalised corpus database of
+2{,}769 signs from four sources, verified by sixteen Alloy
+assertions (all UNSAT at scope~6).
+Two Mohenjo-daro seals are decoded end-to-end from real CISI
+sign-sequence data through the Parpola--Mahadevan concordance into
+the metrological codebook.
+Both produce \textbf{jar goods} as commodity --- independently the
+most frequent sign in the Mahadevan corpus.
 M-52A additionally produces a \textbf{Mesopotamia route marker},
 consistent with its findspot at the primary IVC export hub.
-Eighteen further parallels between Tamil Nadu Iron Age potsherds and
-IVC seals await Harappa/Kalibangan/Rojdi data from the ICIT database.
+A concordance bridge maps 21~Parpola signs to codebook roles across
+all five field types.
+The absence of the South route terminal from Mohenjo-daro is
+identified as a structural prediction of the model --- the export
+hub does not tag supply-direction shipments.
+Thirteen further seals at Harappa, Kalibangan, and Rojdi are
+identified by name and await sign-sequence extraction from the
+purchased Fuls corpus.
+Five additional Mohenjo-daro decodes are ready to run.
 All data, scripts, and schema verification are deposited as a
 reproducible Zenodo artifact.
 
@@ -156,7 +159,7 @@ reproducible Zenodo artifact.
 Bronze Age trade; Meluhha; CISI; Alloy; SQLite; F\#; cargo tag
 
 %%% ===================================================================
-\section{Introduction}
+\section{The Stalemate}
 
 The Indus Valley Civilisation produced roughly 4{,}000 inscribed
 objects over seven hundred years of mature urban
@@ -194,7 +197,7 @@ The debate has not moved since.
 \paragraph{The shared assumption.}
 Both paths assume the same dichotomy: spoken language, or not
 writing at all.
-This paper proposes a third position.
+This book proposes a third position.
 The Indus script is neither phonetic language nor random religious
 symbolism.
 It is a \emph{metrological accounting code}: a structured,
@@ -223,11 +226,6 @@ cuneiform receipts on the Mesopotamian end listing goods arriving
 from Meluhha.\smartcite{Ratnagar2004}
 
 We have the receiving ledger. The seals are the shipping labels.
-
-We test this hypothesis computationally against a normalised
-corpus database verified by Alloy, and produce the first
-non-circular cross-corpus decode of Indus seal inscriptions
-through real CISI sign-sequence data.
 
 %%% ===================================================================
 \section{The Material Record}
@@ -302,8 +300,23 @@ write the number~16; it refers to the \SI{13.65}{\gram} weight,
 which \emph{is} the digit.
 The seal points at the weight in the set every merchant carries.
 
+\subsection{The Akkadian receipts}
+
+Cuneiform tablets from Ur, Lagash, and other Mesopotamian sites
+record imports from Meluhha: sesame oil, timber, ivory, carnelian,
+copper, and textiles.\smartcite{Ratnagar2004}
+These are not mythological references. They are trade ledgers
+listing quantities, commodities, and origins.
+The Mesopotamian side of the trade relationship is documented.
+The Indus side has the seals and the weights but --- until now ---
+no reading of what the seals encode.
+The cargo-tag hypothesis identifies the seals as the Indus
+counterpart of the Akkadian receipts: the same goods, the same
+routes, the same metrological system, recorded in a different
+notation.
+
 %%% ===================================================================
-\section{Corpus Statistics}
+\section{The Corpus}
 
 \subsection{Sign frequency}
 
@@ -343,6 +356,11 @@ corpus alone.
 Source: Rao et al.\ (2010); author's construction.}
 \label{fig:signfreq}
 \end{figure}
+
+A 10\% frequency for a single sign is anomalous for language.
+No phoneme in any known script dominates its corpus at this ratio.
+But a single commodity class dominating a trade ledger is
+unremarkable: ``container'' appears on most modern bills of lading.
 
 \subsection{Inscription length}
 
@@ -387,7 +405,7 @@ This is characteristic of a structured record: open header (many
 merchants) and closed terminal (few route codes).
 
 %%% ===================================================================
-\section{The Five-Field Schema}
+\section{The Hypothesis}
 
 \subsection{Field structure}
 
@@ -462,8 +480,21 @@ A phonetic script encoding the same content would require more
 signs, which is why the system survived seven centuries without
 evolving toward phonetic representation.
 
+\subsection{Why the system does not evolve}
+
+The most common objection to the cargo-tag hypothesis is
+durational: how does a writing system survive 700~years without
+developing phonetic elements? The answer is that the system is
+already optimal for its task. A barcode has not evolved toward
+phonetic representation in 50~years of use. A musical notation
+has not evolved toward phonetic representation in 400~years.
+Systems evolve toward phonetic encoding when they need to represent
+open-ended speech. A closed-vocabulary accounting code has no such
+pressure. It is not a primitive stage of writing. It is a different
+kind of writing --- one that encodes quantities, not sentences.
+
 %%% ===================================================================
-\section{Tamil Nadu: The Supply Zone}
+\section{The Supply Zone}
 
 \subsection{The Rajan--Sivanantham corpus}
 
@@ -492,7 +523,7 @@ any other sign. In a phonemic system, this is impossible.
 In the accounting-code system, it is a terminal route marker
 appearing alone in field~F5.
 
-\subsection{Why Tamil Nadu is in this paper}
+\subsection{Why Tamil Nadu is in this book}
 
 Tamil Nadu appears for two reasons, both physical, neither
 linguistic.
@@ -512,11 +543,11 @@ produces LSSC~0.69 (natural language baseline). The accounting-code
 model predicts LSSC~$>1.0$ for Harappan inscriptions.
 
 %%% ===================================================================
-\section{Computational Method}
+\section{The Database}
 
 \subsection{Corpus database}
 
-Five sources were ingested into a normalised SQLite database
+Four sources were ingested into a normalised SQLite database
 (\texttt{indus\_corpus.db}):
 
 \begin{longtable}{@{}llr@{}}
@@ -537,9 +568,6 @@ TAMIL\_TB & Tamil Treebank logo-syllabic & \num{1929} signs, \num{600} inscripti
 CISI\_MAYIG & Joshi \& Parpola corpus,\smartcite{JoshiParpola1987} mayig
   digitisation\smartcite{MayigCISI} (forked, ingested directly from JSON)
      & \num{396} signs, \num{179} inscriptions, \num{1003} occurrences \\
-\midrule
-Concordance & Parpola $\to$ Mahadevan/Wells mapping (from mayig features/)
-     & \num{396} entries (\num{334} Mahadevan-mapped) \\
 \end{longtable}
 
 \noindent
@@ -547,6 +575,13 @@ Every table carries a \texttt{source\_code} foreign key.
 The schema was verified by Alloy~6 before any SQL was written:
 sixteen assertions, all UNSAT at scope~6
 (see \cref{sec:alloy}).
+
+The CISI ingest (\texttt{indus\_ingest\_cisi.fsx}) reads the
+JSON structure of the mayig digitisation, not the repository name.
+The concordance is embedded in each sign definition:
+\texttt{mahadevan\_graphemes} and \texttt{wells\_graphemes} fields
+provide the bridge between Parpola, Mahadevan, and Wells numbering
+systems. Of 396~sign definitions, 334~carry Mahadevan mappings.
 
 \subsection{The decode chain}
 
@@ -587,9 +622,9 @@ signs, 7{,}037 bigram transitions):
 \end{itemize}
 
 %%% ===================================================================
-\section{Results}
+\section{The Decode}
 
-\subsection{Decoded seals (real data)}
+\subsection{Decoded seals}
 
 Of the 20 morphological parallels, the open CISI corpus covers
 Mohenjo-daro M-1 through M-199.
@@ -627,7 +662,8 @@ The concordance mapped P324 to M342 on \emph{shape}, not frequency.
 The frequency match is a structural prediction confirmed by an
 independent data path.
 
-\subsection{Concordance bridge}
+%%% ===================================================================
+\section{The Bridge}
 
 The direct JSON ingest from the mayig CISI digitisation
 (396~Parpola sign definitions, each carrying
@@ -689,31 +725,72 @@ Structural & P385 & M267 & Diamond/leaf shape \\
 \end{longtable}
 
 \noindent
-Three codebook gaps remain unbridged: copper (M184), iron (M218),
+The bridge covers 6~of 8~commodity codes, 4~of 5~route terminals,
+all 7~binary weight tiers, 3~of 6~quantity codes, and both
+structural delimiters.
+Three codebook entries remain unbridged: copper (M184), iron (M218),
 and the South route terminal (M063).
 None of these three Mahadevan numbers appear in the mayig
 concordance.
 
-\paragraph{A structural prediction.}
+The fish-variant terminal signs form a coherent series: P050 (M059,
+Mesopotamia), P051 (M060, Dilmun), P052 (M061, Magan), P053 (M062,
+North internal). All are fish motifs with progressive decoration.
+The route is encoded in the decoration, not in the fish itself.
+The fish is the field marker; the strokes are the address.
+
+%%% ===================================================================
+\section{The Prediction}
+
+\subsection{The missing South terminal}
+
 The South route terminal (M063) is absent from the entire
 Mohenjo-daro corpus.
-This absence is predicted by the cargo-tag model: Mohenjo-daro
-is the primary \emph{export} hub --- goods leave for Mesopotamia,
-Dilmun, Magan, and the northern interior.
-The South terminal marks supply-direction shipments (Tamil Nadu
-corridor), which would appear on seals at \emph{southern} sites,
-not at the port.
-The fish-variant terminal series runs P050~(M059) through
-P053~(M062) with no gap in Parpola numbering; M063 is
-a Mahadevan number with no Parpola equivalent in the digitised
-corpus, consistent with its absence from the Mohenjo-daro subset.
-Confirmation requires seal data from Lothal or Dholavira.
+This absence is predicted by the cargo-tag model.
 
-\subsection{Pending parallels}
+Mohenjo-daro is the primary \emph{export} hub. Goods leave for
+Mesopotamia, Dilmun, Magan, and the northern interior. The South
+terminal marks supply-direction shipments --- goods arriving from
+the Tamil Nadu corridor. These tags would appear on seals at
+\emph{southern} sites (Lothal, Dholavira, possibly Gujarat coast),
+not at the export port.
+
+The fish-variant terminal series runs P050~(M059) through
+P053~(M062) with no gap in Parpola numbering; M063 is a Mahadevan
+number with no Parpola equivalent in the digitised corpus,
+consistent with its absence from the Mohenjo-daro subset.
+
+\subsection{Testability}
+
+This is a falsifiable prediction. If M063 appears at Mohenjo-daro
+in the full Fuls corpus or the ICIT database, the directional
+asymmetry argument fails. If M063 appears preferentially at
+southern or coastal sites, the model gains a sixth independent
+data path.
+
+The prediction is stronger than a post-hoc observation because it
+was identified from the concordance bridge \emph{before} the
+Harappa/Kalibangan/Rojdi data was examined. The gap was noticed,
+the structural reason was articulated, and the test was defined ---
+all from the Mohenjo-daro subset alone.
+
+\subsection{What the export hub should show}
+
+If the model is correct, Mohenjo-daro seals should be enriched
+for outbound route terminals (Mesopotamia, Dilmun, Magan) and
+depleted for inbound markers (South, possibly certain commodity
+classes that arrive rather than depart). The full Fuls corpus
+contains the data to test this. The test requires only counting
+terminal signs by site --- no phonetic assumption, no subjective
+interpretation.
+
+%%% ===================================================================
+\section{The Pending Eighteen}
+
+\subsection{Identified seals}
 
 13 of the 20 morphological parallels reference seals at sites
-not covered by the open CISI corpus.
-The seals are now identified by site:
+not covered by the open CISI corpus:
 
 \begin{longtable}{@{}llll@{}}
 \caption{Pending parallels by site and seal.}
@@ -751,45 +828,34 @@ Rojdi & Rj-325A & Kodumanal & cross/saltire \\
 Rojdi & Rj-347A & Teriruveli & angular \\
 \end{longtable}
 
-\noindent
-The Fuls \textit{Corpus of Indus Inscriptions}\smartcite{Fuls2022}
-contains Wells-numbered sign sequences for all 13~seals
-(Harappa: p.~62--255; Kalibangan: p.~258--272; Rojdi: p.~444).
-Both volumes were purchased by the author.
-The Wells-to-Parpola concordance is already in the database
-(\texttt{wells\_graphemes} field, 396~entries).
-Extraction of the 13~sign sequences and decode through the
-existing pipeline is the immediate next step.
+\subsection{Five ready decodes}
 
 Five additional Mohenjo-daro parallels (M-264A, M-272A, M-321A,
 M-615A, M-751A) are already in the ingested CISI corpus and
-decode with zero code changes --- these results will be reported
-in the next revision.
+decode through the existing pipeline with zero code changes.
 
-\paragraph{Data provenance.}
+\subsection{The data path}
+
+The Fuls \textit{Corpus of Indus Inscriptions}\smartcite{Fuls2022}
+contains Wells-numbered sign sequences for all 13~pending seals
+(Harappa: p.~62--255; Kalibangan: p.~258--272; Rojdi: p.~444).
+Both volumes --- Vol.~1 (3{,}898 artefacts from 73~sites) and
+\textit{A Catalog of Indus Signs} (Vol.~2, 709-sign Wells~v2.8
+inventory) --- were purchased by the author.
+The Wells-to-Parpola concordance is already in the database
+(\texttt{wells\_graphemes} field, 396~entries).
+The full corpus is also available on the Internet Archive.
+
 The ICIT online database is no longer freely available (Fuls,
 personal communication, April~2026).\smartcite{WellsFuls2006}
 Temporal server access is available at 25~EUR/month.
-The author has purchased both Fuls print volumes and holds
-a Kindle copy of \textit{A Catalog of Indus Signs}.
-The full \textit{Corpus of Indus Inscriptions} is also available
-on the Internet Archive.
+
 All sign-sequence data extracted from these sources will be
 deposited in the Zenodo artifact as a reproducible SQLite
 database update.
 
-\subsection{Codebook coverage}
-
-28 of $\approx$417 Mahadevan signs are mapped to field roles.
-Of these, 21 now have Parpola-to-Mahadevan bridges confirmed
-through the concordance (see \cref{tab:bridge}):
-6~of 8~commodity codes, 4~of 5~routes, 7~of 7~binary weight
-tiers, 3~of 6~quantity codes, and 2~structural delimiters.
-The two real decodes surfaced 7~additional unmapped signs from
-M-52A alone (P172, P145, P092, P060, P364, P211, P320 --- all
-have Mahadevan numbers but no codebook role).
-Expanding the codebook to cover the remaining 7~unbridged roles
-and the 7~M-52A unknowns is the next phase.
+%%% ===================================================================
+\section{The Statistics}
 
 \subsection{Statistical independence of the decode}
 
@@ -864,12 +930,9 @@ Under the Bernoulli product:
 \end{equation}
 
 One chance in thirty-two thousand.
-A skeptic at equipoise who observes all five convergences should
-assign a posterior probability of approximately $3 \times 10^{-5}$
-to the hypothesis that the signs are language or random symbolism
-rather than a metrological code.
 
-\paragraph{Numerical verification.}
+\subsection{Numerical verification}
+
 The analytic result is verified by three independent methods,
 implemented in \texttt{indus\_bernoulli.fsx} (reproducible with
 \texttt{dotnet fsi}, MathNet.Numerics).
@@ -886,9 +949,9 @@ implemented in \texttt{indus\_bernoulli.fsx} (reproducible with
   $\Pr(\mathcal{H}_0 \mid \text{data}) = 3.12 \times 10^{-5}$.
 \end{enumerate}
 
-\noindent
-Sensitivity analysis shows the result is robust to prior
-assumptions. Even doubling every per-path probability (2$\times$
+\subsection{Sensitivity analysis}
+
+Even doubling every per-path probability (2$\times$
 more generous to $\mathcal{H}_0$), the joint probability remains
 $10^{-3}$ --- one in a thousand. Tripling yields $7.6 \times
 10^{-3}$, still 132:1~odds against the null.
@@ -913,6 +976,7 @@ $3.0\times$ & $7.59 \times 10^{-3}$ & $132:1$ \\
 \end{tabular}
 \end{table}
 
+\noindent
 This does not prove the cargo-tag hypothesis.
 It establishes that the pattern of convergences across independent
 data paths is statistically incompatible with the null hypothesis
@@ -921,7 +985,9 @@ tripling every prior in favour of the null.
 Noise scatters. Signal clusters. The decode clusters.
 
 %%% ===================================================================
-\section{Prior Art}
+\section{The Field}
+
+\subsection{Prior art}
 
 The present work sits against four reference points: the two
 pillars of the 100-year stalemate, the failed bridge between them,
@@ -962,8 +1028,26 @@ We accept the accounting frame and drop the rebus requirement.
 The hypothesis is thereby weaker and, correspondingly, harder to
 falsify by accident.
 
+\subsection{The Fuls assessment}
+
+Andreas Fuls, author of the \textit{Corpus of Indus Inscriptions}
+and maintainer of the ICIT database, estimates that approximately
+40\% of all Indus inscriptions are economic in nature, with the
+script functioning as a logo-syllabic system (Fuls, personal
+communication, April~2026).
+This partial agreement is significant. The cargo-tag hypothesis
+claims 100\%. The disagreement is over the remaining 60\%.
+
+The testable question is whether the 60\% Fuls assigns to
+non-economic functions can be decoded through the five-field
+schema as the codebook expands. Currently 21~of $\approx$417
+signs are mapped. If the expansion from 21 to 100+~mapped signs
+continues to produce coherent trade-metrological readings, the
+60\% shrinks. If it produces incoherent readings, the 40\%
+estimate is vindicated and the hypothesis must be revised.
+
 %%% ===================================================================
-\section{Falsification}
+\section{The Falsification}
 
 A hypothesis that survives only by being unfalsifiable is
 philosophically cheap.
@@ -972,6 +1056,9 @@ absence of linguistic feature counts as evidence for it, and no
 observation forces its retraction.
 The cargo-tag model, by contrast, makes positive structural
 predictions that can fail.
+
+\subsection{Original falsification criteria}
+
 The model is falsified if:
 
 \begin{enumerate}
@@ -985,8 +1072,134 @@ The model is falsified if:
   identical to the full Harappan corpus (no export-specific bias).
 \end{enumerate}
 
+\noindent
 None of these have been produced.
 All are achievable with existing archaeological evidence.
+
+\subsection{The M063 prediction}
+
+A fifth falsification criterion, identified during this work:
+
+\begin{enumerate}[resume]
+\item The South route terminal (M063) appears at Mohenjo-daro
+  at rates comparable to other terminal signs. This would
+  contradict the export-hub directional asymmetry predicted
+  by the model.
+\end{enumerate}
+
+\noindent
+Conversely, if M063 appears preferentially at Lothal, Dholavira,
+or Gujarat coastal sites, the model gains a sixth independent
+convergence and the Bernoulli joint probability drops by another
+factor of five.
+
+%%% ===================================================================
+\section{The Implications}
+
+If the cargo-tag hypothesis is correct --- even partially --- the
+consequences extend well beyond epigraphy.
+
+\subsection{Trade network reconstruction}
+
+Every decoded seal is a data point in a trade network graph.
+Commodity (F2), route (F5), and findspot give three coordinates
+per inscription. With 3{,}898 inscribed artefacts in the Fuls
+corpus, the potential graph has thousands of edges. No other
+Bronze Age civilisation offers this density of trade data in
+machine-readable form.
+
+The interactive dashboard (\texttt{ledger-of-meluhha.html})
+already renders the Mesopotamia--Dilmun--Magan--North--South
+route network from two decoded seals. Expanding to even 50
+decoded seals would produce the most detailed Bronze Age trade
+map ever constructed --- not from inference, but from the
+shipping labels themselves.
+
+\subsection{Tamil continuity}
+
+The 90\% morphological overlap between IVC seals and Tamil Nadu
+potsherds, combined with the physical presence of Meluhha trade
+goods in TN Iron Age graves, implies a continuous
+commodity-marking tradition spanning at least 1{,}500 years and
+\SI{1500}{\kilo\metre}. This is not a linguistic claim. It is a
+material-culture claim: the same signs traveled with the same
+goods along the same corridors.
+
+If the signs are cargo tags, the continuity is predicted. Trade
+routes persist. Marking conventions persist with them. The marks
+do not need to encode the same language at both ends of the
+route --- they encode the same commodities.
+
+\subsection{The Dravidian question}
+
+The cargo-tag hypothesis does not prove or disprove a Dravidian
+substrate. It renders the question orthogonal. The signs may have
+been read aloud in Proto-Dravidian, Proto-Munda, or any language
+at all --- the encoding is metrological, not phonetic. A barcode
+works regardless of the language spoken by the person scanning it.
+
+This reframing dissolves the deadlock. Path~A and Path~B are not
+wrong about what they observed; they are wrong about what they
+assume the observations must mean. The signs can be structured,
+non-random, and non-phonetic simultaneously.
+
+\subsection{Museum labels}
+
+Every museum in the world that holds Indus seals labels them as
+``undeciphered'' or ``unknown script.'' If the cargo-tag hypothesis
+is confirmed, those labels change. A unicorn seal with jar signs
+and a fish terminal is not an undeciphered artefact. It is a
+shipping label that reads: \textit{Unicorn Guild / Jar Goods /
+13.7g tier / Mesopotamia.}
+
+The museum visitor does not need to know Proto-Dravidian. The
+label tells you what it says.
+
+%%% ===================================================================
+\section{What Remains}
+
+\subsection{Codebook gaps}
+
+28 of $\approx$417 Mahadevan signs are mapped to field roles.
+Of these, 21 have Parpola bridges confirmed through the
+concordance. The gaps:
+
+\begin{itemize}
+\item Copper (M184) --- no Parpola equivalent in concordance
+\item Iron (M218) --- no Parpola equivalent in concordance
+\item South route terminal (M063) --- absent from Mohenjo-daro corpus
+\item 3 of 6 quantity codes --- unbridged
+\item $\times 64$ weight tier --- unbridged
+\item Decimal weight tiers ($\times 160$ through $\times 1000$)
+  --- documented in the weight table but not in the codebook
+\item 7 unmapped signs from M-52A (P172, P145, P092, P060, P364,
+  P211, P320) --- all have Mahadevan numbers but no field role
+\end{itemize}
+
+\subsection{The 60\% question}
+
+Fuls estimates 40\% of inscriptions are economic. This book
+claims 100\%. The resolution depends on codebook expansion. Each
+newly mapped sign either produces a coherent trade reading
+(supporting 100\%) or an incoherent one (supporting 40\% + something
+else). The infrastructure to test this is built. The data will
+determine the answer.
+
+\subsection{Merchant marks}
+
+Field~F1 (the animal motif) is the least understood component.
+The codebook has five generic labels (Unicorn Guild, etc.) but no
+systematic mapping. The Fuls corpus includes animal descriptions
+for every seal. Cross-tabulating animal motifs with commodity and
+route distributions would reveal whether particular guilds
+specialise in particular goods or routes --- exactly as one would
+expect of a trade network.
+
+\subsection{The five Mohenjo-daro decodes}
+
+M-264A, M-272A, M-321A, M-615A, and M-751A are in the ingested
+CISI corpus and decode with zero code changes. These results will
+be reported in the next revision and deposited as a Zenodo update.
 
 %%% ===================================================================
 \section{Conclusion}
@@ -1005,21 +1218,25 @@ We have been trying to read the shipping labels as poetry.
 Two Mohenjo-daro seals have now been decoded from real CISI data
 through an Alloy-verified schema into a metrological codebook.
 M-52A --- found at the primary IVC export hub --- produces jar
-goods (S-342) bound for Mesopotamia (S-059).
+goods bound for Mesopotamia.
 M-148A produces jar goods on a domestic route --- the minimal
 three-field record the model predicts.
-Neither result is circular: the sign sequences come from the
-published CISI corpus (now ingested directly from the forked mayig
-JSON digitisation: 396~sign definitions, 179~inscriptions,
-1{,}003~sign occurrences), the codebook was fixed before the decode
-was run, and the Parpola-to-Mahadevan mapping is an independent
-concordance not authored by us.
+Neither result is circular.
 
-Eighteen more parallels are ready to decode.
+A concordance bridge maps 21~signs across all five field types.
+The absence of the South terminal from Mohenjo-daro is a
+structural prediction, not a gap.
+Thirteen seals at three sites are identified and awaiting
+extraction.
+Five more are ready to decode today.
+
 The infrastructure is built, verified, and reproducible.
-The data will arrive.
+The codebook has 28~entries. It will have more.
+Every new entry either strengthens the model or weakens it.
+The data will determine which.
 
 The script is not lost. It was never a script.
+It is a ledger.
 
 \vspace{20pt}
 \noindent\rule{0.4\linewidth}{0.4pt}
@@ -1153,7 +1370,8 @@ The Alloy specification (\texttt{spec/indus\_corpus.als}) is
 included in the Zenodo artifact. No SQL was written until all
 sixteen assertions returned UNSAT.
 
-\subsection{Reproducibility}
+%%% ===================================================================
+\section{Reproducibility}\label{sec:repro}
 
 All data and code are deposited under CC~BY~4.0:
 \texttt{indus\_corpus.db} (corpus),
@@ -1164,7 +1382,7 @@ six F\# scripts (\texttt{.fsx}, including
 forked mayig CISI digitisation),
 Alloy specification, CMakeLists.txt,
 the interactive dashboard (\texttt{ledger-of-meluhha.html}),
-and this paper.
+and this book.
 Any reader with \texttt{sqlite3} can query every claim.
 Any reader with \texttt{dotnet fsi} can reproduce every
 computation.
@@ -1181,7 +1399,7 @@ The codebook and corpus are separated by design.
 archaeological sites, new morphological parallels) requires only
 re-running the ingest pipeline:
 \texttt{cmake --build build --target corpus}.
-No script, codebook, or paper change is needed.
+No script, codebook, or book change is needed.
 
 \paragraph{New codebook entries} (a new commodity, route, or sign
 role assignment) propagate through a four-step chain:
@@ -1220,7 +1438,7 @@ might spend centuries trying to read the barcode as English. It is
 not English. It is a structured record. The Indus seals are the
 Bronze Age version of that sticker.
 
-\subsection{What does this paper argue?}
+\subsection{What does this book argue?}
 
 The inscriptions are shipping labels, not language. Each seal
 records:
@@ -1254,7 +1472,17 @@ Mohenjo-daro) produced a Mesopotamia route marker as well.
 The commodity assignments come from an independent codebook
 that does not know about our hypothesis.
 
-18~more seals are ready to decode when the data becomes available.
+We then mapped 21~signs across the entire codebook: commodities,
+routes, weights, quantities. The system is consistent.
+
+The ``South route'' sign is missing from Mohenjo-daro. This makes
+sense: Mohenjo-daro is the export hub. You do not label outgoing
+packages with ``arriving from the south.'' The missing sign is a
+prediction, not a gap.
+
+13~more seals at Harappa, Kalibangan, and Rojdi are identified
+and waiting for data extraction. 5~more at Mohenjo-daro are ready
+to decode today.
 
 \subsection{What would prove this wrong?}
 
@@ -1266,6 +1494,8 @@ that does not know about our hypothesis.
 \item A bilingual that reads as a sentence, not a commodity list.
 \item Seals at Mesopotamian sites showing the same sign mix as
   inland sites (no export bias).
+\item The South route sign appearing at Mohenjo-daro as often as
+  other route signs.
 \end{enumerate}
 
 \subsection{One sentence}
