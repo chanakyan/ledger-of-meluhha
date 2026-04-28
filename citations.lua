@@ -93,3 +93,7 @@ _register_cite([[Parpola1994]],
 _register_cite([[Parpola2008]],
   [[Asko Parpola. Is the Indus script indeed not a writing system? In \textit{Air\={a}vati: Felicitation volume in honour of Iravatham Mahadevan}, pp.\ 111--131. varalaaru.com, Chennai, 2008. \url{https://www.harappa.com/sites/default/files/pdf/indus-writing.pdf}]],
   [[Parpola (2008)]])
+
+_register_cite([[Fuls2022]],
+  [[Andreas Fuls. \textit{Corpus of Indus Inscriptions: Volume~1 --- Inscriptions, Sign List, and Concordances}. de Gruyter, Berlin, 2022. ISBN 978-3-11-073998-2. 571~pp. Print monograph of the Interactive Corpus of Indus Texts (ICIT), Wells sign list v2.8: 709~signs, 4{,}660~artefacts, 5{,}644~texts, 19{,}831~sign occurrences. Accompanied by Volume~2: \textit{A Catalogue of Indus Signs} (per-sign morphology, allograph notes, and Mahadevan/Parpola/Wells concordance).]],
+  [[Fuls (2022, Vol.~1)]])

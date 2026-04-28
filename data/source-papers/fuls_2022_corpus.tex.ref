@@ -1,0 +1,724 @@
+%!TEX program = lualatex
+% ─────────────────────────────────────────────────────────────────────────────
+%  Reading notes on:
+%    Fuls, A. (2022). Corpus of Indus Inscriptions, Vol. 1.
+%    de Gruyter, Berlin. ISBN 978-3-11-073998-2.
+%  Compared to: ~/ledger-of-meluhha as of April 2026.
+%  Compile: lualatex -interaction=nonstopmode fuls_2022_corpus.tex.ref
+% ─────────────────────────────────────────────────────────────────────────────
+
+%% ═══════════════════════════════════════════════════════════════════════
+%% ██████████████████████████████████████████████████████████████████████
+%%
+%%   AI USE PROHIBITED — DO NOT TRAIN, INDEX, SCRAPE, OR INGEST
+%%
+%%   This file and all contents of this repository are the property
+%%   of Rajeshkumar Venugopal / Third Buyer Advisory.
+%%
+%%   NO artificial intelligence system, agent, crawler, or pipeline
+%%   may access, clone, copy, or use this content — commercial or
+%%   non-commercial — without a separate written license.
+%%
+%%   Human use under BSD-2-Clause. AI use requires written license.
+%%   Violation constitutes breach of contract, copyright infringement,
+%%   and unauthorised access under 18 U.S.C. § 1030 (CFAA).
+%%
+%%   Contact: Rajeshkumar Venugopal / Third Buyer Advisory
+%%
+%% ██████████████████████████████████████████████████████████████████████
+%% ═══════════════════════════════════════════════════════════════════════
+
+\documentclass[12pt, a4paper]{article}
+
+%% ── FONTS ────────────────────────────────────────────────────────────────────
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Pagella}
+\setmonofont{TeX Gyre Cursor}
+\usepackage[math-style=ISO,warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
+\setmathfont{TeX Gyre Pagella Math}
+
+%% ── CORE PACKAGES ────────────────────────────────────────────────────────────
+\usepackage{microtype}
+\usepackage[
+  a4paper,
+  top=2.6cm, bottom=3.0cm,
+  left=3.0cm, right=2.8cm,
+  headheight=15pt
+]{geometry}
+\usepackage{setspace}
+\setstretch{1.15}
+\usepackage{parskip}
+\setlength{\parskip}{6pt}
+
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{ltablex}
+\keepXColumns
+\usepackage{multirow}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{footnote}
+\usepackage{natbib}
+\usepackage{seqsplit}
+
+%% ── COLOUR PALETTE ───────────────────────────────────────────────────────────
+\usepackage[dvipsnames, svgnames, table]{xcolor}
+\definecolor{deepnavy}{RGB}{15, 32, 68}
+\definecolor{midnavy}{RGB}{32, 64, 118}
+\definecolor{axiomfill}{RGB}{232, 241, 255}
+\definecolor{axiomborder}{RGB}{70, 125, 200}
+\definecolor{notefill}{RGB}{255, 250, 228}
+\definecolor{noteborder}{RGB}{190, 145, 30}
+\definecolor{warnfill}{RGB}{253, 235, 235}
+\definecolor{warnborder}{RGB}{180, 60, 60}
+\definecolor{shaderow}{RGB}{242, 246, 252}
+
+\usepackage[framemethod=tikz]{mdframed}
+
+%% ── SECTION FORMATTING ───────────────────────────────────────────────────────
+\usepackage{titlesec}
+\titleformat{\section}
+  {\color{deepnavy}\Large\bfseries\scshape}
+  {\thesection.}{0.65em}{}
+  [\vspace{0.3ex}{\color{axiomborder!80}\rule{\linewidth}{0.5pt}}]
+\titleformat{\subsection}
+  {\color{midnavy}\large\bfseries}
+  {\thesubsection.}{0.55em}{}
+\titleformat{\subsubsection}
+  {\color{midnavy}\normalsize\bfseries\itshape}
+  {}{0em}{}
+\titlespacing*{\section}{0pt}{3ex plus 1ex minus .2ex}{1.4ex plus .2ex}
+\titlespacing*{\subsection}{0pt}{2.0ex plus 0.5ex}{0.9ex plus .1ex}
+
+%% ── HEADERS & FOOTERS ────────────────────────────────────────────────────────
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.35pt}
+\fancyhead[L]{\small\color{midnavy}\textsc{Fuls 2022 --- Corpus of Indus Inscriptions, Vol.~1}}
+\fancyhead[R]{\small\color{midnavy}\textit{reading notes}}
+\fancyfoot[C]{\small\color{midnavy}\thepage}
+
+%% ── HYPERREF ─────────────────────────────────────────────────────────────────
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks = true,
+  linkcolor  = midnavy,
+  citecolor  = midnavy,
+  urlcolor   = midnavy,
+  pdftitle   = {Reading notes: Fuls 2022 Corpus of Indus Inscriptions Vol.~1},
+  pdfauthor  = {Rajeshkumar Venugopal},
+  pdfsubject = {Indus script source-paper notes for ledger-of-meluhha},
+  pdfkeywords= {Indus script, Fuls 2022, ICIT, Wells sign list, Mahadevan,
+                 Parpola, ledger-of-meluhha, sign concordance}
+}
+\usepackage{cleveref}
+
+%% ── CUSTOM COMMANDS ──────────────────────────────────────────────────────────
+\newcommand{\sigid}[1]{\texttt{#1}}
+\newcommand{\inscr}[1]{\texttt{\seqsplit{#1}}}
+\newcommand{\db}[1]{\texttt{#1}}
+
+\newmdenv[
+  backgroundcolor=warnfill,
+  linecolor=warnborder,
+  linewidth=1pt,
+  innertopmargin=8pt,
+  innerbottommargin=8pt,
+  innerleftmargin=10pt,
+  innerrightmargin=10pt,
+  skipabove=8pt,
+  skipbelow=8pt
+]{caveat}
+
+\newmdenv[
+  backgroundcolor=notefill,
+  linecolor=noteborder,
+  linewidth=1pt,
+  innertopmargin=8pt,
+  innerbottommargin=8pt,
+  innerleftmargin=10pt,
+  innerrightmargin=10pt,
+  skipabove=8pt,
+  skipbelow=8pt
+]{notebox}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\begin{document}
+\thispagestyle{empty}
+
+% ── TITLE PAGE ───────────────────────────────────────────────────────────────
+\begin{titlepage}
+\centering
+\vspace*{1.6cm}
+
+{\color{deepnavy}\rule{\linewidth}{1.5pt}}
+\vspace{0.5cm}
+
+{\color{deepnavy}\LARGE\bfseries\scshape
+  Reading Notes: Fuls 2022}\\[0.4em]
+{\color{midnavy}\large
+  \textit{Corpus of Indus Inscriptions}, Volume~1\\
+  Compared against \texttt{ledger-of-meluhha} (April 2026)}
+
+\vspace{0.5cm}
+{\color{deepnavy}\rule{\linewidth}{0.5pt}}
+
+\vspace{1.3cm}
+
+{\large\bfseries Rajeshkumar Venugopal}\\[0.4em]
+{\normalsize Third Buyer Advisory}\\[0.2em]
+{\normalsize ORCID: \href{https://orcid.org/0009-0002-1838-5976}{0009-0002-1838-5976}}\\[0.2em]
+{\normalsize \href{https://thirdbuyeradvisory.org}{thirdbuyeradvisory.org}}
+
+\vspace{0.9cm}
+{\normalsize \textbf{April 2026}}
+
+\vspace{1.4cm}
+
+\begin{mdframed}[
+  backgroundcolor=axiomfill,
+  linecolor=axiomborder,
+  linewidth=1pt,
+  innerleftmargin=18pt,
+  innerrightmargin=18pt,
+  innertopmargin=14pt,
+  innerbottommargin=14pt
+]
+\noindent\textbf{Scope of these notes.}\enspace
+This is a structured comparison between
+Andreas Fuls's printed corpus monograph
+(\textit{Corpus of Indus Inscriptions}, Vol.~1, de~Gruyter 2022)
+and the existing decode work in
+\db{\textasciitilde/ledger-of-meluhha} as of April~2026.
+The source material consulted is a 35-page publisher preview
+of Vol.~1 (front matter, Chapter~1, Chapter~2 sign list,
+sample inscription pages from Alamgirpur through Mohenjo-daro,
+ICIT/CISI/M77 indices, bibliography).
+The companion Vol.~2 (\textit{A Catalogue of Indus Signs}),
+which is where per-sign morphology and Mahadevan/Parpola/Wells
+concordance live, has not been read; conclusions that depend
+on per-sign descriptions are flagged as such.
+
+\medskip
+\noindent\textbf{Headline finding.}\enspace
+The Fuls~2022 sign inventory (Wells~v2.8: 709 signs,
+4,660 artefacts, 5,644 texts, 19,831 sign occurrences)
+is the next public revision after Wells~2015 (v2.4: 694 signs);
+a delta of \textbf{+15 signs} on the Wells track, and
+\textbf{+7 signs} on the Fuls~2020 track (v2.7: 702 signs).
+None of these IDs are currently represented in
+\db{indus\_corpus.db}: the live \db{sign\_concordance} table is empty
+and lacks a Fuls column entirely, so every Fuls ID is, by construction,
+``new'' relative to the running baseline.
+The actionable diff is therefore a \emph{concordance}
+(Fuls\,$\leftrightarrow$\,Mahadevan\,$\leftrightarrow$\,Parpola)
+rather than a list of unfamiliar signs --- and that concordance
+table is in Vol.~2.
+\end{mdframed}
+
+\vfill
+{\footnotesize\color{gray}
+  \textit{Companion notes to} \texttt{ledger\_of\_meluhha.tex}.
+  \textit{See} \texttt{citations.lua} \textit{for the canonical
+  bibliographic entry} \texttt{Fuls2022}.
+}
+\end{titlepage}
+
+% ── TABLE OF CONTENTS ─────────────────────────────────────────────────────────
+\tableofcontents
+\newpage
+
+% =============================================================================
+\section{Scope of the Fuls Extract}
+\label{sec:scope}
+% =============================================================================
+
+\subsection{What was read}
+
+The PDF examined is the publisher's
+``view inside'' preview of Fuls~2022, Vol.~1, totalling 35~pages out of
+571.  Coverage:
+
+\begin{itemize}[leftmargin=1.6em, itemsep=2pt]
+\item Front matter and table of contents.
+\item Chapter~1 (Corpus development), including Table~1.1
+      summarising prior sign lists from Hunter (1934, 396 signs)
+      through Wells~2015 (v2.4, 694 signs) to Fuls~2020/2022.
+\item Chapter~2 (Introduction to Indus writing), including the
+      visible \emph{end} of the sign list: Table~2.8 covering
+      sign IDs \sigid{703}--\sigid{958}.
+      Tables~2.6 and 2.7, which carry IDs \sigid{001}--\sigid{702},
+      are \emph{not} in the preview.
+\item Chapter~3 partial: sample inscription tables from
+      Alamgirpur, Allahdino, Altyn~Depe, Amri, Bakkar~Buthi,
+      Bala-kot, plus pages 312--313 of the Mohenjo-daro section.
+\item Index of ICIT IDs (1--138), index of CISI numbers,
+      index of Mahadevan~1977 (M77/IDF80) IDs, bibliography.
+\end{itemize}
+
+\subsection{What was not read}
+
+\begin{caveat}
+\textbf{Vol.~2 dependency.}\enspace
+The per-sign morphological descriptions, allograph notes,
+and the Mahadevan/Parpola/Wells cross-references live in
+\textit{Vol.~2: A Catalogue of Indus Signs} (Fuls 2022,
+de~Gruyter), a separate book not included in the preview.
+Without Vol.~2, no Fuls ID can be aligned to a Mahadevan or
+Parpola ID textually --- only by visual matching of glyph
+shapes, which is exactly the work the catalogue exists to
+short-circuit.  All concordance work below is gated on
+acquiring Vol.~2.
+\end{caveat}
+
+The sign-level diff this report can produce is therefore
+\emph{structural} (counts, ID ranges, source dating, schema
+implications) rather than \emph{lexical} (``sign Fuls~715 is
+the same as Mahadevan~123'').
+
+% =============================================================================
+\section{Baseline: \texttt{ledger-of-meluhha} as of April 2026}
+\label{sec:baseline}
+% =============================================================================
+
+The baseline against which Fuls~2022 is being compared is the
+research repository at \db{\textasciitilde/ledger-of-meluhha}
+(memory.db article~44, project slug \db{ledger-of-meluhha},
+weight \db{high}).
+The relevant artefacts:
+
+\subsection{Loaded sources}
+
+\db{indus\_corpus.db} currently has five rows in the \db{source}
+table:
+
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}l l p{8.6cm}@{}}
+\toprule
+\textbf{Code} & \textbf{Year} & \textbf{Description}\\
+\midrule
+\db{CISI}      & 1987 & Joshi \& Parpola CISI Vol.~1, digitised by mayig.
+                       179 Mohenjo-daro inscriptions, Parpola sign IDs.\\
+\db{MAHADEVAN} & 1977 & Mahadevan Concordance / EBUDS / ICIT digital corpus.
+                       $\sim$417 signs, $\sim$4{,}000 objects, $\sim$4{,}791 texts.\\
+\db{RS2025}    & 2025 & Rajan \& Sivanantham, \textit{Indus Signs and
+                       Graffiti Marks of Tamil Nadu}. 42 base signs,
+                       544 variants.\\
+\db{RS2026}    & 2026 & Rajan \& Sivanantham, \textit{Inscribed Potsherds
+                       of Tamil Nadu}, Vol.~1.  740~pp, 15{,}184 potsherds.\\
+\db{TAMIL\_TB} & 2011 & Tamil Treebank v0.1 --- logo-syllabic conversion
+                       reference.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+There is \textbf{no Fuls source row, no standalone Wells source row,
+and no Parpola-only source row}.  \db{base\_sign} is populated only
+for \db{MAHADEVAN} (402), \db{RS2025} (42), and \db{TAMIL\_TB}
+(1{,}929) --- 2{,}373 rows total.
+
+\subsection{Concordance table state}
+
+The schema as defined in \texttt{ledger\_of\_meluhha.tex},
+Appendix~A:
+
+\begin{quote}\small\ttfamily
+CREATE TABLE sign\_concordance (\\
+\hspace*{1em}parpola\_id TEXT PRIMARY KEY, description TEXT,\\
+\hspace*{1em}mahadevan\_ids TEXT, wells\_ids TEXT) STRICT;
+\end{quote}
+
+\db{sign\_concordance} contains \textbf{0~rows}.
+\db{sign\_form} contains \textbf{0~rows}.
+There is no \db{fuls\_id} or \db{fuls\_ids} column.
+The decode pipeline (\texttt{indus\_tn\_decoder.fsx})
+currently joins through \db{mahadevan\_ids} only;
+\db{wells\_ids} is reserved but unused.
+
+\subsection{Codebook coverage}
+
+\db{indus\_codebook.db} maps 28 Mahadevan signs to roles
+(weights~1--7, quantities~10--15, terminals~59--63,
+commodities at IDs 89/176/184/200/211/218/301/342, and two
+structural delimiters).  All numbering is Mahadevan-derived.
+
+\subsection{Existing citations}
+
+\texttt{citations.lua} already carries
+\texttt{Mahadevan1977},
+\texttt{Parpola1994}, \texttt{Parpola2008},
+\texttt{JoshiParpola1987}, \texttt{MayigCISI}, and
+\texttt{WellsFuls2006} (the ICIT digital database citation).
+The \texttt{Fuls2022} entry for the print monograph has been
+added as part of this update.
+
+% =============================================================================
+\section{The Sign Inventory: Headline Diff}
+\label{sec:headline}
+% =============================================================================
+
+\subsection{Counts across versions}
+
+Reproduced from the preview's Table~1.1 and Chapter~1 narrative,
+restricted to the Wells--Fuls track (other sign lists shown for
+historical context):
+
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}l l r l@{}}
+\toprule
+\textbf{Sign list} & \textbf{Year} & \textbf{Signs} & \textbf{Notes}\\
+\midrule
+Hunter            & 1934 & 396 & First systematic list.\\
+Mahadevan (M77)   & 1977 & 419 & Basis of \db{MAHADEVAN} in baseline.\\
+Parpola           & 1973--1994 & 386--396 & CISI numbering family.\\
+Wells (early)     & 1998 & $\sim$610 & \\
+Wells v2.4        & 2015 & 694 & ICIT through 2019.\\
+Fuls v2.7         & 2020 & 702 & First Fuls revision of ICIT.\\
+\textbf{Fuls v2.8} & \textbf{2022} & \textbf{709} & \textbf{Vol.~1 of this monograph.}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The arithmetic deltas:
+\begin{itemize}[leftmargin=1.6em, itemsep=2pt]
+\item Wells~2015 $\rightarrow$ Fuls~2022: \textbf{+15 signs}
+      (694 $\rightarrow$ 709).
+\item Fuls~2020 $\rightarrow$ Fuls~2022: \textbf{+7 signs}
+      (702 $\rightarrow$ 709).
+\item Mahadevan $\rightarrow$ Fuls~2022: \textbf{+290 signs}
+      (419 $\rightarrow$ 709), but this number is not directly
+      meaningful: most of the increase is variant/allograph
+      separation that Mahadevan~1977 collapsed.
+\end{itemize}
+
+\subsection{Visible ID range in the preview}
+
+The preview surfaces Table~2.8 covering signs
+\sigid{703}--\sigid{958} as glyph images, with no textual
+descriptions.  Note the gap: Fuls~v2.8 has 709~signs but the
+last ID is \sigid{958}; the inventory is sparse.  Special
+codes: \sigid{000} is reserved for illegible glyph positions
+in transcriptions, \sigid{999} is reserved for blank/missing
+positions.
+
+\subsection{Diff against baseline (status table)}
+
+\begin{notebox}
+\textbf{How to read the status column.}\enspace
+Because the baseline \db{sign\_concordance} is empty and has no
+Fuls column, every Fuls ID is mechanically ``new'' relative to
+the loaded data.  The interesting question is whether the
+\emph{glyph} that ID denotes is already present under another
+catalogue's numbering (Mahadevan, Parpola, Wells~2015).
+That question requires Vol.~2.
+\end{notebox}
+
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{@{}l l l p{6.6cm}@{}}
+\toprule
+\textbf{Range} & \textbf{Origin} & \textbf{Status} & \textbf{Notes}\\
+\midrule
+\sigid{001}--\sigid{694}
+  & Wells $\leq$2015
+  & \textsc{not visible}
+  & In Tables~2.6/2.7, not in preview.  Concordance to
+    Mahadevan/Parpola requires Vol.~2.\\
+\sigid{695}--\sigid{702}
+  & Fuls~2020 additions
+  & \textsc{new}
+  & 8 IDs added between Wells~2015 and Fuls~2020.
+    Glyph identities pending Vol.~2.\\
+\sigid{703}--\sigid{958}
+  & Fuls~2022 v2.8
+  & \textsc{new}
+  & 7 of these are the v2.7$\rightarrow$v2.8 additions.
+    Visible as glyphs in Table~2.8.\\
+\sigid{000}, \sigid{999}
+  & ---
+  & \textsc{reserved}
+  & Illegible / blank.  Decoder must handle these as
+    sentinels, not signs.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% =============================================================================
+\section{Sample Inscriptions Extracted from the Preview}
+\label{sec:samples}
+% =============================================================================
+
+The preview's Chapter~3 sample tables include full
+sign-by-sign transcriptions in Fuls's plus-delimited
+notation, e.g.\ \inscr{+a-b-c-+}.  The transcriptions
+captured below are useful as a sanity check: every numeric
+token below is a Fuls ID drawn from the very inventory
+described above, and the same physical objects appear
+under different IDs in the existing \db{cisi\_inscription}
+and Mahadevan tables.
+
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}l l l p{6.4cm}@{}}
+\toprule
+\textbf{Site} & \textbf{Object} & \textbf{ICIT~ID} & \textbf{Fuls inscription}\\
+\midrule
+Alamgirpur   & Ad-8 (elephant)  & 13
+             & \inscr{+740-440-503-002-861-000+}\\
+Bakkar Buthi & Blk-1            & 19
+             & \inscr{+226-003-002-297-350-125-413+}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+These two are recorded for cross-reference only; a fuller
+extraction would require either Vol.~1 in full or the live
+ICIT database.
+
+% =============================================================================
+\section{Schema-Change Proposal (Gated on Alloy)}
+\label{sec:schema}
+% =============================================================================
+
+To represent Fuls~2022 IDs in \db{indus\_corpus.db} the
+\db{sign\_concordance} schema needs one additional column.
+The proposed change is:
+
+\begin{quote}\small\ttfamily
+ALTER TABLE sign\_concordance ADD COLUMN fuls\_ids TEXT;
+\end{quote}
+
+Pluralisation matches the existing \db{mahadevan\_ids} and
+\db{wells\_ids} columns, which already accept comma-separated
+multi-mappings (one Parpola sign that resolves to several
+Mahadevan variants, etc.).  An additional source row should
+also be added:
+
+\begin{quote}\small\ttfamily
+INSERT INTO source(code, year, description) VALUES \\
+\hspace*{1em}('FULS', 2022, 'Fuls (2022) Corpus of Indus \\
+\hspace*{1em} Inscriptions, Vol.~1.  709 signs (Wells v2.8), \\
+\hspace*{1em} 4660 artefacts, 5644 texts, 19831 sign occ.');
+\end{quote}
+
+\begin{caveat}
+\textbf{Do not run either statement until Alloy verification
+clears.}\enspace
+The repository's coding standard (P2.3 + Alloy gates,
+16~assertions UNSAT at scope~6) treats schema mutations as
+proof obligations.  Concretely: extending \db{sign\_concordance}
+with \db{fuls\_ids} requires re-checking that the decode
+pipeline's existing assertions (notably the field-role
+disjointness assertion and the deterministic-mapping
+assertion in \texttt{spec/indus\_corpus.als})
+still hold under the wider relation.
+The expected outcome is that they do --- adding a nullable
+descriptive column does not introduce new join paths into the
+weight/commodity/quantity decode --- but ``expected'' is not
+the same as ``proved.''  No \db{ALTER TABLE} should land
+without an Alloy check passing first.
+\end{caveat}
+
+\subsection{What ingestion would look like (when Vol.~2 arrives)}
+
+A \texttt{fuls\_ingest.fsx} script would mirror the existing
+\texttt{indus\_ingest\_corpus.fsx} pattern:
+
+\begin{itemize}[leftmargin=1.6em, itemsep=2pt]
+\item Open a Microsoft.Data.Sqlite connection to
+      \db{indus\_corpus.db} with \texttt{PRAGMA foreign\_keys=ON}.
+\item Read the Vol.~2 catalogue (per-sign rows with
+      Mahadevan/Parpola/Wells references) into a typed
+      F\# record.
+\item Insert/upsert into \db{sign\_concordance}, populating
+      \db{fuls\_ids} alongside the existing
+      \db{mahadevan\_ids} and \db{wells\_ids}.
+\item Run \texttt{PRAGMA integrity\_check} after the
+      transaction.
+\item Re-run the Alloy assertion suite; the run is part of
+      the ingest, not separate.
+\end{itemize}
+
+No raw SQL on the read path: SqlHydra-typed records only,
+per coding standard P2.3.
+
+% =============================================================================
+\section{Contextual Notes}
+\label{sec:notes}
+% =============================================================================
+
+\subsection{ICIT vs.\ ECIT}
+
+The preview clarifies the distinction between two related
+corpora:
+
+\begin{itemize}[leftmargin=1.6em, itemsep=2pt]
+\item \textbf{ICIT} --- \textit{Interactive Corpus of Indus
+      Texts}, online at \url{https://www.epigraphica.de/}
+      since October 2009.  This is the textual corpus the
+      \texttt{WellsFuls2006} citation already covers.
+\item \textbf{ECIT} --- \textit{Extended Corpus of Indus
+      Texts}, iconography only, 888 artefacts.  Not currently
+      relevant to the decode pipeline (no inscriptions), but
+      worth recording because future morphological-parallel
+      work might draw on the iconographic side.
+\end{itemize}
+
+\subsection{Numbering: Wells vs.\ Fuls}
+
+The sign list is conventionally referred to as the ``Wells
+sign list'' through v2.4 (2015), and the ``Fuls~v2.7'' /
+``Fuls~v2.8'' beyond that, reflecting maintainership.
+The numbering is continuous: a Wells~2015 ID and a Fuls~2022
+ID for the same glyph are the same integer; the higher
+inventory adds new IDs at the top rather than renumbering.
+This means the existing \db{wells\_ids} column is, for the
+overlap, also a Fuls~2022 column --- but the \emph{added} 15
+IDs (\sigid{695}--\sigid{958} in the sparse range) have no
+Wells equivalent and require a distinct \db{fuls\_ids}
+column for clarity.
+
+\subsection{Allographs}
+
+Fuls~2022 explicitly retains some graphemes pending
+allograph confirmation; the Vol.~2 catalogue is structured
+around this distinction.  This matters for the baseline
+because the \db{sign\_form} table (currently empty) is the
+intended home for allograph relations.  When ingesting Vol.~2,
+each Fuls ID should land in \db{sign\_concordance}, while
+allograph clusters land in \db{sign\_form} as
+\texttt{(canonical\_id, variant\_id)} pairs.
+
+\subsection{Effect on the field-role count}
+
+The decode codebook covers 28 of the 419 Mahadevan signs.
+Re-expressed against Fuls~2022 (709 signs), the same 28
+field-role mappings cover $28/709 \approx 4\%$ of the
+catalogue rather than $28/419 \approx 7\%$.  This is a
+re-baselining of the denominator, not a regression: the
+codebook gain that matters is whether any of the +15
+Wells$\rightarrow$Fuls additions plays a structural
+(weight, quantity, terminal) role.  That cannot be
+determined from the preview.
+
+% =============================================================================
+\section{Open Questions}
+\label{sec:open}
+% =============================================================================
+
+\begin{enumerate}[leftmargin=1.8em, itemsep=4pt]
+\item \textbf{Vol.~2 acquisition.}\enspace
+      Does the Vol.~2 catalogue include the
+      Mahadevan/Parpola/Wells cross-reference for every
+      Fuls ID, or only for the IDs new in v2.8?  This
+      determines whether ingestion is a one-shot bulk
+      operation or a per-sign reconciliation.
+\item \textbf{Allograph policy in the codebook.}\enspace
+      If a field-role-bearing Mahadevan sign maps to two
+      Fuls IDs (canonical~+ variant), should the codebook
+      duplicate the role, or carry the role on the canonical
+      and rely on \db{sign\_form} for variant resolution?
+      Probably the latter, but Alloy needs a check that the
+      decoder does not silently apply the role to both
+      under a typed-join path.
+\item \textbf{Re-test the 16 Z3 assertions.}\enspace
+      With \db{fuls\_ids} added and (hypothetically) populated
+      from Vol.~2, do all 16 assertions still come back UNSAT
+      at scope~6?  If any flip to SAT, the schema change is
+      not safe and the column needs constraints.
+\item \textbf{Inscription transcriptions.}\enspace
+      Fuls's plus-delimited notation
+      (\inscr{+a-b-c-+}) differs from the dash-only notation
+      used in \db{cisi\_inscription.signs}.  An ingest of
+      Vol.~1 (the inscription side, separate from Vol.~2's
+      catalogue side) would need a small parser; this is
+      trivial but should be specified before code lands.
+\item \textbf{ECIT iconography.}\enspace
+      Worth a follow-up note (separate \texttt{.tex.ref}) on
+      whether the 888-artefact iconographic corpus contributes
+      to the \db{morphological\_parallel} table or stays
+      orthogonal to it.
+\end{enumerate}
+
+% =============================================================================
+\section{Summary}
+\label{sec:summary}
+% =============================================================================
+
+The preview pages of Fuls~2022 establish that the live ICIT
+sign inventory has expanded from Wells~2015's 694 signs to
+709 signs (+15 net), with 7 of those 15 added between Fuls~2020
+and Fuls~2022.  None of the new IDs are currently represented
+in \db{indus\_corpus.db}, but the absence is structural
+(no Fuls source row, no \db{fuls\_ids} column) rather than
+substantive (the \db{sign\_concordance} table is empty for
+all sources).  A schema extension is proposed but not
+applied; the actual ingestion is gated on (a) acquiring
+Vol.~2 of the monograph, which carries the per-sign
+concordance, and (b) Alloy re-verification that the decode
+assertions hold under the wider relation.  The \texttt{Fuls2022}
+citation has been added to \texttt{citations.lua} and a single
+\texttt{\textbackslash smartcite\{Fuls2022\}} reference has
+been inserted in \texttt{ledger\_of\_meluhha.tex} adjacent to
+the existing \texttt{WellsFuls2006} citation.
+
+% =============================================================================
+%  REFERENCES
+% =============================================================================
+\bibliographystyle{plainnat}
+\begin{thebibliography}{99}
+
+\bibitem[Fuls(2022)]{Fuls2022}
+Fuls, A. (2022).
+\textit{Corpus of Indus Inscriptions: Volume~1 ---
+Inscriptions, Sign List, and Concordances}.
+de Gruyter, Berlin.  ISBN 978-3-11-073998-2.  571~pp.
+
+\bibitem[Wells \& Fuls(2006--2022)]{WellsFuls2006}
+Wells, B.K. and Fuls, A. (2006--2022).
+\textit{Interactive Corpus of Indus Texts (ICIT)}.
+Digital database.  4{,}660 artefacts, 5{,}644 texts,
+17{,}957 signs.
+\url{https://www.indus.epigraphica.de/}
+
+\bibitem[Wells(2015)]{Wells2015}
+Wells, B.K. (2015).
+ICIT sign list v2.4.  694 signs.
+Predecessor of the Fuls~v2.7 (2020) and Fuls~v2.8 (2022)
+revisions.
+
+\bibitem[Mahadevan(1977)]{Mahadevan1977}
+Mahadevan, I. (1977).
+\textit{The Indus Script: Texts, Concordance and Tables}.
+Archaeological Survey of India, New Delhi.
+
+\bibitem[Joshi \& Parpola(1987)]{JoshiParpola1987}
+Joshi, J.P. and Parpola, A., eds.\ (1987).
+\textit{Corpus of Indus Seals and Inscriptions, Vol.~1:
+Collections in India}.
+Suomalainen Tiedeakatemia, Helsinki.
+
+\bibitem[Parpola(1994)]{Parpola1994}
+Parpola, A. (1994).
+\textit{Deciphering the Indus Script}.
+Cambridge University Press, Cambridge.
+
+\bibitem[Venugopal(2026)]{LedgerOfMeluhha2026}
+Venugopal, R. (2026).
+\textit{The Ledger of Meluhha --- Indus Valley Script as
+Metrological Accounting Code}.
+Third Buyer Advisory.
+\href{https://thirdbuyeradvisory.org}{thirdbuyeradvisory.org}
+
+\end{thebibliography}
+
+\end{document}
