@@ -1,5 +1,8 @@
 #!/usr/bin/env -S dotnet fsi
 // SPDX-License-Identifier: BSD-2-Clause
+// Implements: Ledger of Meluhha §Pending Eighteen — CISI Vol. 1 OCR data path
+// Coding standard: spec/fsharp/reference/fsharp_coding_standard.tex
+//
 // OCR Joshi & Parpola 1987 'Corpus of Indus Seals and Inscriptions, Vol. 1:
 // Collections in India' (Helsinki, Suomalainen Tiedeakatemia, ASI MASI No. 86,
 // AASF Series B No. 239, 862-page scanned PDF, ~/Downloads/Corpus of Indus
@@ -25,12 +28,13 @@
 // Defaults: first-page=1, last-page=last-page-of-PDF.
 
 #r "nuget: Microsoft.Data.Sqlite, 8.0.13"
+#load "lib/shell/Shell.fsx"
 
 open System
 open System.IO
-open System.Diagnostics
 open System.Text.RegularExpressions
 open Microsoft.Data.Sqlite
+open Shell
 
 // === ARG PARSING =============================================================
 
@@ -94,17 +98,10 @@ let sourceRow =
 let workDir = Path.Combine(Path.GetTempPath(), "cisi_ocr_work")
 Directory.CreateDirectory workDir |> ignore
 
-let runProc (exe: string) (args: string seq) =
-    let psi = ProcessStartInfo(exe)
-    for a in args do psi.ArgumentList.Add a
-    psi.RedirectStandardOutput <- true
-    psi.RedirectStandardError <- true
-    psi.UseShellExecute <- false
-    let p = Process.Start psi
-    let stdout = p.StandardOutput.ReadToEnd()
-    let stderr = p.StandardError.ReadToEnd()
-    p.WaitForExit()
-    p.ExitCode, stdout, stderr
+// Process spawning goes through Shell.runAsync (lib/shell/Shell.fsx).
+// Local wrapper drops the script edge to a synchronous call site.
+let runProc (exe: string) (args: string list) =
+    Shell.runAsync exe args |> Async.RunSynchronously
 
 // Determine last page if not given.
 let lastPage =

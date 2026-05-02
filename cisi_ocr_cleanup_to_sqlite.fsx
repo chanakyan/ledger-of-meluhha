@@ -1,5 +1,8 @@
 #!/usr/bin/env -S dotnet fsi
 // SPDX-License-Identifier: BSD-2-Clause
+// Implements: Ledger of Meluhha §The data path — CISI OCR phantom-row cleanup
+// Coding standard: spec/fsharp/reference/fsharp_coding_standard.tex
+//
 // Post-process the raw cisi_page / cisi_artefact rows produced by
 // cisi_ocr_to_sqlite.fsx. Two passes:
 //   1. Normalize site OCR typos (MOHENIJO-DARO → MOHENJO-DARO, HARAPPAS →

@@ -1,5 +1,8 @@
 #!/usr/bin/env -S dotnet fsi
 // SPDX-License-Identifier: BSD-2-Clause
+// Implements: Ledger of Meluhha §The Database — Fuls 2022 metadata scaffold
+// Coding standard: spec/fsharp/reference/fsharp_coding_standard.tex
+//
 // Ingest Fuls 2022 'Corpus of Indus Inscriptions' (Mathematica Epigraphica No. 3,
 // ISBN 978-1-671-80486-9) metadata into indus_corpus.db.
 //
@@ -54,80 +57,82 @@ let sourceRow =
 
 // === DATA: 73 sites with book-page anchors (parsed from ToC pp. iv-vi) =======
 
-let sites : (int * string * int) list = [
-    (1,  "Alamgirpur",          28)
-    (2,  "Allahdino",            28)
-    (3,  "Altyn Depe",           29)
-    (4,  "Amri",                 29)
-    (5,  "Bakkar Buthi",         30)
-    (6,  "Bala-kot",             30)
-    (7,  "Banawali",             31)
-    (8,  "Baror",                33)
-    (9,  "Bhirrana",             33)
-    (10, "Chandigarh",           34)
-    (11, "Chanhujo-daro",        34)
-    (12, "Daimabad",             41)
-    (13, "Derawar Ther",         41)
-    (14, "Desalpur",             41)
-    (15, "Dholavira",            42)
-    (16, "Failaka",              58)
-    (17, "Farmana",              59)
-    (18, "Ganweriwala",          59)
-    (19, "Gharo Bhiro",          60)
-    (20, "Girsu",                60)
-    (21, "Gola Dhoro (Bagasra)", 60)
-    (22, "Gonur Depe",           61)
-    (23, "Guddal A",             61)
-    (24, "Gumla",                61)
-    (25, "Hajar",                62)
-    (26, "Harappa",              62)
-    (27, "Hissam-dheri",        256)
-    (28, "Hulas",               257)
-    (29, "Janabiyah",           257)
-    (30, "Jhukar",              257)
-    (31, "Kalibangan",          258)
-    (32, "Kanmer",              273)
-    (33, "Karanpura",           274)
-    (34, "Karzakan",            274)
-    (35, "Khirsara",            274)
-    (36, "Kish",                275)
-    (37, "Kot-Diji",            275)
-    (38, "Lakhanjo-daro",       276)
-    (39, "Lohumjo-daro",        278)
-    (40, "Lothal",              278)
-    (41, "Luristan",            293)
-    (42, "Miri Qalat",          293)
-    (43, "Mohenjo-daro",        294)
-    (44, "Naru-Waro-dharo",     436)
-    (45, "Nausharo",            436)
-    (46, "Nindowari-damb",      439)
-    (47, "Nippur",              440)
-    (48, "Nuhato",              440)
-    (49, "Pabumath",            441)
-    (50, "Pirak",               441)
-    (51, "Qala'at Al-Bahrain",  441)
-    (52, "Ra's Al-Junayz",      441)
-    (53, "Rahman-deri",         442)
-    (54, "Rajanpur",            442)
-    (55, "Rakhigarhi",          443)
-    (56, "Rappwala Ther",       443)
-    (57, "Rodji",               444)
-    (58, "Rupar",               444)
-    (59, "Saar",                445)
-    (60, "Salut",               445)
-    (61, "Shikarpur",           445)
-    (62, "Shortughai",          446)
-    (63, "Sibri",               446)
-    (64, "Surkotada",           446)
-    (65, "Susa",                447)
-    (66, "Tarkhanewala-dera",   447)
-    (67, "Tell Umma",           448)
-    (68, "Tello",               448)
-    (69, "Tepe Yahya",          448)
-    (70, "Tigrana",             449)
-    (71, "Unknown",             449)
-    (72, "Ur",                  451)
-    (73, "Wattoowala",          451) ]
+type FulsSite = { Number: int; Name: string; BookPage: int }
+
+let sites : FulsSite list = [
+    { Number=1;  Name="Alamgirpur";          BookPage=28 }
+    { Number=2;  Name="Allahdino";           BookPage=28 }
+    { Number=3;  Name="Altyn Depe";          BookPage=29 }
+    { Number=4;  Name="Amri";                BookPage=29 }
+    { Number=5;  Name="Bakkar Buthi";        BookPage=30 }
+    { Number=6;  Name="Bala-kot";            BookPage=30 }
+    { Number=7;  Name="Banawali";            BookPage=31 }
+    { Number=8;  Name="Baror";               BookPage=33 }
+    { Number=9;  Name="Bhirrana";            BookPage=33 }
+    { Number=10; Name="Chandigarh";          BookPage=34 }
+    { Number=11; Name="Chanhujo-daro";       BookPage=34 }
+    { Number=12; Name="Daimabad";            BookPage=41 }
+    { Number=13; Name="Derawar Ther";        BookPage=41 }
+    { Number=14; Name="Desalpur";            BookPage=41 }
+    { Number=15; Name="Dholavira";           BookPage=42 }
+    { Number=16; Name="Failaka";             BookPage=58 }
+    { Number=17; Name="Farmana";             BookPage=59 }
+    { Number=18; Name="Ganweriwala";         BookPage=59 }
+    { Number=19; Name="Gharo Bhiro";         BookPage=60 }
+    { Number=20; Name="Girsu";               BookPage=60 }
+    { Number=21; Name="Gola Dhoro (Bagasra)"; BookPage=60 }
+    { Number=22; Name="Gonur Depe";          BookPage=61 }
+    { Number=23; Name="Guddal A";            BookPage=61 }
+    { Number=24; Name="Gumla";               BookPage=61 }
+    { Number=25; Name="Hajar";               BookPage=62 }
+    { Number=26; Name="Harappa";             BookPage=62 }
+    { Number=27; Name="Hissam-dheri";        BookPage=256 }
+    { Number=28; Name="Hulas";               BookPage=257 }
+    { Number=29; Name="Janabiyah";           BookPage=257 }
+    { Number=30; Name="Jhukar";              BookPage=257 }
+    { Number=31; Name="Kalibangan";          BookPage=258 }
+    { Number=32; Name="Kanmer";              BookPage=273 }
+    { Number=33; Name="Karanpura";           BookPage=274 }
+    { Number=34; Name="Karzakan";            BookPage=274 }
+    { Number=35; Name="Khirsara";            BookPage=274 }
+    { Number=36; Name="Kish";                BookPage=275 }
+    { Number=37; Name="Kot-Diji";            BookPage=275 }
+    { Number=38; Name="Lakhanjo-daro";       BookPage=276 }
+    { Number=39; Name="Lohumjo-daro";        BookPage=278 }
+    { Number=40; Name="Lothal";              BookPage=278 }
+    { Number=41; Name="Luristan";            BookPage=293 }
+    { Number=42; Name="Miri Qalat";          BookPage=293 }
+    { Number=43; Name="Mohenjo-daro";        BookPage=294 }
+    { Number=44; Name="Naru-Waro-dharo";     BookPage=436 }
+    { Number=45; Name="Nausharo";            BookPage=436 }
+    { Number=46; Name="Nindowari-damb";      BookPage=439 }
+    { Number=47; Name="Nippur";              BookPage=440 }
+    { Number=48; Name="Nuhato";              BookPage=440 }
+    { Number=49; Name="Pabumath";            BookPage=441 }
+    { Number=50; Name="Pirak";               BookPage=441 }
+    { Number=51; Name="Qala'at Al-Bahrain";  BookPage=441 }
+    { Number=52; Name="Ra's Al-Junayz";      BookPage=441 }
+    { Number=53; Name="Rahman-deri";         BookPage=442 }
+    { Number=54; Name="Rajanpur";            BookPage=442 }
+    { Number=55; Name="Rakhigarhi";          BookPage=443 }
+    { Number=56; Name="Rappwala Ther";       BookPage=443 }
+    { Number=57; Name="Rodji";               BookPage=444 }
+    { Number=58; Name="Rupar";               BookPage=444 }
+    { Number=59; Name="Saar";                BookPage=445 }
+    { Number=60; Name="Salut";               BookPage=445 }
+    { Number=61; Name="Shikarpur";           BookPage=445 }
+    { Number=62; Name="Shortughai";          BookPage=446 }
+    { Number=63; Name="Sibri";               BookPage=446 }
+    { Number=64; Name="Surkotada";           BookPage=446 }
+    { Number=65; Name="Susa";                BookPage=447 }
+    { Number=66; Name="Tarkhanewala-dera";   BookPage=447 }
+    { Number=67; Name="Tell Umma";           BookPage=448 }
+    { Number=68; Name="Tello";               BookPage=448 }
+    { Number=69; Name="Tepe Yahya";          BookPage=448 }
+    { Number=70; Name="Tigrana";             BookPage=449 }
+    { Number=71; Name="Unknown";             BookPage=449 }
+    { Number=72; Name="Ur";                  BookPage=451 }
+    { Number=73; Name="Wattoowala";          BookPage=451 } ]
 
 // Sites outside the Indus core that Fuls includes (Mesopotamia / Iran / Gulf /
 // Central Asia / Bahrain). Region inferred from archaeological context.
@@ -158,49 +163,51 @@ let regionOf name =
 
 // === DATA: artefact typology (Fuls 2022, §1.1) ================================
 
-let artefactTypes : (string * string option * string) list = [
+type ArtefactType = { Code: string; ParentCode: string option; Label: string }
+
+let artefactTypes : ArtefactType list = [
     // Top-level types
-    "TAB",     None,           "Miniature tablets"
-    "POT",     None,           "Pot sherds or ceramic vessels"
-    "SEAL",    None,           "Intaglio carved seals"
-    "TAG",     None,           "Clay objects with seal impressions (sealings)"
-    "BNGL",    None,           "Bangles"
-    "ROD",     None,           "Cylindrical artefacts"
-    "IMPL",    None,           "Implements or tools"
-    "BEAD",    None,           "Beads"
-    "MDLN",    None,           "Medallions"
-    "MISC",    None,           "Other (not in the categories above)"
+    { Code="TAB";     ParentCode=None;          Label="Miniature tablets" }
+    { Code="POT";     ParentCode=None;          Label="Pot sherds or ceramic vessels" }
+    { Code="SEAL";    ParentCode=None;          Label="Intaglio carved seals" }
+    { Code="TAG";     ParentCode=None;          Label="Clay objects with seal impressions (sealings)" }
+    { Code="BNGL";    ParentCode=None;          Label="Bangles" }
+    { Code="ROD";     ParentCode=None;          Label="Cylindrical artefacts" }
+    { Code="IMPL";    ParentCode=None;          Label="Implements or tools" }
+    { Code="BEAD";    ParentCode=None;          Label="Beads" }
+    { Code="MDLN";    ParentCode=None;          Label="Medallions" }
+    { Code="MISC";    ParentCode=None;          Label="Other (not in the categories above)" }
 
     // TAB subtypes
-    "TAB:B",   Some "TAB",     "Bas-relief tablets"
-    "TAB:I",   Some "TAB",     "Incised tablets"
-    "TAB:C",   Some "TAB",     "Copper tablets"
+    { Code="TAB:B";   ParentCode=Some "TAB";    Label="Bas-relief tablets" }
+    { Code="TAB:I";   ParentCode=Some "TAB";    Label="Incised tablets" }
+    { Code="TAB:C";   ParentCode=Some "TAB";    Label="Copper tablets" }
 
     // POT subtypes
-    "POT:T",   Some "POT",     "Pottery with text"
-    "POT:T:s", Some "POT:T",   "Pottery text — seal impression"
-    "POT:T:g", Some "POT:T",   "Pottery text — graffiti"
-    "POT:T:p", Some "POT:T",   "Pottery text — painting"
-    "POT:D",   Some "POT",     "Pottery with drawings"
-    "POT:M",   Some "POT",     "Pottery with potter's marks"
+    { Code="POT:T";   ParentCode=Some "POT";    Label="Pottery with text" }
+    { Code="POT:T:s"; ParentCode=Some "POT:T";  Label="Pottery text — seal impression" }
+    { Code="POT:T:g"; ParentCode=Some "POT:T";  Label="Pottery text — graffiti" }
+    { Code="POT:T:p"; ParentCode=Some "POT:T";  Label="Pottery text — painting" }
+    { Code="POT:D";   ParentCode=Some "POT";    Label="Pottery with drawings" }
+    { Code="POT:M";   ParentCode=Some "POT";    Label="Pottery with potter's marks" }
 
     // SEAL subtypes
-    "SEAL:S",  Some "SEAL",    "Square seals"
-    "SEAL:R",  Some "SEAL",    "Rectangular seals"
-    "SEAL:C",  Some "SEAL",    "Circular seals"
-    "SEAL:O",  Some "SEAL",    "Oval seals"
-    "SEAL:CY", Some "SEAL",    "Cylindrical seals"
-    "SEAL:L",  Some "SEAL",    "Lenticular seals"
-    "SEAL:Ot", Some "SEAL",    "Other seal shapes"
+    { Code="SEAL:S";  ParentCode=Some "SEAL";   Label="Square seals" }
+    { Code="SEAL:R";  ParentCode=Some "SEAL";   Label="Rectangular seals" }
+    { Code="SEAL:C";  ParentCode=Some "SEAL";   Label="Circular seals" }
+    { Code="SEAL:O";  ParentCode=Some "SEAL";   Label="Oval seals" }
+    { Code="SEAL:CY"; ParentCode=Some "SEAL";   Label="Cylindrical seals" }
+    { Code="SEAL:L";  ParentCode=Some "SEAL";   Label="Lenticular seals" }
+    { Code="SEAL:Ot"; ParentCode=Some "SEAL";   Label="Other seal shapes" }
 
     // TAG subtypes
-    "TAG:P",   Some "TAG",     "Palm sealing"
-    "TAG:C",   Some "TAG",     "Cube sealing"
-    "TAG:R",   Some "TAG",     "Pot rim sealing"
-    "TAG:L",   Some "TAG",     "Sealing on textile or reed"
-    "TAG:W",   Some "TAG",     "Sealing on wooden strip or pole"
-    "TAG:B",   Some "TAG",     "Sealing on box"
-    "TAG:Ot",  Some "TAG",     "Other sealing types" ]
+    { Code="TAG:P";   ParentCode=Some "TAG";    Label="Palm sealing" }
+    { Code="TAG:C";   ParentCode=Some "TAG";    Label="Cube sealing" }
+    { Code="TAG:R";   ParentCode=Some "TAG";    Label="Pot rim sealing" }
+    { Code="TAG:L";   ParentCode=Some "TAG";    Label="Sealing on textile or reed" }
+    { Code="TAG:W";   ParentCode=Some "TAG";    Label="Sealing on wooden strip or pole" }
+    { Code="TAG:B";   ParentCode=Some "TAG";    Label="Sealing on box" }
+    { Code="TAG:Ot";  ParentCode=Some "TAG";    Label="Other sealing types" } ]
 
 // === DATA: corpus headline statistics (Tables 1.1, 2.5; §2.1) ================
 
@@ -216,16 +223,22 @@ let corpusStat =
 
 // === DATA: reading direction statistics (Table 2.5) ==========================
 
-let readingDirections : (string * int * int * int * int) list = [
-    // (direction, n_texts, n_lines, n_sign_occurrences, n_legible_signs)
-    "right_to_left",        4235, 4328, 17030, 15737
-    "left_to_right",         215,  216,   661,   617
-    "top_to_bottom",          16,   18,    51,    45
-    "boustrophedon",          10,   15,    74,    72
-    "single_sign_text_line", 376,  377,   385,   376
-    "symmetrical_sign_seq",    8,    8,    18,    18
-    "unknown_or_doubtful",   784,  807,  1612,  1092
-    "TOTAL",                5644, 5769, 19831, 17957 ]
+type ReadingDirStat = {
+    Direction:    string
+    Texts:        int
+    Lines:        int
+    SignOcc:      int
+    LegibleSigns: int }
+
+let readingDirections : ReadingDirStat list = [
+    { Direction="right_to_left";        Texts=4235; Lines=4328; SignOcc=17030; LegibleSigns=15737 }
+    { Direction="left_to_right";        Texts=215;  Lines=216;  SignOcc=661;   LegibleSigns=617 }
+    { Direction="top_to_bottom";        Texts=16;   Lines=18;   SignOcc=51;    LegibleSigns=45 }
+    { Direction="boustrophedon";        Texts=10;   Lines=15;   SignOcc=74;    LegibleSigns=72 }
+    { Direction="single_sign_text_line"; Texts=376; Lines=377;  SignOcc=385;   LegibleSigns=376 }
+    { Direction="symmetrical_sign_seq"; Texts=8;    Lines=8;    SignOcc=18;    LegibleSigns=18 }
+    { Direction="unknown_or_doubtful";  Texts=784;  Lines=807;  SignOcc=1612;  LegibleSigns=1092 }
+    { Direction="TOTAL";                Texts=5644; Lines=5769; SignOcc=19831; LegibleSigns=17957 } ]
 
 // === SCHEMA: additive — only CREATE IF NOT EXISTS ============================
 
@@ -301,16 +314,16 @@ try
 
     // 3. Sites + book-page anchors
     let mutable nSites = 0
-    for (n, name, page) in sites do
+    for s in sites do
         let siteId =
             "FULS_" +
-            (name.ToUpper()
-                  .Replace(" ", "_")
-                  .Replace("-", "_")
-                  .Replace("'", "")
-                  .Replace("(", "")
-                  .Replace(")", ""))
-        let region = regionOf name
+            (s.Name.ToUpper()
+                   .Replace(" ", "_")
+                   .Replace("-", "_")
+                   .Replace("'", "")
+                   .Replace("(", "")
+                   .Replace(")", ""))
+        let region = regionOf s.Name
 
         let cmdSite = conn.CreateCommand()
         cmdSite.Transaction <- txn
@@ -319,7 +332,7 @@ try
             "VALUES ($id, $name, $src, $region, NULL) " +
             "ON CONFLICT(id) DO UPDATE SET name=excluded.name, source_code=excluded.source_code, region=excluded.region"
         cmdSite.Parameters.AddWithValue("$id",     siteId)        |> ignore
-        cmdSite.Parameters.AddWithValue("$name",   name)          |> ignore
+        cmdSite.Parameters.AddWithValue("$name",   s.Name)        |> ignore
         cmdSite.Parameters.AddWithValue("$src",    sourceCode)    |> ignore
         cmdSite.Parameters.AddWithValue("$region", region)        |> ignore
         cmdSite.ExecuteNonQuery() |> ignore
@@ -330,26 +343,26 @@ try
             "INSERT INTO site_book_anchor (source_code, site_id, page) " +
             "VALUES ($src, $sid, $page) " +
             "ON CONFLICT(source_code, site_id) DO UPDATE SET page=excluded.page"
-        cmdAnchor.Parameters.AddWithValue("$src",  sourceCode) |> ignore
-        cmdAnchor.Parameters.AddWithValue("$sid",  siteId)     |> ignore
-        cmdAnchor.Parameters.AddWithValue("$page", page)       |> ignore
+        cmdAnchor.Parameters.AddWithValue("$src",  sourceCode)  |> ignore
+        cmdAnchor.Parameters.AddWithValue("$sid",  siteId)      |> ignore
+        cmdAnchor.Parameters.AddWithValue("$page", s.BookPage)  |> ignore
         cmdAnchor.ExecuteNonQuery() |> ignore
 
         nSites <- nSites + 1
 
     // 4. Artefact typology
     let mutable nTypes = 0
-    for (code, parent, label) in artefactTypes do
+    for t in artefactTypes do
         let cmd = conn.CreateCommand()
         cmd.Transaction <- txn
         cmd.CommandText <-
             "INSERT INTO artefact_type (source_code, code, parent_code, label) " +
             "VALUES ($src, $code, $parent, $label) " +
             "ON CONFLICT(source_code, code) DO UPDATE SET parent_code=excluded.parent_code, label=excluded.label"
-        cmd.Parameters.AddWithValue("$src",    sourceCode)                                      |> ignore
-        cmd.Parameters.AddWithValue("$code",   code)                                            |> ignore
-        cmd.Parameters.AddWithValue("$parent", parent |> Option.map box |> Option.defaultValue (DBNull.Value :> obj)) |> ignore
-        cmd.Parameters.AddWithValue("$label",  label)                                           |> ignore
+        cmd.Parameters.AddWithValue("$src",    sourceCode)                                              |> ignore
+        cmd.Parameters.AddWithValue("$code",   t.Code)                                                  |> ignore
+        cmd.Parameters.AddWithValue("$parent", t.ParentCode |> Option.map box |> Option.defaultValue (DBNull.Value :> obj)) |> ignore
+        cmd.Parameters.AddWithValue("$label",  t.Label)                                                 |> ignore
         cmd.ExecuteNonQuery() |> ignore
         nTypes <- nTypes + 1
 
@@ -377,7 +390,7 @@ try
 
     // 6. Reading direction stats
     let mutable nDirs = 0
-    for (dir, t, l, so, ls) in readingDirections do
+    for r in readingDirections do
         let cmd = conn.CreateCommand()
         cmd.Transaction <- txn
         cmd.CommandText <-
@@ -386,12 +399,12 @@ try
             "ON CONFLICT(source_code, direction) DO UPDATE SET " +
             "n_texts=excluded.n_texts, n_lines=excluded.n_lines, " +
             "n_sign_occurrences=excluded.n_sign_occurrences, n_legible_signs=excluded.n_legible_signs"
-        cmd.Parameters.AddWithValue("$src", sourceCode) |> ignore
-        cmd.Parameters.AddWithValue("$dir", dir)        |> ignore
-        cmd.Parameters.AddWithValue("$t",   t)          |> ignore
-        cmd.Parameters.AddWithValue("$l",   l)          |> ignore
-        cmd.Parameters.AddWithValue("$so",  so)         |> ignore
-        cmd.Parameters.AddWithValue("$ls",  ls)         |> ignore
+        cmd.Parameters.AddWithValue("$src", sourceCode)     |> ignore
+        cmd.Parameters.AddWithValue("$dir", r.Direction)    |> ignore
+        cmd.Parameters.AddWithValue("$t",   r.Texts)        |> ignore
+        cmd.Parameters.AddWithValue("$l",   r.Lines)        |> ignore
+        cmd.Parameters.AddWithValue("$so",  r.SignOcc)      |> ignore
+        cmd.Parameters.AddWithValue("$ls",  r.LegibleSigns) |> ignore
         cmd.ExecuteNonQuery() |> ignore
         nDirs <- nDirs + 1
 
