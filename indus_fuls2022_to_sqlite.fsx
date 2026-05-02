@@ -20,8 +20,8 @@
 // once we have either OCR'd glyphs or a public Wells-2015 sign list export.
 //
 // Usage:
-//   dotnet fsi indus_ingest_fuls2022.fsx <output-db>
-//   dotnet fsi indus_ingest_fuls2022.fsx indus_corpus.db
+//   dotnet fsi indus_fuls2022_to_sqlite.fsx <output-db>
+//   dotnet fsi indus_fuls2022_to_sqlite.fsx indus_corpus.db
 
 #r "nuget: Microsoft.Data.Sqlite, 8.0.13"
 
@@ -35,7 +35,7 @@ let dbPath =
     match args with
     | [| db |] -> db
     | _ ->
-        eprintfn "Usage: dotnet fsi indus_ingest_fuls2022.fsx <output-db>"
+        eprintfn "Usage: dotnet fsi indus_fuls2022_to_sqlite.fsx <output-db>"
         exit 1
 
 if not (File.Exists dbPath) then
