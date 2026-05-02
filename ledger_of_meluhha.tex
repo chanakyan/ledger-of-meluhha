@@ -279,9 +279,11 @@ local rows = {
   {"$\\times 500$", "\\SI{685}{\\gram}",   "",                  "Decimal",        "Sesame oil jar class"},
   {"$\\times 1000$","\\SI{1370}{\\gram}",  "\\SI{1.37}{\\kilo\\gram}", "Decimal", "Bulk grain"},
 }
+local n = 0
+for _ in ipairs(rows) do n = n + 1 end
 for i, r in ipairs(rows) do
   tex.print(r[1] .. " & " .. r[2] .. " & " .. r[3] .. " & " .. r[4] .. " & " .. r[5] .. " \\\\")
-  if i < #rows then tex.print("\\midrule") end
+  if i < n then tex.print("\\midrule") end
 end
 }
 \end{longtable}
@@ -642,8 +644,26 @@ RS2025 & Rajan--Sivanantham 42 base signs & \num{42} signs \\
 TAMIL\_TB & Tamil Treebank logo-syllabic & \num{1929} signs, \num{600} inscriptions \\
 \midrule
 CISI\_MAYIG & Joshi \& Parpola corpus,\smartcite{JoshiParpola1987} mayig
-  digitisation\smartcite{MayigCISI} (forked, ingested directly from JSON)
+  digitisation\smartcite{MayigCISI} (Mohenjo-daro subset, forked, ingested
+  directly from JSON)
      & \num{396} signs, \num{179} inscriptions, \num{1003} occurrences \\
+\midrule
+CISI\_JP1987 & Joshi \& Parpola Vol.~1, Collections in
+  India,\smartcite{JoshiParpola1987} 862-page scanned PDF, ingested via
+  Tesseract OCR of page headers and per-photo captions (Phase~1: artefact
+  metadata; sign-sequence transcription remains a separate phase since
+  Indus glyphs are photographs of stone, not OCR-extractable typeset)
+     & \num{1399} unique artefacts across 6 sites (M/H/L/K/C/B), 322
+       content pages \\
+\midrule
+FULS2022 & Fuls~2022 \textit{Corpus of Indus
+  Inscriptions},\smartcite{Fuls2022} ICIT~v2.8 (May~2022). Metadata
+  scaffold ingested from the 35-page published PDF (chapters~1--2 +
+  bibliography); the 570-page Chapter~3 site sections and four indices
+  promised in the table of contents are not in any PDF Fuls distributes
+     & 73~sites, 709~signs (canonical), 4660~artefacts / 5644~texts /
+       19831 sign~occurrences (17957 legible) recorded as
+       headline counts \\
 \end{longtable}
 
 \noindent
@@ -702,8 +722,8 @@ signs, 7{,}037 bigram transitions):
 
 \subsection{Decoded seals}
 
-Of the 20 morphological parallels, the open CISI corpus covers
-Mohenjo-daro M-1 through M-199.
+Of the 20 morphological parallels, the open mayig CISI digitisation
+covers Mohenjo-daro M-1 through M-184 (179 inscriptions).
 Two parallels reference seals in this range and decode from real,
 non-circular data.
 
@@ -1077,6 +1097,68 @@ Rojdi & Rj-325A & Kodumanal & cross/saltire \\
 Rojdi & Rj-347A & Teriruveli & angular \\
 \end{longtable}
 
+\subsection{Status as of CISI Vol.~1 OCR (2026-05-02)}
+
+The 862-page Joshi--Parpola Vol.~1 PDF was OCR'd on 2026-05-02
+into \texttt{cisi\_artefact} and \texttt{cisi\_page} tables of the
+corpus database. Of the 18~pending parallels, 9~are confirmed
+present in Vol.~1 (artefact metadata located; sign-sequence
+transcription pending):
+
+\begin{longtable}{@{}lll@{}}
+\caption{Pending parallels — status against CISI~Vol.~1 OCR
+2026-05-02.}
+\label{tab:pending-status}\\
+\toprule
+Site & Seal & Status \\
+\midrule
+\endfirsthead
+\bottomrule
+\endlastfoot
+Mohenjo-daro & M-264 & confirmed in Vol.~1 \\
+\midrule
+Mohenjo-daro & M-272 & confirmed in Vol.~1 \\
+\midrule
+Mohenjo-daro & M-321 & confirmed in Vol.~1 \\
+\midrule
+Mohenjo-daro & M-615 & confirmed in Vol.~1 \\
+\midrule
+Mohenjo-daro & M-751 & not in Vol.~1 OCR \\
+\midrule
+Harappa & H-6   & confirmed in Vol.~1 \\
+\midrule
+Harappa & H-9   & confirmed in Vol.~1 \\
+\midrule
+Harappa & H-71  & confirmed in Vol.~1 \\
+\midrule
+Harappa & H-93  & confirmed in Vol.~1 \\
+\midrule
+Harappa & H-174 & confirmed in Vol.~1 \\
+\midrule
+Harappa & H-1482 & beyond Vol.~1 range (Vol.~2/3 candidate) \\
+\midrule
+Harappa & H-1487 & beyond Vol.~1 range (Vol.~2/3 candidate) \\
+\midrule
+Harappa & H-1488 & beyond Vol.~1 range (Vol.~2/3 candidate) \\
+\midrule
+Kalibangan & K-180 & not in Vol.~1 OCR \\
+\midrule
+Kalibangan & K-292 & not in Vol.~1 OCR \\
+\midrule
+Rojdi & Rj-129 & Vol.~3 (Parpola~2010, post-1987 excavations) \\
+\midrule
+Rojdi & Rj-325 & Vol.~3 (Parpola~2010, post-1987 excavations) \\
+\midrule
+Rojdi & Rj-347 & Vol.~3 (Parpola~2010, post-1987 excavations) \\
+\end{longtable}
+
+\noindent
+Net: 9~of~18 located, 9~remain pending. The author has formally
+requested ICIT subscription access to obtain the sign sequences
+for the located 9; that request is pending as of 2026-05-02.
+The Vol.~2/3 entries require either Vol.~2 (Shah~\&~Parpola~1991)
+or Vol.~3 (Parpola~et~al.~2010) ingest, neither yet attempted.
+
 \subsection{Additional Mohenjo-daro parallels}
 
 Five Mohenjo-daro parallels (M-264A, M-272A, M-321A, M-615A,
@@ -1087,23 +1169,55 @@ Harappa/Kalibangan/Rojdi seals.
 
 \subsection{The data path}
 
-The Fuls \textit{Corpus of Indus Inscriptions}\smartcite{Fuls2022}
-contains Wells-numbered sign sequences for all 13~pending seals
-(Harappa: p.~62--255; Kalibangan: p.~258--272; Rojdi: p.~444).
-Both volumes --- Vol.~1 (3{,}898 artefacts from 73~sites) and
-\textit{A Catalog of Indus Signs} (Vol.~2, 709-sign Wells~v2.8
-inventory) --- were purchased by the author.
-The Wells-to-Parpola concordance is already in the database
-(\texttt{wells\_graphemes} field, 396~entries).
-The full corpus is also available on the Internet Archive.
+The Fuls~2022 \textit{Corpus of Indus
+Inscriptions}\smartcite{Fuls2022} table of contents promises
+Wells-numbered sign sequences for all~73 sites
+(Harappa: book~p.~62--255; Kalibangan:
+book~p.~258--272; etc.). The published PDF, however, contains
+only chapters~1--2 + bibliography (35~pages of typeset content);
+the 570-page Chapter~3 site sections and four cross-reference
+indices (ICIT, CISI, excavation, M77 numbers) are not in any
+PDF the author distributes. The data referenced in those promised
+indices lives only in the ICIT online database
+(\texttt{caddy.igg.tu-berlin.de})\smartcite{WellsFuls2006},
+which Fuls states is reachable by paid subscription
+(25~EUR/month). The author of this paper has purchased the book
+twice and has formally requested ICIT subscription access; that
+request is pending as of 2026-05-02. Independent verification on
+2026-05-02 found the database server unreachable
+(100\% packet loss on \texttt{ping}, HTTP timeout on
+\texttt{http} and \texttt{https}; DNS resolves but the host is
+not responding).
 
-The ICIT online database is no longer freely available (Fuls,
-personal communication, April~2026).\smartcite{WellsFuls2006}
-Temporal server access is available at 25~EUR/month.
+The fallback data path actually in hand is the Joshi--Parpola~1987
+\textit{Corpus of Indus Seals and Inscriptions Vol.~1: Collections
+in India}\smartcite{JoshiParpola1987} --- the photographic
+corpus that Fuls~2022 \S1.1 cites as the source for ICIT entries.
+Vol.~1 covers 1537~Indus seals and inscriptions physically held in
+Indian museums (per its own introduction). The 862-page scanned
+PDF was OCR'd on 2026-05-02 (\texttt{cisi\_ocr\_to\_sqlite.fsx}),
+producing \num{1399} unique artefact identifiers (91\% recall vs
+the documented 1537), with 322~content pages indexed by site,
+range, and per-photo caption. Of the 18~pending parallels:
+9~are now confirmed present in CISI Vol.~1 (4~Mohenjo-daro,
+5~Harappa); 9~remain pending --- 3~Harappa entries beyond Vol.~1's
+range (H-1482/1487/1488), 2~Kalibangan, 3~Rojdi (the Rojdi
+excavations postdate Vol.~1; their CISI entries appear in
+Parpola~et~al.~2010 Vol.~3), and 1~Mohenjo-daro
+(M-751).
 
-All sign-sequence data extracted from these sources will be
-deposited in the Zenodo artifact as a reproducible SQLite
-database update.
+OCR extracts only typeset metadata (page headers, artefact
+identifiers like \texttt{M-134~A}). The Indus sign sequences
+themselves are photographs of stone, not OCR-extractable typeset.
+Sign-sequence transcription for the 9~now-located parallels is a
+separate phase. The Wells-to-Parpola concordance already in the
+database (\texttt{wells\_graphemes} field, 396~entries) is the
+bridge once any sign sequence is transcribed.
+
+All updates to the corpus database and any sign-sequence
+transcriptions will be deposited in the Zenodo artifact as
+reproducible \texttt{*\_to\_sqlite.fsx} scripts plus the resulting
+SQLite database.
 
 %%% ===================================================================
 \section{The Statistics}
