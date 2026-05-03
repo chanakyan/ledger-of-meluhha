@@ -34,3 +34,9 @@ indus_corpus/
 
 # Large archives — backed up to GDrive, not tracked in git
 data/indus-valley-archive.tar.gz
+
+# Source papers — third-party content, not tracked in git
+# Ambedkar 1936 Annihilation of Caste is PD in India (life+60, 2017)
+# but US URAA / EU life+70 are gray areas. Local-only; re-fetchable
+# from the URLs noted in matching memory.db article rows.
+data/source-papers/Ambedkar*
