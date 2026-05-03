@@ -3280,4 +3280,378 @@ to decode today.
 We have been trying to read 4{,}000-year-old shipping labels as
 poetry --- and wondering why we could not find the rhyme.
 
+%%% ===================================================================
+\clearpage
+\section{For Journalists}\label{sec:press}
+
+This appendix is for newsroom use. It explains what this book
+actually claims, what it does not claim, who wrote it, and how to
+verify any single quantitative statement in less than ten minutes
+using only a downloaded SQLite file and a free tool. It is offered
+to obviate the otherwise inevitable round of misquotation that
+attaches to anything mentioning the words ``Indus'' and
+``decipherment'' in the same headline.
+
+\subsection{Who wrote this, and why}
+
+This book was written by Rajeshkumar Venugopal, an independent
+engineer (Third Buyer Advisory, \texttt{thirdbuyeradvisory.org},
+ORCID \texttt{0009-0002-1838-5976}). I am not an academic. I do
+not hold a position at any university. I have no PhD in
+linguistics, no degree in archaeology, and no professional
+training in epigraphy. My day-job background is embedded C++ and
+audio platform software --- voice-assistant integration, low-level
+audio routing, that sort of thing. My most recent
+operating-system work was a microkernel re-implementation in
+modern C++26 (\texttt{qnx-micro}) and a Raspberry~Pi~4 bare-metal
+DSP project (\texttt{rp4}). The ratio of my working hours spent
+in audio code to the working hours spent on Indus epigraphy is
+greater than 99 to 1. This book is the 1.
+
+I mention this because the field of Indus studies has been
+exhausting itself for ninety years inside a small set of accredited
+institutions. Asko Parpola at Helsinki, Iravatham Mahadevan in
+Chennai (now deceased), Bryan Wells at Calgary and later
+Harvard, Andreas Fuls at the Technical University of Berlin ---
+the entire active editorial chain of the canonical corpora has
+fewer than a dozen names. The 100-year stalemate is not a
+coincidence. It is what happens when the data lives behind paid
+subscriptions, the indices live in books that promise data they
+do not deliver, and the only people allowed in the room are people
+who stand to lose their position by saying anything publishable
+that the room does not already think.
+
+I bought Andreas Fuls's \textit{Corpus of Indus Inscriptions}
+twice. I requested formal access to the ICIT online database. I
+verified that the database server (\texttt{caddy.igg.tu-berlin.de})
+is unreachable as of \today (DNS resolves; the host does not
+respond; ICMP returns 100\% packet loss; HTTP and HTTPS time out).
+The institutional response is that paid subscription is available
+at 25 EUR per month. I have submitted that subscription request.
+It is pending.
+
+In the meantime I OCR'd the only freely-accessible source on
+Fuls's personal Technical-University-of-Berlin staff page (the
+21-page documentation PDF for the database that I cannot reach),
+ingested the proto-Dravidian numerical system from Bryan Wells's
+2015 monograph (which is born-digital and therefore parseable),
+and OCR'd the 862-page Joshi-Parpola 1987 photographic corpus
+volume, which is the data that Fuls 2022 cites as primary source
+and that the gated database is built on top of. Every datum in
+this book is now reproducible from the SQLite database
+(\texttt{indus\_corpus.db}) shipped in the Zenodo artifact, using
+the F\# scripts published alongside it. No login required. No
+paywall. No PhD.
+
+That is what this book is for.
+
+\subsection{What the book actually claims, in plain English}
+
+The Indus signs are shipping labels, not language. More precisely:
+the Indus script is a cargo-tag accounting system organised as a
+five-field record (merchant, commodity, weight, quantity, route),
+encoded with a small closed-vocabulary set of codebook signs plus
+a large open-vocabulary set of merchant identifiers. The system
+appears non-linguistic because it \emph{is} non-linguistic: it
+encodes commercial relationships between objects, not phonetic
+relationships between sounds. A barcode, on a shipping container,
+in 2200~\textsc{bce}.
+
+This is a \emph{weaker} claim than ``deciphered'' in the sense
+journalists usually mean it. We are not claiming we can read the
+seals as Tamil, Sanskrit, Sumerian, or any other language. We are
+claiming that the question ``what language are these in?'' is the
+wrong question to ask of a system whose function is to specify
+weight, quantity, commodity, and destination. A shipping label
+in any modern airport works regardless of what language the cargo
+handler speaks. So did these.
+
+The reading we propose is testable. Decode two seals (M-52A and
+M-148A) using the codebook and the concordance: ``Unicorn Guild /
+Jar Goods / 685~grams tier / 40~units / Mesopotamia.'' Compare to
+the cuneiform record from Ur, which lists Meluhhan jar imports
+with weights in the same range. Run the same chain across
+179~mass-decoded inscriptions: 65\% produce a coherent commodity
+reading, 21\% produce a coherent route reading, the South-route
+terminal sign appears zero times in the export hub
+(predicted ahead of time --- the export hub does not tag inbound
+shipments). The probability of all of this aligning by chance is
+$3.125 \times 10^{-5}$. One in thirty-two thousand.
+
+That is the claim.
+
+\subsection{What the book does NOT claim}
+
+This is the section most likely to be misquoted. Read it twice.
+
+\paragraph{The book does NOT claim the Indus script has been
+deciphered.} It claims a structural reading: a record format
+identification with field assignments. The phonetic content of
+individual signs is not asserted. If a journalist's headline says
+``Indus script deciphered'' I will issue a public correction.
+
+\paragraph{The book does NOT claim the Indus people spoke
+proto-Dravidian.} It engages with the proto-Dravidian numeral
+system because Wells (2015) reproduces it as a candidate source
+for sign polyvalence; the engagement is methodological, not a
+language-identity claim. If a journalist's headline says ``Indus
+script proven Dravidian'' the correction will be even more
+public.
+
+\paragraph{The book does NOT claim Andreas Fuls, Bryan Wells, or
+Asko Parpola are wrong about the data.} Their corpora and
+analyses are the foundation of every chapter. The disagreement
+is interpretive (cargo-tag vs.\ logo-syllabic) and scoped (100\%
+economic vs.\ 40\% economic per Fuls's own assessment). The
+disagreement about \emph{database access} --- the gated nature of
+the canonical ICIT --- is separate from the disagreement about
+\emph{interpretation}. Both are real; do not conflate them.
+
+\paragraph{The book does NOT claim the Indus people did not have
+language.} They obviously did. The claim is that they did not feel
+the need to encode their language in writing, because their
+writing was for inventory, not for speech. Spoken language in
+the Indus Valley would have been Proto-Dravidian, Proto-Munda,
+some unattested third option, or more likely several of these
+mixed across regions. None of these languages would have been
+encoded in the seals. The seals had a different job.
+
+\paragraph{The book does NOT claim a single Bronze Age
+civilisation was uniquely advanced.} Sumerian proto-cuneuiform
+from Uruk c.\ 3400~\textsc{bce} are also accounting tablets; the
+phonetic layer came later. The Indus pattern is not ``the Indus
+was first'' --- it is ``the Indus, like several other early
+literacies, started with mathematics and never made the
+transition to speech encoding because the trade-network use case
+did not need it.''
+
+\subsection{How to verify any quantitative claim in this book in
+under ten minutes}
+
+\begin{enumerate}
+\item Download the Zenodo artifact (DOI in the front matter). It
+  contains \texttt{indus\_corpus.db}, the F\# scripts that produce
+  every claim, the LaTeX source, and the rendered PDF.
+\item Install one tool: SQLite. (Most operating systems ship with
+  it. Mac: built in. Linux: \texttt{apt install sqlite3} or
+  equivalent. Windows: download the precompiled binary from
+  \texttt{sqlite.org}.)
+\item Open the database:
+  \texttt{sqlite3 indus\_corpus.db}.
+\item Pick any quantitative claim in this book that has a number
+  attached and a \texttt{source\_code} attribution. For example:
+  the proto-Dravidian numeral table in §The Dravidian question
+  attributes its data to \texttt{source\_code = 'WELLS2015'}.
+  Run:
+\begin{verbatim}
+  SELECT * FROM dravidian_numeral
+  WHERE source_code = 'WELLS2015'
+  ORDER BY number;
+\end{verbatim}
+\item Compare the SQLite output to the table in the book. If they
+  agree, the claim is verified to whatever degree the source
+  itself can be trusted. If they disagree, file a bug report
+  against the ingest script
+  (\texttt{wells2015\_tables\_to\_sqlite.fsx}) at the GitHub
+  repository \texttt{github.com/chanakyan/ledger-of-meluhha}.
+\end{enumerate}
+
+This procedure works for every numeric claim in this book. The
+sign-role assignments, the corpus statistics, the bibliography,
+the volumetric units, the sign-pair frequencies, the OCR'd CISI
+artefact list --- all live in named tables with named source
+attributions. There is no proprietary processing. There is no
+``trust me, this is what I found.''
+
+\subsection{What to ask the field}
+
+If the editorial team wants to call the canonical sources for
+comment, here are the questions worth asking:
+
+\paragraph{To Andreas Fuls (Technical University of Berlin):}
+The database server \texttt{caddy.igg.tu-berlin.de}, to which the
+\texttt{user.tu-berlin.de/fuls/Homepage/indus/} page directs
+prospective users with the link ``Enter the database of Indus
+script'', has been unreachable on \today\ from at least one
+European-routed network. ICMP echo returns 100\% packet loss; HTTP
+and HTTPS connection attempts time out. The published 2022
+methodology volume (\textit{Corpus of Indus Inscriptions},
+ISBN~978-1-671-80486-9) lists 73 sites in its table of contents
+across approximately 570 pages of Chapter~3 site sections that are
+not present in the published PDF. Will the database be restored?
+Will the chapter contents be released as a separate publication or
+data deposit independent of the ICIT subscription?
+
+\paragraph{To Bryan Wells:}
+The 21-code sign-function vocabulary used in this book combines
+the 16 codes documented in the Fuls 2019 ICIT help PDF with five
+additional positional categories from your 2015 \textit{Archaeology
+and Epigraphy} (INS, ICTM, EMS, MMS, LMS). Is there a published
+sign-by-sign assignment of these categories across the full 709-sign
+inventory anywhere outside the ICIT database? If so, where?
+
+\paragraph{To the Mahadevan estate / Roja Muthiah Research Library:}
+Iravatham Mahadevan's 1977 IDF80 corpus has been described as
+publicly available via a web application since 2021. The URL of
+that web application has not been public-facing in our search.
+What is the canonical citation URL?
+
+\paragraph{To university libraries holding Joshi-Parpola 1987:}
+The 1{,}537 inscribed artefacts catalogued in Volume~1
+(``Collections in India'') are physically held in named Indian
+museums. Has any museum digitised its holdings independently?
+Are high-resolution photographs of any specific seal available for
+academic use without subscription?
+
+These are not gotcha questions. They are the questions a careful
+journalist would ask before writing the inevitable
+``establishment vs.\ outsider'' narrative. The establishment is
+not a monolith and the data-access story is more nuanced than the
+narrative suggests.
+
+\subsection{Falsification criteria, summarised}
+
+Five testable predictions the cargo-tag model makes (full
+treatment in §The Falsification):
+
+\begin{enumerate}[nosep]
+\item \textbf{No long-text grammar.} A long inscription
+  ($n > 20$~signs) found with grammatical repetition patterns
+  characteristic of natural language falsifies the model.
+\item \textbf{No site-uncorrelated frequencies.} If high-frequency
+  signs occur in fixed ratios across sites with no correlation to
+  commodity categories, the model fails.
+\item \textbf{No bilingual overhead.} If a bilingual inscription
+  maps Indus sign sequences to phonetic readings of a known
+  language without metrological content, the model fails.
+\item \textbf{No export-bias absence.} If seal sign distributions
+  at Mesopotamian findspots are identical to the full Harappan
+  corpus (no export-specific bias), the model fails.
+\item \textbf{No M063 absence.} If the South route terminal
+  (Mahadevan~063) appears at Mohenjo-daro at rates comparable to
+  other terminal signs, the model fails.
+\end{enumerate}
+
+None of these have been observed. All are achievable with existing
+archaeological evidence. The hypothesis is honestly falsifiable;
+its survival rests on tested-and-not-rejected status, not on
+unfalsifiability.
+
+\subsection{Quote-able paragraphs}
+
+The following short paragraphs may be quoted verbatim with
+attribution to ``Rajeshkumar Venugopal, \textit{The Ledger of
+Meluhha} (2026)''. They are designed to be lift-able into newsroom
+copy without loss of nuance.
+
+\paragraph{On what the script is.}
+``The Indus signs are shipping labels, not language. They encode
+who shipped what cargo, in what weight, in what quantity, to what
+destination. They do not encode speech, because the people writing
+them did not need to encode speech --- their writing was for
+inventory. The dock clerk did not have to read a language; he had
+to match five fields against the contents of the boat.''
+
+\paragraph{On the 100-year stalemate.}
+``The field has been stuck for ninety years between two camps,
+one insisting the script must be a language we have not
+identified, the other insisting it cannot be writing at all
+because no language fits. Both are right about what they observed
+and both are wrong about what they assumed. The signs can be
+structured, non-random, and non-phonetic simultaneously.''
+
+\paragraph{On gatekeeping.}
+``I bought the canonical reference book twice. The published
+volume promises 570~pages of inscription data in its table of
+contents that the published volume does not actually contain. The
+data lives in an online database whose server is unreachable. The
+subscription that would restore access is 25~euros per month. The
+request I submitted is pending. In the meantime I OCR'd what is
+freely available, ingested it into a SQLite file, and put the
+SQLite file on the internet. Anyone can download it. Anyone can
+verify the claims. The point of an open database is that it does
+not require you to be sitting in the right room to use it.''
+
+\paragraph{On the broader implication.}
+``Mathematics is older than language. Not in the trivial sense
+that animals can count, but in the structural sense: the first
+formal systems that human civilisations committed to durable media
+were numerical, not phonetic. Weight ratios, field schemas,
+commodity codes, trade routes. The Indus seals are the oldest
+surviving evidence of this priority --- a civilisation that
+encoded its commercial life in mathematics and never saw the need
+to encode it in speech.''
+
+\subsection{Bibliography pointers for follow-up}
+
+Fourteen primary references are catalogued in
+\texttt{indus\_corpus.db.bibliography\_reference}. The four most
+useful for a journalist who wants to read the disagreement
+firsthand:
+
+\begin{itemize}[nosep]
+\item Wells, Bryan K.\ (2015) \textit{The Archaeology and
+  Epigraphy of Indus Writing}. Archaeopress, Oxford. The most
+  recent comprehensive monograph from the establishment.
+  Born-digital PDF, accessible via Archaeopress.
+\item Fuls, Andreas (2022) \textit{Corpus of Indus Inscriptions}
+  (Mathematica Epigraphica No.~3). The methodology volume
+  paired with the gated ICIT online database.
+\item Farmer, Sproat, Witzel (2004) \textit{The Collapse of the
+  Indus-Script Thesis}. Electronic Journal of Vedic Studies.
+  The strongest published case for ``the script is not writing
+  at all'' --- the position the cargo-tag model partly accepts
+  (the statistics) and partly rejects (the function).
+\item Joshi, Jagat Pati and Asko Parpola (1987) \textit{Corpus
+  of Indus Seals and Inscriptions, Vol.~1: Collections in
+  India}. Helsinki: Suomalainen Tiedeakatemia. The canonical
+  photographic corpus; 862 pages of seal photographs.
+\end{itemize}
+
+\subsection{Contact and license}
+
+\paragraph{Contact.} Rajeshkumar Venugopal,
+\texttt{vrajeshkumar@gmail.com}, ORCID
+\texttt{0009-0002-1838-5976}, Third Buyer Advisory
+(\texttt{thirdbuyeradvisory.org}). Press inquiries welcome via
+email.
+
+\paragraph{Code and data.} GitHub:
+\texttt{github.com/chanakyan/ledger-of-meluhha}. The repository
+contains the LaTeX source, the SQLite databases, the F\# ingest
+and analysis scripts, the Alloy specifications, the interactive
+HTML dashboard, and the rendered PDF of this book.
+
+\paragraph{License.} BSD-2-Clause for human use, including
+academic citation, journalistic quotation, classroom use,
+critique, parody, and derivative works of all kinds. No
+permission is required for any human use; attribution is
+appreciated but not legally required.
+
+\paragraph{AI use.} AI ingestion, training, fine-tuning,
+retrieval-augmented generation, inference, and any other
+machine-learning application of the contents of this book and
+its associated code/data are explicitly prohibited under contract
+law. The repository carries an \texttt{ai.txt} file documenting
+the prohibition. This is not negotiable. Newsrooms that use AI
+tools to summarise or paraphrase this book are putting themselves
+into legal exposure that the human use does not.
+
+\paragraph{Why the AI carve-out.} Because the data this book
+recovers from gatekept sources should not be re-ingested into the
+training corpora of commercial AI systems whose access controls
+are even more opaque than the original sources. The point of the
+exercise was to make the data freely available to humans. AI
+systems are not humans.
+
+\subsection{Final note to the editorial team}
+
+If your headline writer cannot resist the words ``deciphered''
+or ``Dravidian'' or ``oldest'', the courteous thing is to call
+me before publication. I will not write your headline for you.
+I will tell you in two minutes whether the headline you have
+drafted is supported by the book. Most are not. Some are.
+Knowing the difference is the difference between a story and
+a correction.
+
 \end{document}
