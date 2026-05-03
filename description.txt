@@ -12,11 +12,11 @@ The Indus decode pipeline produces its result through five independent data path
 
 Interactive dashboard: ledger-of-meluhha.html (single file, drop indus_corpus.db to render trade network, decode seals live, filter routes by commodity).
 
-Peer review requested.
+Independent research. No peer review process is sought. Verification protocol is in §For Journalists of the book: any quantitative claim is reproducible from the SQLite database in under ten minutes using one tool (sqlite3) and no credentials.
 
 Keywords: Indus Valley, Harappan script, metrological accounting, Bronze Age trade, Meluhha, CISI, Alloy, SQLite, F#, SqlHydra, cargo tag, Tamil Nadu, Rajan-Sivanantham, formal verification
 
-License: CC BY 4.0
+License: BSD-2-Clause for human use; AI ingestion / training / fine-tuning / RAG / inference prohibited under contract law.
 
 Upload files:
 1. ledger_of_meluhha.pdf (21 pages)
