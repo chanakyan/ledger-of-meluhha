@@ -1,7 +1,10 @@
-# Generated databases — rebuild with cmake --build build
-indus_codebook.db
-indus_corpus.db
-indus_lssc.db
+# Databases — committed deliberately. They ARE the artifact.
+# Rebuilding from scratch is documented in §Reproducing Every Claim
+# (eleven *_to_sqlite.fsx scripts), but the .db file is the data
+# that the §For Journalists 10-minute verification protocol points
+# at. Shipping it in git eliminates the Zenodo round-trip and the
+# subscription-gated alternative both. See commit message for the
+# Fuls-asymmetry argument that motivates the choice.
 
 # LaTeX build artifacts
 *.aux
