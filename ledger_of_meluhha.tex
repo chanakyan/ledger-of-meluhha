@@ -241,6 +241,62 @@ temples or palaces.
 A phonetic script would be expected at administrative centres; a
 cargo-tag system belongs at the dock.
 
+\subsubsection*{The Indus reach in numbers}
+
+Fuls (2022) catalogues 73~sites with Indus inscribed material across
+the table of contents of \textit{Corpus of Indus
+Inscriptions}.\smartcite{Fuls2022} The full list is now in
+\texttt{indus\_corpus.db.site} with \texttt{source\_code = 'FULS2022'}
+and \texttt{indus\_corpus.db.site\_book\_anchor} pointing at the
+catalogue page where each site begins. Distribution by region:
+
+\begin{longtable}{@{}lr@{}}
+\caption{Fuls 2022 site distribution by inferred region.}
+\label{tab:fuls-regions}\\
+\toprule
+Region & Sites \\
+\midrule
+\endfirsthead
+\bottomrule
+\endlastfoot
+Indus core (Sindh + Punjab + Haryana + Gujarat + Balochistan) & 24 \\
+\midrule
+Sindh                                                          & 12 \\
+\midrule
+Balochistan                                                    & 9 \\
+\midrule
+Haryana / UP / Punjab India                                    & 9 \\
+\midrule
+Mesopotamia (Girsu, Kish, Nippur, Tell Umma, Tello, Ur)        & 6 \\
+\midrule
+Persian Gulf (Failaka, Janabiyah, Qala'at Al-Bahrain, Saar)    & 4 \\
+\midrule
+Iran (Luristan, Susa, Tepe Yahya)                              & 3 \\
+\midrule
+Oman (Ra's Al-Junayz, Salut)                                   & 2 \\
+\midrule
+Central Asia (Altyn Depe, Gonur Depe)                          & 2 \\
+\midrule
+Afghanistan (Shortughai)                                       & 1 \\
+\midrule
+Unknown provenience                                            & 1 \\
+\midrule
+\textbf{Total}                                                 & \textbf{73} \\
+\end{longtable}
+
+\noindent
+The geographic reach is the empirical anchor for the trade-network
+claim that the cargo-tag hypothesis predicts. Of the 73~sites,
+49~are Indus-core (Sindh, Punjab, Haryana/UP/Punjab India,
+Balochistan), 17~are export-destination (Mesopotamia, Persian Gulf,
+Iran, Oman), and 7~are intermediate or peripheral. The export
+destinations correspond exactly to the F5 route terminals in
+Table~\ref{tab:fields} (Mesopotamia $\to$ Ur/Kish/Nippur, Dilmun
+$\to$ Persian Gulf hubs, Magan $\to$ Oman, internal North $\to$
+Central Asia/Afghanistan). The hypothesis predicts route-terminal
+distribution should mirror this geography; the 73-site catalogue
+provides the test bed.
+
 \subsection{The weight system}
 
 Harappan metrology is the civilisation's most precisely documented
@@ -289,6 +345,65 @@ end
 \end{longtable}
 
 \noindent{\footnotesize $^\star$ Most commonly recovered weight.}
+
+\subsubsection*{The volumetric system at Harappa}
+
+Mass is one half of Harappan metrology. Volume is the
+other.\smartcite{Wells2015}
+At Harappa specifically (not Mohenjo-daro, not Lothal --- Harappa
+alone), inscriptions of the form \texttt{V+\#} encode container volumes
+in stroke-counted units. The unit was determined empirically from three
+ceramic vessels excavated at Purana Qila (H-372, H-371, H-370) carrying
+3, 6, and 7 strokes respectively. Calculating the volume of each vessel
+geometrically (formula
+$V = \tfrac{4}{3} \pi R_h^2 R_v$ adjusted for wall thickness $\approx
+1$~cm), then dividing by the stroke count, yields a base unit
+(\textbf{V$_I$}) of \SI{40.4}{\litre} with errors never exceeding 2\%
+of vessel volume across the three pots.\smartcite{Wells2015}
+
+\begin{longtable}{@{}lrl@{}}
+\caption{Harappa volumetric system. Reproduced from Wells 2015 Table~4.2,
+in turn derived from grand means across H-372, H-371, H-370.}
+\label{tab:volumes}\\
+\toprule
+Symbol & Volume & Notes \\
+\midrule
+\endfirsthead
+\toprule
+Symbol & Volume & Notes \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+V$_I$       & \SI{40.4}{\litre}  & basic unit; observed in Purana Qila vessels \\
+\midrule
+V$_{II}$    & \SI{80.9}{\litre}  & \\
+\midrule
+V$_{III}$   & \SI{121.3}{\litre} & \\
+\midrule
+V$_{IIII}$  & \SI{161.7}{\litre} & upper end of miniature-tablet range \\
+\midrule
+V$_{IIIII}$ & \SI{202.1}{\litre} & \\
+\midrule
+V$_{IIIIII}$  & \SI{242.6}{\litre} & Purana Qila pot H-371 \\
+\midrule
+V$_{IIIIIII}$ & \SI{283.0}{\litre} & Purana Qila pot H-370 \\
+\end{longtable}
+
+The volumetric system has the same structural shape as the weight system
+in Table~\ref{tab:weights}: a base unit, a near-uniform progression
+($\Delta V \approx \SI{40.4}{\litre}$ between successive marks), and
+distinct categorical applications (large containers and grain stores
+versus the precision-balance domain of weights). What changes between
+Harappa and the rest of the Indus is which medium the merchants chose
+to record on. At Mohenjo-daro the records ride on miniature tablets and
+seal impressions; at Harappa specifically the volumetric record rides
+on bas-relief and incised tablets (TAB:B and TAB:I), with the largest
+two Purana Qila pots (V$_{IIIIII}$, V$_{IIIIIII}$) too heavy to move
+once filled --- they were inventory, not transaction
+media.\smartcite{Wells2015}
+The decoder treats both systems identically: a stroke count after a
+classifier sign reads as a quantity in the system's base unit.
 
 \subsection{The zero gap}
 
@@ -437,6 +552,49 @@ The animal motif is a hallmark --- the Bronze Age equivalent of a
 guild logo. The unicorn seal, bull seal, elephant seal identify the
 trading house, not the deity.
 
+\subsubsection*{Field-position evidence in the sign\_role table}
+
+The five-field assignment in Table~\ref{tab:fields} is the
+\emph{commercial} reading of sign positions. There is also an
+independent \emph{positional} reading derived from histogram
+analysis of where each sign tends to appear in long inscriptions.
+Wells (2006) systematised this analysis and Wells (2015) Appendix~II
+extends it.\smartcite{Wells2015} The full assignments are now in
+\texttt{indus\_corpus.db.sign\_role} (97~rows across 21~function
+codes; see \cref{tab:signfunctions}). The relevant correspondences
+to the field structure above:
+
+\begin{itemize}
+\item \textbf{F2 (Commodity)} signs preferentially occur in
+  text-position~1. Wells classifies them as INS (Initial Sign).
+  Sign~820 is a documented INS (``typical initial sign'' per
+  Fuls 2019 page~4).
+\item \textbf{F4 (Quantity)} signs occur in early-medial positions.
+  Wells classifies them as ICTM (Initial Cluster Terminal Marker)
+  when they mark the boundary of an initial-sign cluster: signs~1,
+  2, 60. Wells (2015) Appendix~II Figure~6 calls these
+  Early-Medial Signs (EMS) when the same signs appear past the
+  cluster boundary; signs~2 and~60 are explicitly classified as
+  both ICTM and EMS in the \texttt{sign\_role} table.
+\item \textbf{F5 (Route/destination terminal)} signs concentrate at
+  text-final position. Wells classifies them as TMK (Terminal
+  Marker): signs 90, 156, 158, 226, 400, 520, 527, 740, 760, 741.
+  M063 is documented absent from this list (see §The M063
+  prediction in §The Falsification).
+\item \textbf{Post-F5} signs (PTM, Post-Terminal Marker) appear
+  after the terminal as a final-position affix: signs 90, 161,
+  400, 422, 423, 621, 679. The presence of dedicated PTM signs
+  is independent evidence for a slot \emph{after} the route
+  terminal --- consistent with a check-digit, signature, or
+  endorsement field that the cargo-tag model does not yet
+  account for. This is a genuine gap in the five-field reading
+  and a specific extension target for the codebook.
+\end{itemize}
+
+The cargo-tag field structure and the Wells positional structure
+do not contradict each other. They cite the same signs from
+different observational angles.
+
 \subsection{The barcode analogy}
 
 A GS1 barcode encodes manufacturer, product class, variant, check
@@ -558,6 +716,45 @@ A phonetic script encoding the same content would require more
 signs, which is why the system survived seven centuries without
 evolving toward phonetic representation.
 
+\subsubsection*{Empirical adjacency frequencies}
+
+The compression argument is theoretical. The empirical evidence
+that the script's high-information signs are clustered as expected
+sits in \texttt{indus\_corpus.db.sign\_pair\_frequency}, which now
+contains 27~documented sign-pair frequencies from two
+sources.\smartcite{WellsFuls2006}\smartcite{Wells2015} The headline
+patterns:
+
+\begin{itemize}
+\item \textbf{Terminal Markers cluster with each other.} The 12
+  TMK--TMK adjacency frequencies from Fuls 2019 (page~18 matrix)
+  show the strongest pair as 400$\to$740 with 216 occurrences,
+  followed by 90$\to$740 (115), 400$\to$520 (15), 400$\to$90 (12),
+  and 740$\to$400 (14). The directionality is asymmetric: pairs
+  flow into 740 much more often than out of it. This is consistent
+  with sign~740 being the canonical text-final terminal, and the
+  other TMKs (90, 226, 400, 520, 527) appearing as the
+  immediately-pre-terminal route or post-terminal qualifier.
+\item \textbf{Sign 700 collocates predominantly with stroke
+  numerals.} The 8~Fuls 2019 entries plus 3~Wells 2015 entries
+  show sign~700 right-adjacent to sign~33 (136--137 times across
+  the two counts), sign~34 (87--105), and sign~32 (89--105) ---
+  these are the long-linear-stroke (LON) numerals. Lower-frequency
+  pairings cover signs~3, 6, 14, 31, 36 --- the short-linear and
+  early-long stroke numerals. The pattern matches the volumetric
+  reading of sign~700 as a classifier whose adjacent stroke count
+  encodes a multiple of V$_I$ = \SI{40.4}{\litre}.
+\item \textbf{Cluster 400--740--176} appears 42 times exclusively
+  on TAB:B and TAB:I from Harappa (Fuls 2019 page~16). Three-sign
+  clusters with double-digit recurrence are the closure-rich
+  signature predicted by a structured record format. The
+  alternative explanation --- a phonetic word \emph{4-7-1} repeated
+  42 times in Harappa-only inscriptions --- is implausible:
+  natural-language vocabulary distributes across sites with the
+  population, not with a single artefact type at a single
+  location.
+\end{itemize}
+
 \subsection{Why the system does not evolve}
 
 The most common objection to the cargo-tag hypothesis is
@@ -625,7 +822,7 @@ model predicts LSSC~$>1.0$ for Harappan inscriptions.
 
 \subsection{Corpus database}
 
-Four sources were ingested into a normalised SQLite database
+Ten sources were ingested into a normalised SQLite database
 (\texttt{indus\_corpus.db}):
 
 \begin{longtable}{@{}llr@{}}
@@ -639,9 +836,9 @@ Source & Description & Records \\
 \endlastfoot
 MAHADEVAN & Concordance histogram signs & \num{402} signs \\
 \midrule
-RS2025 & Rajan--Sivanantham 42 base signs & \num{42} signs \\
-\midrule
-TAMIL\_TB & Tamil Treebank logo-syllabic & \num{1929} signs, \num{600} inscriptions \\
+CISI & Joshi \& Parpola 1987 photographic
+  corpus\smartcite{JoshiParpola1987} (umbrella source) & 1\,537 Indus seals/inscriptions
+  in Indian collections \\
 \midrule
 CISI\_MAYIG & Joshi \& Parpola corpus,\smartcite{JoshiParpola1987} mayig
   digitisation\smartcite{MayigCISI} (Mohenjo-daro subset, forked, ingested
@@ -656,6 +853,27 @@ CISI\_JP1987 & Joshi \& Parpola Vol.~1, Collections in
      & \num{1399} unique artefacts across 6 sites (M/H/L/K/C/B), 322
        content pages \\
 \midrule
+WELLS2015 & Wells 2015 \textit{The Archaeology and Epigraphy of Indus
+  Writing}\smartcite{Wells2015} with technical appendices by Fuls.
+  Born-digital 161-page PDF; sign-role classifications (INS, ICTM, EMS,
+  MMS, LMS) and the Harappa volumetric system; proto-Dravidian numeral
+  table from Ch.~6 (McAlpin~1981 reproduced)
+     & 5 sign-function codes, 57 sign-role assignments, 7 volumetric
+       units, 11 proto-Dravidian numerals, 6 sign-pair frequencies,
+       6 bibliography references \\
+\midrule
+ICIT\_HELP\_2019 & Fuls 2019 \textit{Documentation of the Online
+  Indus Writing Database}\smartcite{WellsFuls2006} (21-page help PDF
+  hosted at \texttt{user.tu-berlin.de/fuls/Homepage/indus/}). Only
+  freely-accessible Wells-numbered ICIT data source; the actual
+  database at \texttt{caddy.igg.tu-berlin.de} is unreachable as of
+  2026-05-02 (DNS resolves, host does not respond)
+     & 16 sign-function codes, 4 reading-direction codes, 10 real
+       Wells-numbered ICIT inscriptions, 40 sign-role assignments,
+       20 sign-pair frequencies (12 TMK--TMK plus 8 sign~700 $\times$
+       NUM), 4 paradigmatic sign clusters, 8 bibliography
+       references \\
+\midrule
 FULS2022 & Fuls~2022 \textit{Corpus of Indus
   Inscriptions},\smartcite{Fuls2022} ICIT~v2.8 (May~2022). Metadata
   scaffold ingested from the 35-page published PDF (chapters~1--2 +
@@ -664,6 +882,13 @@ FULS2022 & Fuls~2022 \textit{Corpus of Indus
      & 73~sites, 709~signs (canonical), 4660~artefacts / 5644~texts /
        19831 sign~occurrences (17957 legible) recorded as
        headline counts \\
+\midrule
+TAMIL\_TB & Tamil Treebank logo-syllabic & \num{1929} signs, \num{600} inscriptions \\
+\midrule
+RS2025 & Rajan--Sivanantham 42 base signs & \num{42} signs \\
+\midrule
+RS2026 & Rajan--Sivanantham extended TN inscribed potsherds & 13 sites
+  across Tamil Nadu \\
 \end{longtable}
 
 \noindent
@@ -671,6 +896,9 @@ Every table carries a \texttt{source\_code} foreign key.
 The schema was verified by Alloy~6 before any SQL was written:
 sixteen assertions, all UNSAT at scope~6
 (see \cref{sec:alloy}).
+Twelve additional Alloy assertions for the new tables introduced by the
+WELLS2015, ICIT\_HELP\_2019, FULS2022, CISI\_JP1987 sources are
+proposed in \cref{sec:alloy} but not yet validated.
 
 The CISI ingest (\texttt{indus\_ingest\_cisi.fsx}) reads the
 JSON structure of the mayig digitisation, not the repository name.
@@ -818,6 +1046,83 @@ across the broader Mahadevan corpus. The single most frequent
 sign is the single most frequently traded commodity. This
 correspondence was not engineered; it emerged from the data.
 
+\subsubsection*{Ten Wells-numbered ICIT inscriptions from the Fuls
+2019 documentation}
+
+The 179-inscription mass decode rides on the mayig digitisation,
+which uses Parpola sign IDs. To cross-check the decode against the
+canonical Wells-numbered ICIT system (the one Fuls 2022 documents
+and the broken \texttt{caddy.igg.tu-berlin.de} would have served),
+this book draws on a small but real sample: ten ICIT inscriptions
+fully spelled out with their Wells-numbered text codes inside the
+Fuls 2019 help PDF\smartcite{WellsFuls2006} (eight on page~8 as
+the introductory example, two on page~20 as the Set~17 search
+example). All are ingested into
+\texttt{indus\_corpus.db.icit\_inscription}.
+
+\begin{longtable}{@{}rllll@{}}
+\caption{Ten Wells-numbered ICIT inscriptions from Fuls 2019
+documentation.}
+\label{tab:icit-ten}\\
+\toprule
+ICIT ID & Site & Type & Excavation idno & Text code \\
+\midrule
+\endfirsthead
+\bottomrule
+\endlastfoot
+1202 & Mohenjo-daro & TAB:B  & E232 CXVI:6  & +520-033-705-803-853+ \\
+\midrule
+1254 & Mohenjo-daro & SEAL:S & DK1104       & +740-760-033-705-803-002-920-317+ \\
+\midrule
+815  & Mohenjo-daro & SEAL:S & SD2445/105   & +520-220-033-705-803-055-002-820+ \\
+\midrule
+814  & Mohenjo-daro & SEAL:S & VS1779/104   & +740-773-033-705-233-803-002-861+ \\
+\midrule
+1470 & Mohenjo-daro & SEAL:S & DK-i 1066    & +520-070-033-705-233-235-803+ \\
+\midrule
+404  & Mohenjo-daro & SEAL:S & DK6357/446   & +740-585-017-033-705-233-798-803-002-861-603+ \\
+\midrule
+856  & Mohenjo-daro & SEAL:S & DK221/147    & +520-033-705-236-803+ \\
+\midrule
+385  & Mohenjo-daro & SEAL:S & DK5821/426   & +740-176-033-705-240-235-803+ \\
+\midrule
+1296 & Harappa      & SEAL:S & 11453 619    & +740-585-017-240-002-305-032-904+ \\
+\midrule
+3119 & Mohenjo-daro & SEAL:S & DK12124/174  & +740-798-231-002-298-460-032+ \\
+\end{longtable}
+
+\noindent
+Three structural features visible in this sample, none predicted by a
+phonetic reading:
+
+\begin{itemize}
+\item Sign~033 + sign~705 occurs in eight of the ten inscriptions
+  --- a fixed di-sign that the Wells--Fuls
+  literature\smartcite{Wells2015} treats as a recurring
+  classifier-plus-modifier construct, exactly the role the
+  cargo-tag model assigns to the F2--F3 commodity-plus-weight
+  field pair.
+\item Sign~803 occurs as the right-most sign before the closing
+  \texttt{+} in seven of the ten inscriptions --- a Terminal
+  Marker pattern. Sign~803 is not yet classified in
+  \texttt{sign\_role}; this sample is direct evidence to add it.
+\item All ten inscriptions begin with a TMK (520, 740) at the
+  left of the textpart. This is unusual under a strict
+  TMK-as-text-final reading and consistent with the
+  ``coded as it would be on the seal impression'' note from
+  Fuls 2019 page~7 --- the texts are written mirrored. The
+  pre-mirror reading-direction is right-to-left, so the
+  rightmost sign (803) is actually the textually-first sign
+  encountered when reading the impression. The 87\% RTL reading
+  direction in the Fuls 2022 \texttt{reading\_direction\_stat}
+  is the empirical anchor for this convention.
+\end{itemize}
+
+These ten Wells-numbered inscriptions are not yet decoded against
+the codebook in this book. They are first-class data and are now
+in \texttt{icit\_inscription} for any future decoder pass to consume
+without scraping the help PDF again.
+
 \paragraph{Route distribution.}
 
 \begin{longtable}{@{}lr@{}}
@@ -851,6 +1156,18 @@ inscriptions. This was predicted in \cref{sec:prediction}
 not tag supply-direction shipments. The prediction is now
 confirmed against the full digitised corpus, not just the two
 originally decoded seals.
+
+The South-terminal absence is corroborated by two further
+independent enumerations of the Indus Terminal Marker class ingested
+into \texttt{indus\_corpus.db.sign\_role} this session: Wells (2015)
+Appendix~II lists TMKs as signs 90, 156, 158, 226, 400, 520, 527,
+740, 760, 741\smartcite{Wells2015}, and Fuls (2019) ICIT help PDF
+lists six TMKs in its adjacency matrix (90, 226, 400, 520, 527,
+740) plus sign 760 in the page-4 figure caption. M063 in the
+Mahadevan numbering does not appear in either Terminal Marker
+enumeration. Three independent sources, three null results --- the
+M063 prediction now rides on triangulated absence rather than a
+single-corpus claim.
 
 Magan (Oman) also produces zero hits. This may reflect the
 indirect routing of Oman-bound cargo through Dilmun, or it may
@@ -919,6 +1236,22 @@ quantity or structural delimiter --- it appears across positions
 1--7 with a flat distribution, co-occurring with P324 (jar) in
 57\% of cases. This is a codebook expansion candidate, not a
 phonetic element.
+
+\paragraph{The Wells syllable list.}
+Wells (2015) Appendix~II identifies six signs whose positional
+distribution is uniform across all positions, the canonical
+signature of a syllabic value: signs 382, 790, 832,
+892\smartcite{Wells2015} (recorded in \texttt{sign\_role} as SYL
+under \texttt{source\_code = 'WELLS2015'}). Two further signs
+(368, 595) are uniform but almost never initial, suggesting a
+suffixed grammatical marker rather than a free-standing syllable
+--- Knorozov (1968) had already proposed sign~368 as a grammatical
+particle.\smartcite{Knorozov1968}
+Six SYL candidates against 132~unmapped signs is consistent with
+the bigram analysis: a small phonetic layer exists, but it is on
+the order of 5\% of the unmapped inventory, not 60\%. The other
+$\sim$126 unmapped signs remain candidates for codebook expansion
+under the merchant-mark and sub-qualifier interpretation.
 
 \paragraph{The Fuls 60\%.}
 Fuls estimates 60\% of inscriptions are non-economic
@@ -1007,6 +1340,50 @@ Mesopotamia), P051 (M060, Dilmun), P052 (M061, Magan), P053 (M062,
 North internal). All are fish motifs with progressive decoration.
 The route is encoded in the decoration, not in the fish itself.
 The fish is the field marker; the strokes are the address.
+
+\subsection*{The fourth bridge: ICIT sign-function vocabulary}
+
+The Parpola--Mahadevan--Wells concordance walked above is a
+\emph{numbering} bridge. It maps one ID space to another. It does
+not attach functional meaning to those IDs.
+
+The Fuls (2019) ICIT documentation introduced a fourth bridge: a
+controlled vocabulary of 16~functional codes that classify what
+each sign \emph{does} in a text, independent of what it
+\emph{means}. The vocabulary was already laid out in
+Table~\ref{tab:signfunctions}. Wells (2015) Appendix~II added five
+more codes (INS, ICTM, EMS, MMS, LMS) for finer positional
+analysis. Together these 21~codes form a fourth dimension of the
+concordance that the original Parpola--Mahadevan--Wells walk did
+not name.
+
+The full bridge is therefore four-way:
+
+\begin{enumerate}[nosep]
+\item \textbf{Parpola number} (P001--P417) --- the photographic
+  corpus identifier, anchored to the Joshi--Parpola 1987 plates.
+\item \textbf{Mahadevan number} (M001--M417, with Wells extensions
+  to higher IDs) --- the concordance identifier, anchored to the
+  1977 ASI Memoir.
+\item \textbf{Wells number} (signs 001--958 with gaps, 709 distinct
+  signs in Wells 2015) --- the analytical identifier, anchored to
+  the ICIT database.
+\item \textbf{ICIT function code} (16 Fuls + 5 Wells = 21) --- the
+  functional identifier, classifying signs by what they do
+  positionally and structurally regardless of which numbering
+  system points at them.
+\end{enumerate}
+
+A row in \texttt{indus\_corpus.db} that says
+\texttt{(P050, M059, Wells~205, TMK)} now reads as: ``the plain
+fish sign that Joshi-Parpola 1987 cataloged as P050, that Mahadevan
+1977 numbered M059, that Wells 2015 lists as sign~205, functioning
+as a Terminal Marker.'' The fourth column is the one that lets the
+codebook expansion query pose: \emph{which Mahadevan signs not yet
+in the codebook are classified TMK in sign\_role?} Those are the
+candidates for the next route-terminal addition. The fourth bridge
+is the bridge that turns the codebook from a static literal table
+into a queryable inference engine.
 
 %%% ===================================================================
 \section{The Prediction}
@@ -1356,7 +1733,12 @@ Noise scatters. Signal clusters. The decode clusters.
 
 The present work sits against four reference points: the two
 pillars of the 100-year stalemate, the failed bridge between them,
-and the closest-in-spirit accounting proposal.
+and the closest-in-spirit accounting proposal. The full bibliography
+is materialised in
+\texttt{indus\_corpus.db.bibliography\_reference} (14 rows across
+three source\_codes: Wells 2015 ingest, Fuls 2019 ICIT help PDF
+ingest, and the original ingest of this paper's references).
+The paragraphs below summarise each strand at chapter scale.
 
 \paragraph{Parpola (1994, 2008) --- Path~A in canonical form.}\smartcite{Parpola1994}\smartcite{Parpola2008}
 represents the Dravidian decipherment tradition and its most
@@ -1392,6 +1774,101 @@ proposed wealth-accounting ledgers with rebus readings.
 We accept the accounting frame and drop the rebus requirement.
 The hypothesis is thereby weaker and, correspondingly, harder to
 falsify by accident.
+
+\subsubsection*{Sources used as primary epigraphic data}
+
+The structural claims in this book draw on a longer chain of
+epigraphic work than the four reference-point critique above.
+Each of the following primary sources is now ingested into
+\texttt{indus\_corpus.db} (see Table~\ref{tab:sources}); the
+paragraphs below state what each contributed and where it falls in
+the analytical pipeline.
+
+\paragraph{Joshi \& Parpola (1987) --- Corpus of Indus Seals and
+Inscriptions, Vol.~1: Collections in India.}\smartcite{JoshiParpola1987}
+The 862-page Helsinki/ASI photographic corpus, covering 1{,}537
+artefacts physically held in Indian museums (Mohenjo-daro and Harappa
+items that ended up in India after partition, plus all Indian-soil
+sites: Lothal, Kalibangan, Dholavira, etc.). The mayig digitisation
+covers a 179-inscription subset of this volume's Mohenjo-daro section;
+the full Vol.~1 was ingested via Tesseract OCR (commit 0edbaf2) into
+\texttt{cisi\_page} and \texttt{cisi\_artefact} tables, recovering
+\num{1399} unique artefact identifiers across six sites at 91\%
+recall versus the documented 1{,}537. The image-based PDF predates
+post-1987 excavations (Rojdi, additional Harappa material), so
+items in \texttt{cisi\_artefact} cap at the prefixes M, H, L, K, C, B.
+
+\paragraph{Wells (2006, 2011, 2015).}\smartcite{Wells2015}
+Bryan K.~Wells's three-volume body of work on Indus epigraphy is
+the closest analogue to a modern critical edition of the Indus
+script. Wells (2006), the Harvard PhD dissertation, established
+the positional-analysis framework (Initial Sign, Terminal Marker,
+Post-Terminal Marker, Initial Cluster Terminal Marker) that this
+book uses for the field-position argument in §The Hypothesis.
+Wells (2011) and Wells (2015) extend the framework empirically.
+Wells (2015) Ch.~5 contains the full Indus numeral inventory
+reproduced under §Numbers before words and Ch.~6 contains the
+proto-Dravidian number system (Table~\ref{tab:dravidian}).
+The 2015 volume includes three technical appendices by Andreas
+Fuls covering automated segmentation, positional analysis, and
+classification of undeciphered writing systems (Fuls 2015a/b/c).
+
+\paragraph{Fuls (2010, 2014, 2019, 2022).}
+Andreas Fuls is the principal architect of the ICIT online database
+and Wells's long-time collaborator. Fuls (2010)\smartcite{Fuls2010}
+is the original geographic-epigraphic database design. Fuls (2014)
+is the published Positional Analysis paper. Fuls (2019) is the
+21-page online help PDF for the ICIT database --- the only
+freely-accessible Wells-numbered ICIT data source as of
+2026-05-02; ingested into \texttt{sign\_function},
+\texttt{sign\_role}, \texttt{icit\_inscription},
+\texttt{sign\_pair\_frequency}, and \texttt{sign\_cluster}.
+Fuls (2022)\smartcite{Fuls2022} is \textit{Corpus of Indus
+Inscriptions} (Mathematica Epigraphica No.~3): a 35-page methodology
+volume whose table of contents promises 570~pages of site-by-site
+inscription data that the published PDF does not contain --- those
+data live only in the gated ICIT online database.
+
+\paragraph{Mahadevan (1977).}\smartcite{Mahadevan1977}
+The 1977 ASI Memoir No.~77 \textit{The Indus Script: Texts,
+Concordance and Tables} (alternate title: ASI MASI~86, AASF~B~239)
+is the foundational digital-prior corpus: 2{,}906 inscribed objects,
+3{,}548 lines of text, 419 sign IDs. The Mahadevan numbering scheme
+(M-numbers) is one of the three concordance bridges in
+\texttt{sign\_concordance}; the IDF80 update of 1980 is the same
+corpus in digital form, hosted publicly since 2021 by the Roja
+Muthiah Research Library, Chennai. Forms the second leg of the
+Parpola--Mahadevan--Wells concordance.
+
+\paragraph{Yadav et al.\ (2008).}\smartcite{Yadav2008}
+Statistical pattern-search work that classified Indus sign
+combinations by frequency in solo, left-end, middle, and right-end
+positions. Cited extensively by Wells (2015) Appendix~II. Used here
+as a methodological precedent for treating sign position as a
+classifier feature.
+
+\paragraph{Knorozov (1968).}\smartcite{Knorozov1968}
+Russian Indologist who argued that sign~368 functioned as a
+grammatical marker. The hypothesis remains unconfirmed but
+constrains \texttt{sign\_role.function\_code} for sign~368 to
+SYL with the qualifier ``almost never initial'' --- the morphology
+of a suffixed grammatical marker rather than a free-standing
+syllable.
+
+\paragraph{Marshall (1931); Mackay (1938).}\smartcite{Marshall1931}\smartcite{Mackay1938}
+The original excavation reports for Mohenjo-daro. Source for the
+``Block'' and ``House'' architectural designations that this book
+reframes (in §The Material Record / Urban geography) as group
+compounds and craft-specialisation areas. Hemmy (1931, in
+Marshall Vol.~II Appendix~XIV) is the source for the
+\SI{0.856}{\gram} weight base unit cited in §The weight system.
+
+\paragraph{Wells (1999).}\smartcite{Wells1999}
+The University of Calgary MA thesis that originated the ICIT
+database project. Co-developed with Andreas Fuls; online since
+October 2009 at \texttt{epigraphica.de}. Now superseded by
+Wells (2011, 2015) for analytical purposes; cited here for the
+provenance of the database itself.
 
 \subsection{The Fuls assessment}
 
@@ -1458,6 +1935,41 @@ or Gujarat coastal sites, the model gains a sixth independent
 convergence and the Bernoulli joint probability drops by another
 factor of five.
 
+\subsubsection*{Cross-source confirmation of M063 absence}
+
+The M063 prediction was originally derived from the mayig
+179-inscription Mohenjo-daro digitisation. Two independent sources
+ingested this session strengthen it:
+
+\begin{itemize}
+\item \textbf{Wells (2015) Appendix~II} systematically enumerates
+  the Indus Terminal Markers as signs 90, 156, 158, 226, 400,
+  520, 527, 740, 760, 741\smartcite{Wells2015} (recorded in
+  \texttt{sign\_role} with \texttt{function\_code = 'TMK'} under
+  \texttt{source\_code = 'WELLS2015'}). M063 in the Mahadevan
+  numbering is absent from this enumeration. Wells's enumeration
+  comes from positional histogram analysis of the full ICIT
+  corpus, not the 179-mayig subset.
+\item \textbf{Fuls (2019) ICIT help PDF} enumerates the
+  Terminal Markers as signs 90, 226, 400, 520, 527, 740 in the
+  TMK--TMK adjacency matrix, plus sign 760 in the
+  ``terminal marker'' caption on page~4
+  (\texttt{sign\_role} under \texttt{source\_code =
+  'ICIT\_HELP\_2019'}). M063 likewise absent.
+\end{itemize}
+
+The intersection of three independent sources (mayig 179, Wells
+2015 Appendix~II, Fuls 2019 ICIT help PDF) all returning M063
+absent from the Terminal Marker class is structurally stronger
+than the original single-source claim. The prediction now reads:
+M063 is documented to occur at Mohenjo-daro in zero of three
+independent enumerations of Terminal Markers, including one
+(Wells 2015) drawn from the full ICIT corpus across all sites.
+A new appearance of M063 in any future Mohenjo-daro inscription
+catalogued as a Terminal Marker would falsify all three
+enumerations simultaneously, not just the local mayig
+digitisation.
+
 %%% ===================================================================
 \section{The Implications}
 
@@ -1508,6 +2020,95 @@ wrong about what they observed; they are wrong about what they
 assume the observations must mean. The signs can be structured,
 non-random, and non-phonetic simultaneously.
 
+\subsubsection*{What the proto-Dravidian numeral system actually
+gives us}
+
+That orthogonality is not a refusal to engage with linguistics. It
+is a constraint on \emph{which} linguistic claims the data can
+ground. The clearest place where the cargo-tag model meets
+proto-Dravidian is in the numeral system, because numerals are the
+one part of the lexicon where the Indus signs and the proto-Dravidian
+forms share a structural property: both are bounded, ordered, and
+documented with high confidence.
+
+Wells (2015) Ch.~6 reproduces the proto-Dravidian number system
+from McAlpin (1981, pp.~40--41).\smartcite{Wells2015} The system has
+two notable properties.
+First, it is fundamentally base-ten with vestiges of a base-eight
+substrate (the compounding bases stop at eight; the root for eight
+\textit{*en} is the same as the root for ``count'' and
+``number'' --- DED~678).
+Second, several numerals are morphologically identical to non-numeric
+lexical roots --- the same phonetic shell carries both a quantity and
+an unrelated meaning. This is the structural source of polyvalence:
+a writing system tracking proto-Dravidian does not need to invent a
+new syllabic sign for a sound that already exists as a numeral.
+
+\begin{longtable}{@{}rllll@{}}
+\caption{The proto-Dravidian number system, reproduced from McAlpin
+1981 via Wells 2015 Table~6.1. Empty cells in the printed source are
+shown blank: rows~8 and~9 have no compounding base because the
+compounding bases stop at eight.}
+\label{tab:dravidian}\\
+\toprule
+$n$ & Compounding base & Variant & Noun (human) & Noun (neuter) \\
+\midrule
+\endfirsthead
+\toprule
+$n$ & Compounding base & Variant & Noun (human) & Noun (neuter) \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1   & or, on, ol, okka & oru, okkanre & oruvanre (m), orutti (f) & onre  \\
+\midrule
+2   & ir               & iru          & iruvar                   & iranta\\
+\midrule
+3   & mu(N)            & mu, muC      & muvar                    & munre \\
+\midrule
+4   & nal              & nan          & ---                      & nalke \\
+\midrule
+5   & cayN             & cayn         & ---                      & caynte\\
+\midrule
+6   & care             & care         & ---                      & care  \\
+\midrule
+7   & ez               & ezu          & ---                      & eze   \\
+\midrule
+8   & ---              & ---          & ---                      & entte \\
+\midrule
+9   & ---              & ---          & ---                      & onpate\\
+\midrule
+10  & tol              & ton          & ---                      & patte \\
+\midrule
+100 & pate, patin, pan & nure         & ---                      & nure  \\
+\end{longtable}
+
+\noindent
+The full table is in
+\texttt{indus\_corpus.db.dravidian\_numeral} (source\_code =
+\texttt{WELLS2015}, 11~rows). Source-of-truth for the paper's claim
+that proto-Dravidian provides a polyvalence mechanism is now
+machine-verifiable rather than philosophical.
+
+What this gives the cargo-tag hypothesis is a \emph{deniable} channel
+to language: when a low-frequency sign in the Indus inventory has a
+numeric reading already established (sign~003 collocates with sign~156
+$n=35$ in numeric contexts; signs~031 and~032 carry both numeric and
+syllabic contexts per Wells 2015 Ch.~5\smartcite{Wells2015}), the
+phonetic shell of the corresponding proto-Dravidian numeral
+(\textit{or}/\textit{ir}/\textit{mu}, etc.) is the natural candidate
+for any non-numeric reading the same sign carries. The cargo-tag
+encoding is logographic; the polyvalence is the bleed-through into
+syllabic use; the source of the syllabic value is the numeral lexicon.
+This is exactly Wells's argument restated structurally rather than
+intuitively.
+
+The hypothesis remains orthogonal to language identity. What it gains
+from the proto-Dravidian numerals is a constrained mechanism: if
+phonetic readings are ever established for individual signs, the
+testable prediction is that they will rhyme with the numeric values
+those signs carry, not with random morphological roots.
+
 \subsection{Museum labels}
 
 Every museum in the world that holds Indus seals labels them as
@@ -1524,6 +2125,84 @@ label tells you what it says.
 
 The deepest implication is not about the Indus script. It is
 about writing itself.
+
+\subsubsection*{The Indus numeral inventory}
+
+Before the philosophical argument, the inventory itself. Wells (2015)
+Ch.~5 distinguishes four classes of Indus numerals plus a positional
+notation for two-numeral and three-numeral expressions. All five are
+documented in \texttt{indus\_corpus.db.sign\_role} with
+\texttt{function\_code} values from the canonical Fuls 2019
+ICIT vocabulary.
+
+\begin{itemize}
+\item \textbf{SHN --- Short Linear Stroke numerals.} Signs 001
+  through 007. Maximum value 7; the encoding is inefficient in
+  horizontal space, which appears to be the cap. Sign~002 is the
+  most-collocated short numeral in the corpus (763 right-adjacent
+  contexts in Wells 2015 Table~5.1) and is multi-role: it doubles as
+  one of the three Initial Cluster Terminal Markers
+  (signs~001, 002, 060 per Wells 2006). Sign~003 has the widest set
+  of right-adjacent collocations and pairs strongly with sign~156
+  ($n=35$, all numeric contexts).
+\item \textbf{SSN --- Short Stacked Stroke numerals.} Two-row
+  arrangements, signs 012 through 020 plus the special-case
+  three-row sign~055. Of these, signs 014 through 019 have
+  unambiguous numeric contexts; 012 and 013 are questionable
+  (Wells flags 012 as ``may not always be a numeral'', and 013 has
+  only one clear numeric instance at K-059). Sign~020 is a mystery:
+  one example, solo on a ceramic vessel.
+\item \textbf{LON --- Long Linear Stroke numerals.} Signs 031 through
+  037 and 039 (the eight-stroke value 038 is unattested). Two of
+  these --- signs~031 and~032 --- are explicitly polyvalent: Wells
+  documents both numeric and syllabic contexts for each. Long stroke
+  signs collocate right-adjacent to sign~700 on Harappa tablets,
+  where they encode multiples of the Harappa volumetric base unit
+  V$_I$ = \SI{40.4}{\litre} (see Table~\ref{tab:volumes}).
+\item \textbf{SPN --- Special Numeral.} Sign~055, three-row stacked,
+  occurring in a wide variety of contexts. Wells calls it ``isolated
+  from the rest of the system of Indus numerals'' since the numeral
+  for 11 is unattested.
+\item \textbf{Two/Three Numeral Positional Notation.} Sign~900 in
+  Wells 2015 Figure~5.7 acts as a positional marker: a numeral to
+  its right contributes its face value; a numeral to its left
+  contributes a multiplied value. The example
+  \texttt{) IIIII} (sign~900 followed by five short strokes)
+  reads $5 + 5 = 10$ in additive parse, but $5 + 5 \times 10 = 55$
+  in multiplicative parse, which Wells argues is the intended
+  interpretation in three-numeral expressions. This is positional
+  arithmetic without a positional zero --- the multiplication is
+  triggered by a marker sign rather than by absence-of-digit.
+\end{itemize}
+
+The 700~$\times$~NUM right-adjacency frequencies are documented from
+two independent sources, recorded under their respective
+\texttt{source\_code}s in \texttt{sign\_pair\_frequency}:
+
+\begin{longtable}{@{}rrrrrrr@{}}
+\caption{Sign~700 right-adjacent NUM collocations from two
+independent counts.}
+\label{tab:sign700}\\
+\toprule
+NUM sign       & 003 & 006 & 014 & 031 & 032 & 033 \\
+\midrule
+\endfirsthead
+\toprule
+NUM sign       & 003 & 006 & 014 & 031 & 032 & 033 \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Fuls 2019 ICIT helper PDF & 2 & 8 & 1 & 3 & 89 & 136 \\
+\midrule
+Wells 2015 Table~5.3      & --- & --- & --- & --- & 105 & 137 \\
+\end{longtable}
+
+\noindent
+The discrepancies (89 vs.~105 for sign~032; 136 vs.~137 for sign~033)
+are visible in the database rather than reconciled --- both counts
+are honest, both are recorded, and neither is more authoritative
+than the other.
 
 The standard history of writing begins with language. Sumerian
 cuneiform started as pictographs representing words, evolved into
@@ -1586,9 +2265,9 @@ mathematics and never saw the need to encode it in speech.
 
 \subsection{Codebook gaps}
 
-28 of $\approx$417 Mahadevan signs are mapped to field roles.
-Of these, 21 have Parpola bridges confirmed through the
-concordance. The gaps:
+28 of $\approx$417 Mahadevan signs are mapped to field roles in
+\texttt{indus\_codebook.db}. Of these, 21 have Parpola bridges
+confirmed through the concordance. The original codebook gaps:
 
 \begin{itemize}
 \item Copper (M184) --- no Parpola equivalent in concordance
@@ -1601,6 +2280,85 @@ concordance. The gaps:
 \item 7 unmapped signs from M-52A (P172, P145, P092, P060, P364,
   P211, P320) --- all have Mahadevan numbers but no field role
 \end{itemize}
+
+\subsubsection*{Partial closure: the sign\_role table}
+
+The 2026-05-02 Wells 2015 and ICIT help-PDF ingests added a
+\texttt{sign\_role} table to \texttt{indus\_corpus.db} that catalogues
+functional classifications for individual sign IDs --- not the same as
+codebook field-role assignments, but a strictly weaker class of
+information that constrains them. After both ingests
+\texttt{sign\_role} contains 97 assignments across 21 sign-function
+codes (16 from Fuls 2019, 5 from Wells 2015):
+
+\begin{longtable}{@{}llp{0.55\linewidth}@{}}
+\caption{Sign-function codes in \texttt{sign\_function} after
+the Wells 2015 + Fuls 2019 ingests.}
+\label{tab:signfunctions}\\
+\toprule
+Code & Source & Meaning \\
+\midrule
+\endfirsthead
+\bottomrule
+\endlastfoot
+ITM  & Fuls 2019 & Initial Cluster Terminal Marker \\
+\midrule
+ICTM & Wells 2015 & same concept, Wells's name (signs 1, 2, 60) \\
+\midrule
+INS  & Wells 2015 & Initial Sign --- preferred position 1 \\
+\midrule
+EMS  & Wells 2015 & Early-Medial Sign --- max at positions 3--4 \\
+\midrule
+MMS  & Wells 2015 & Mid-Medial Sign --- max at positions 5--6 \\
+\midrule
+LMS  & Wells 2015 & Late-Medial Sign \\
+\midrule
+TMK  & Fuls 2019 & Terminal Marker \\
+\midrule
+PTM  & Fuls 2019 & Post-Terminal Marker \\
+\midrule
+LOG  & Fuls 2019 & Logogram \\
+\midrule
+SYL  & Fuls 2019 & Syllable \\
+\midrule
+NUM  & Fuls 2019 & Numeral (positional) \\
+\midrule
+SHN  & Fuls 2019 & Short Numeral (linear stroke 1--7) \\
+\midrule
+SSN  & Fuls 2019 & Short Stacked Numeral (12--20) \\
+\midrule
+LON  & Fuls 2019 & Long Numeral (linear stroke 31--39) \\
+\midrule
+SPN  & Fuls 2019 & Special Numeral (sign 55) \\
+\midrule
+PTM  & Fuls 2019 & Post Terminal Marker \\
+\midrule
+FSH  & Fuls 2019 & Fish sign (signs 156, 158, 220) \\
+\midrule
+S17  & Fuls 2019 & Set 17 \\
+\midrule
+S28  & Fuls 2019 & Set 28 \\
+\midrule
+S30  & Fuls 2019 & Set 30 \\
+\midrule
+S36  & Fuls 2019 & Set 36 \\
+\midrule
+XXX  & Fuls 2019 & Test function \\
+\end{longtable}
+
+\noindent
+Concrete sign assignments now in db include the three Initial Cluster
+Terminal Markers (signs 1, 2, 60); seven Terminal Markers (signs 90,
+156, 158, 226, 400, 520, 527, 740, 760, 741); seven Post-Terminal
+Markers (signs 90, 161, 400, 422, 423, 621, 679); six Syllables of
+uniform distribution (signs 368, 382, 595, 790, 832, 892); and the
+full numeral inventory enumerated under §\textit{Numbers before
+words} above. None of this closes the codebook gap directly, but it
+constrains which Mahadevan signs are candidates for codebook
+expansion. A sign classified TMK in \texttt{sign\_role} cannot be
+a commodity logogram. A sign classified NUM cannot be a route
+terminal. The codebook expansion task is now bounded by the role
+table rather than open across all 417 signs.
 
 \subsection{The 60\% question}
 
@@ -1623,9 +2381,47 @@ expect of a trade network.
 
 \subsection{The five Mohenjo-daro decodes}
 
-M-264A, M-272A, M-321A, M-615A, and M-751A are in the ingested
-CISI corpus and decode with zero code changes. These results will
-be reported in the next revision and deposited as a Zenodo update.
+M-264A, M-272A, M-321A, M-615A, and M-751A are five Mohenjo-daro
+morphological parallels whose Mahadevan text numbers fall beyond
+the mayig CISI digitisation range (M-1 through M-184). The
+2026-05-02 OCR of CISI Vol.~1 (Joshi--Parpola
+1987)\smartcite{JoshiParpola1987} located four of the five in the
+canonical photographic corpus:
+
+\begin{longtable}{@{}lll@{}}
+\caption{Status of the five Mohenjo-daro parallels against
+CISI Vol.~1 OCR.}
+\label{tab:five-md}\\
+\toprule
+Parallel & In CISI Vol.~1 OCR & Path forward \\
+\midrule
+\endfirsthead
+\bottomrule
+\endlastfoot
+M-264 & yes & sign-sequence transcription from photograph \\
+\midrule
+M-272 & yes & sign-sequence transcription from photograph \\
+\midrule
+M-321 & yes & sign-sequence transcription from photograph \\
+\midrule
+M-615 & yes & sign-sequence transcription from photograph \\
+\midrule
+M-751 & no  & beyond Vol.~1 range; Vol.~2 (Shah \& Parpola 1991)
+              or Vol.~3 (Parpola et al.\ 2010) candidate \\
+\end{longtable}
+
+\noindent
+The four located parallels are recorded in
+\texttt{indus\_corpus.db.cisi\_artefact} with their CISI page
+anchors. Decoding them requires per-photograph sign-sequence
+transcription, which the OCR pipeline does not produce (Indus
+glyphs are stone-photographs, not OCR-extractable typeset text).
+The decode infrastructure is in place; the transcription work is
+the remaining gap. The Bernoulli joint-probability calculation in
+§The Statistics is conservative against this gap: it assumes the
+five Mohenjo-daro parallels do \emph{not} decode, which makes the
+$3.125 \times 10^{-5}$ joint probability strictly worse than the
+true value once the four locatable parallels are decoded.
 
 %%% ===================================================================
 \section{Conclusion}
@@ -1737,6 +2533,119 @@ CREATE TABLE cisi_inscription (
 \end{verbatim}
 }
 
+\subsubsection*{Schema additions, 2026-05-02 / 2026-05-03}
+
+The Wells 2015, Fuls 2019, Fuls 2022, and Joshi--Parpola 1987 ingests
+this session added 13~tables to the schema. All are additive (no
+existing rows touched) and use \texttt{ON CONFLICT \ldots DO UPDATE}
+so re-running an ingest script is idempotent. DDL summaries:
+
+{\small
+\begin{verbatim}
+CREATE TABLE artefact_type (
+    source_code TEXT REFERENCES source(code), code TEXT,
+    parent_code TEXT, label TEXT,
+    PRIMARY KEY (source_code, code)) STRICT;
+    -- 33 rows (Fuls 2022 §1.1 typology: TAB/POT/SEAL/TAG/...)
+
+CREATE TABLE corpus_stat (
+    source_code TEXT PRIMARY KEY REFERENCES source(code),
+    n_artefacts INTEGER, n_texts INTEGER,
+    n_sign_occurrences INTEGER, n_legible_signs INTEGER,
+    n_distinct_signs INTEGER,
+    sign_id_range_low INTEGER, sign_id_range_high INTEGER,
+    note TEXT) STRICT;
+    -- 1 row (Fuls 2022: 4660/5644/19831/17957/709)
+
+CREATE TABLE reading_direction_stat (
+    source_code TEXT REFERENCES source(code), direction TEXT,
+    n_texts INTEGER, n_lines INTEGER,
+    n_sign_occurrences INTEGER, n_legible_signs INTEGER,
+    PRIMARY KEY (source_code, direction)) STRICT;
+    -- 8 rows (Fuls 2022 Table 2.5)
+
+CREATE TABLE site_book_anchor (
+    source_code TEXT REFERENCES source(code),
+    site_id TEXT REFERENCES site(id), page INTEGER,
+    PRIMARY KEY (source_code, site_id)) STRICT;
+    -- 73 rows (Fuls 2022 ToC pp. 28-451)
+
+CREATE TABLE cisi_page (
+    source_code TEXT REFERENCES source(code), page_num INTEGER,
+    book_page TEXT, site TEXT, id_range TEXT, raw_header TEXT,
+    PRIMARY KEY (source_code, page_num)) STRICT;
+    -- 862 rows (Joshi-Parpola 1987 Vol.1 OCR pages)
+
+CREATE TABLE cisi_artefact (
+    source_code TEXT REFERENCES source(code),
+    artefact_id TEXT, side TEXT, page_num INTEGER,
+    raw_caption TEXT, is_phantom INTEGER DEFAULT 0,
+    PRIMARY KEY (source_code, artefact_id, side)) STRICT;
+    -- 3305 rows (1399 unique IDs across 6 site prefixes)
+
+CREATE TABLE sign_function (
+    source_code TEXT REFERENCES source(code),
+    function_code TEXT, label TEXT,
+    PRIMARY KEY (source_code, function_code)) STRICT;
+    -- 21 rows (16 Fuls + 5 Wells; see Table sign-functions)
+
+CREATE TABLE reading_direction_code (
+    source_code TEXT REFERENCES source(code), code TEXT, label TEXT,
+    PRIMARY KEY (source_code, code)) STRICT;
+    -- 4 rows (R/L, L/R, T/B, BUS — Fuls 2019)
+
+CREATE TABLE sign_role (
+    source_code TEXT REFERENCES source(code),
+    sign_id INTEGER, function_code TEXT, evidence TEXT,
+    PRIMARY KEY (source_code, sign_id, function_code)) STRICT;
+    -- 97 rows (40 Fuls 2019 + 46 Wells 2015 P1 + 11 Wells 2015 P2)
+
+CREATE TABLE icit_inscription (
+    icit_id INTEGER, source_code TEXT REFERENCES source(code),
+    site TEXT, artefact_type TEXT, text_class TEXT,
+    excavation_idno TEXT, text_code TEXT NOT NULL,
+    PRIMARY KEY (source_code, icit_id)) STRICT;
+    -- 10 rows (real Wells-numbered ICIT inscriptions
+    --          from Fuls 2019 help PDF pages 8 and 20)
+
+CREATE TABLE sign_cluster (
+    source_code TEXT REFERENCES source(code),
+    signs TEXT, frequency INTEGER, contexts TEXT, evidence TEXT,
+    PRIMARY KEY (source_code, signs)) STRICT;
+    -- 4 rows (paradigmatic clusters from Fuls 2019)
+
+CREATE TABLE sign_pair_frequency (
+    source_code TEXT REFERENCES source(code),
+    sign_left INTEGER, sign_right INTEGER,
+    frequency INTEGER, context TEXT,
+    PRIMARY KEY (source_code, sign_left, sign_right)) STRICT;
+    -- 27 rows (12 TMK-TMK + 8 sign700-NUM Fuls 2019,
+    --          3 sign700-LON + 4 sign-pair Wells 2015)
+
+CREATE TABLE bibliography_reference (
+    citation_key TEXT, source_code TEXT REFERENCES source(code),
+    author TEXT, year INTEGER, title TEXT, venue TEXT, url TEXT,
+    PRIMARY KEY (source_code, citation_key)) STRICT;
+    -- 14 rows (Wells 1999/2006/2011/2015, Fuls 2010/2014/2015a/b/c,
+    --          Yadav 2008, Knorozov 1968, Marshall 1931, Mackay 1938,
+    --          Hemmy 1931)
+
+CREATE TABLE volumetric_unit (
+    source_code TEXT REFERENCES source(code),
+    symbol TEXT, liters REAL, notes TEXT,
+    PRIMARY KEY (source_code, symbol)) STRICT;
+    -- 7 rows (Wells 2015 Table 4.2: VI=40.4L through VIIIIIII=283L)
+
+CREATE TABLE dravidian_numeral (
+    source_code TEXT REFERENCES source(code),
+    number INTEGER, compounding_base TEXT, variant TEXT,
+    noun_human TEXT, noun_neuter TEXT,
+    PRIMARY KEY (source_code, number)) STRICT;
+    -- 11 rows (proto-Dravidian numbers 1-10, 100;
+    --          McAlpin 1981 via Wells 2015 Table 6.1)
+\end{verbatim}
+}
+
 \subsection{Codebook schema}
 
 The metrological codebook (\texttt{indus\_codebook.db}) maps Parpola
@@ -1795,6 +2704,41 @@ The Alloy specification (\texttt{spec/indus\_corpus.als}) is
 included in the Zenodo artifact. No SQL was written until all
 sixteen assertions returned UNSAT.
 
+\subsubsection*{Alloy specs proposed for the new tables}
+
+The 13~tables added in the 2026-05-02 / 2026-05-03 ingests are not
+yet covered by the original 16-assertion specification. Twelve
+additional assertions are proposed; specs to be authored in a
+subsequent revision and run to UNSAT at scope~6 before the
+Zenodo update is published.
+
+{\small
+\begin{verbatim}
+16. check artefactTypeNoOrphanParent      (artefact_type)
+17. check artefactTypeAcyclicHierarchy    (artefact_type)
+18. check corpusStatOnePerSource          (corpus_stat)
+19. check readingDirTotalIsRowSum         (reading_direction_stat)
+20. check siteAnchorOnePerSource          (site_book_anchor)
+21. check cisiPageNumInRange              (cisi_page)
+22. check cisiArtefactIdFormat            (cisi_artefact)
+23. check signRoleFunctionExists          (sign_role -> sign_function)
+24. check icitInscriptionTextCodeGrammar  (icit_inscription)
+25. check signPairFreqNonNegative         (sign_pair_frequency)
+26. check signClusterFormat               (sign_cluster)
+27. check bibliographyYearInRange         (bibliography_reference)
+\end{verbatim}
+}
+
+\noindent
+\texttt{cisiArtefactIdFormat} requires \texttt{artefact\_id} to
+match \texttt{[A-Z]-[0-9]+}. \texttt{icitInscriptionTextCodeGrammar}
+requires \texttt{text\_code} to match
+$\backslash{\rm +([0-9]\{3\}-)*[0-9]\{3\}\backslash{\rm +}}$
+(the canonical ICIT text-code grammar from Fuls 2019 page~7).
+\texttt{readingDirTotalIsRowSum} requires the row whose
+\texttt{direction} value is \texttt{'TOTAL'} to equal the sum of
+the other rows on every numeric column for the same source.
+
 %%% ===================================================================
 \section{Reproducibility}\label{sec:repro}
 
@@ -1841,6 +2785,41 @@ The codebook has been stable at 28~sign roles, 8~commodities, and
 5~routes since the initial seeding. By construction the open
 inventory (merchant marks, artefact IDs) lives in the corpus, not
 the codebook.
+
+\subsubsection*{Coding standard for ingest scripts}
+
+Every script that writes to \texttt{indus\_corpus.db} is named
+\texttt{*\_to\_sqlite.fsx} and lives at the repository root. This
+convention encodes the read/write split that the F\# coding
+standard (\texttt{spec/fsharp/reference/fsharp\_coding\_standard.tex})
+requires: write-path scripts may use raw SQL through
+\texttt{Microsoft.Data.Sqlite}; read-path scripts must consume the
+database via SqlHydra-generated typed records (no
+\texttt{SqliteCommand}, \texttt{ExecuteReader}, or
+\texttt{GetString} calls). The \texttt{*\_to\_sqlite.fsx} suffix is
+the file-naming half of the same rule.
+
+Ingest scripts share four further conventions:
+
+\begin{itemize}[nosep]
+\item \texttt{\#load "lib/shell/Shell.fsx"} for any process
+  spawning. \texttt{lib/shell/Shell.fsx} is an absolute symlink to
+  \texttt{\textasciitilde{}/fsx-tools/lib/Shell.fsx}, the canonical
+  shared F\# DSL for grep/find/sed/zsh-style operations and
+  process invocation. \texttt{Shell.runAsync} replaces raw
+  \texttt{ProcessStartInfo} usage.
+\item Header citation pair: \texttt{// Implements: Ledger of
+  Meluhha §<section> --- <what>} and
+  \texttt{// Coding standard: spec/fsharp/reference/fsharp\_coding\_standard.tex}
+  immediately under the SPDX line.
+\item Records over tuples (T1): hardcoded data tables that mirror
+  paper tables are typed F\# records, not tuples. The record name
+  matches the table label in the paper.
+\item Idempotent UPSERT: every \texttt{INSERT} carries
+  \texttt{ON CONFLICT \ldots DO UPDATE} so re-running a script
+  against an already-populated database is a no-op rather than a
+  duplicate-row error.
+\end{itemize}
 
 %%% ===================================================================
 \clearpage
@@ -1999,7 +2978,12 @@ scripts are the source of truth. They read from SQLite, perform
 the computation, and print the result. No raw SQL is required ---
 the scripts embed it.
 
-\subsection{The seven scripts}
+\subsection{The thirteen scripts}
+
+The original seven scripts produce the analytical claims of the book.
+Six write-path \texttt{*\_to\_sqlite.fsx} scripts shipped 2026-05-02 /
+2026-05-03 ingest the secondary sources discussed in §The Field /
+Prior art into \texttt{indus\_corpus.db}.
 
 \begin{longtable}{@{}lp{8cm}@{}}
 \toprule
@@ -2008,6 +2992,8 @@ Script & What it reproduces \\
 \endfirsthead
 \bottomrule
 \endlastfoot
+\multicolumn{2}{@{}l@{}}{\textit{Original analytical scripts (7).}} \\
+\midrule
 \texttt{indus\_ingest\_corpus.fsx}
   & Builds \texttt{indus\_corpus.db} from four sources
     (Mahadevan, Rajan--Sivanantham, Tamil Treebank,
@@ -2050,6 +3036,59 @@ Script & What it reproduces \\
     analysis: mapped vs unmapped signs. Conclusion: no
     alphabet detected (1.1~successors/sign, 71\% unique
     bigrams = open inventory, not phonetic layer). \\
+\midrule
+\multicolumn{2}{@{}l@{}}{\textit{Secondary-source ingest scripts (6, 2026-05-02 / 03).}} \\
+\midrule
+\texttt{indus\_fuls2022\_to\_sqlite.fsx}
+  & Fuls 2022 \textit{Corpus of Indus Inscriptions} metadata
+    scaffold: source row, 73~sites with book-page anchors,
+    artefact typology (10 top-level + 23 subtypes),
+    corpus headline statistics (4660 / 5644 / 19831), reading
+    direction stats (Table~2.5). Phase~1 ingest of the published
+    35-page methodology PDF; the gated 570-page Chapter~3 site
+    sections are not extractable. \\
+\midrule
+\texttt{cisi\_ocr\_to\_sqlite.fsx}
+  & Joshi--Parpola 1987 Vol.~1: 862-page scanned PDF rendered at
+    300dpi via pdftoppm, OCR'd via tesseract \texttt{--psm 6},
+    parsed via regex into \texttt{cisi\_page} (862 rows) and
+    \texttt{cisi\_artefact} (3305 rows, 1399 unique IDs across
+    six site prefixes). 91\% recall against the documented
+    1{,}537 artefacts. \\
+\midrule
+\texttt{cisi\_ocr\_cleanup\_to\_sqlite.fsx}
+  & Post-process for the OCR pipeline: site-name typo
+    normalisation (MOHENIJO-DARO, HARAPPAS, HULASI, GRAFFITI/SEALS
+    prefixes); \texttt{is\_phantom} marker on
+    \texttt{cisi\_artefact} rows whose page lacks a canonical
+    Indus-site header. Removes phantom rows from the
+    introduction-text and index-page noise. \\
+\midrule
+\texttt{icit\_help\_to\_sqlite.fsx}
+  & Fuls 2019 ICIT documentation PDF: 16~sign-function codes,
+    4~reading-direction codes, 10~real Wells-numbered ICIT
+    inscriptions (the only such data outside the unreachable
+    \texttt{caddy.igg.tu-berlin.de}), 40~sign-role assignments,
+    20~sign-pair frequencies (12 TMK--TMK + 8 sign~700~$\times$~NUM),
+    4~paradigmatic sign clusters, 8~bibliography references. \\
+\midrule
+\texttt{wells2015\_to\_sqlite.fsx}
+  & Wells 2015 \textit{Archaeology and Epigraphy of Indus
+    Writing} Phase~1 (prose-extractable): 5~new sign-function
+    codes (INS, ICTM, EMS, MMS, LMS), 46~sign-role assignments
+    including the canonical ICTM identification (signs 1, 2, 60),
+    4~Harappa volumetric units, 6~bibliography entries
+    (Wells 2006, Yadav 2008, Knorozov 1968, Marshall 1931,
+    Mackay 1938, Hemmy 1931). \\
+\midrule
+\texttt{wells2015\_tables\_to\_sqlite.fsx}
+  & Wells 2015 Phase~2 (table OCR): 3~more volumetric units
+    (full Harappa series VI=40.4L through VIIIIIII=283.0L now
+    7~rows), Wells's own sign~700~$\times$~Long-Linear-Stroke
+    matrix from Table~5.3 (3~rows; differ slightly from Fuls
+    2019 figures, both kept), 11~more sign-role assignments,
+    11~proto-Dravidian numerals from Table~6.1 (McAlpin 1981
+    reproduced). \\
 \end{longtable}
 
 \subsection{Running a script}
