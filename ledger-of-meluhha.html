@@ -198,6 +198,27 @@ footer { position:relative; z-index:10; border-top:1px solid rgba(196,146,74,0.1
 .leaflet-popup-tip { background:var(--bg) !important; }
 .leaflet-popup-content { font-family:'JetBrains Mono',monospace !important; font-size:10px !important; margin:8px 12px !important; }
 
+/* --- Expanded data section (Wells/ICIT/Fuls/CISI ingests, 2026-05-02/03) --- */
+#expanded-data { display:none; padding:0 24px 32px; position:relative; z-index:10; }
+.expanded-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(360px,1fr)); gap:16px; }
+.exp-panel { background:rgba(196,146,74,0.03); border:1px solid rgba(196,146,74,0.1); padding:16px; }
+.exp-panel.wide { grid-column:span 2; }
+@media (max-width:900px) { .exp-panel.wide { grid-column:span 1; } }
+.exp-title { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--clay); letter-spacing:3px; text-transform:uppercase; margin-bottom:8px; }
+.exp-subtitle { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--dim); margin-bottom:10px; }
+.exp-claim { font-size:11px; font-style:italic; color:var(--sand); margin-bottom:10px; line-height:1.4; }
+.exp-table { width:100%; border-collapse:collapse; font-family:'JetBrains Mono',monospace; font-size:10px; }
+.exp-table th { color:var(--clay); text-align:left; padding:4px 6px; border-bottom:1px solid rgba(196,146,74,0.25); font-weight:500; }
+.exp-table td { color:var(--sand); padding:3px 6px; border-bottom:1px solid var(--faint); vertical-align:top; }
+.exp-table td.num { text-align:right; color:var(--clay); }
+.exp-table td.code { color:var(--tba-red); font-weight:500; }
+.exp-table tr:hover td { background:rgba(196,146,74,0.06); }
+.exp-scroll { max-height:280px; overflow-y:auto; }
+.exp-scroll::-webkit-scrollbar { width:6px; }
+.exp-scroll::-webkit-scrollbar-thumb { background:rgba(196,146,74,0.2); border-radius:3px; }
+.section-divider { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--clay); letter-spacing:4px; text-transform:uppercase;
+  padding:24px 24px 12px; border-top:1px solid rgba(196,146,74,0.15); margin-top:24px; position:relative; z-index:10; }
+
 /* --- Responsive --- */
 @media (max-width:900px) { .dash-grid { grid-template-columns:1fr; } }
 </style>
@@ -262,6 +283,93 @@ footer { position:relative; z-index:10; border-top:1px solid rgba(196,146,74,0.1
         <table class="comm-table" id="comm-table"></table>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="section-divider" id="ext-divider" style="display:none">
+  Extended data — 2026-05-02 / 03 ingests (Wells 2015 · Fuls 2019 · Fuls 2022 · Joshi-Parpola 1987)
+</div>
+
+<div id="expanded-data">
+  <div class="expanded-grid">
+
+    <div class="exp-panel">
+      <div class="exp-title">SOURCES</div>
+      <div class="exp-subtitle">10 sources in indus_corpus.db, all with row counts.</div>
+      <p class="exp-claim">Every quantitative claim in this book is traceable to one of these source_codes.</p>
+      <div class="exp-scroll"><table class="exp-table" id="src-table"></table></div>
+    </div>
+
+    <div class="exp-panel">
+      <div class="exp-title">SIGN FUNCTIONS</div>
+      <div class="exp-subtitle">21 codes: 16 from Fuls 2019 ICIT documentation + 5 from Wells 2015 App. II.</div>
+      <p class="exp-claim">Functional vocabulary independent of the Parpola/Mahadevan/Wells numbering bridges. The fourth bridge.</p>
+      <div class="exp-scroll"><table class="exp-table" id="signfn-table"></table></div>
+    </div>
+
+    <div class="exp-panel">
+      <div class="exp-title">VOLUMETRIC SYSTEM (HARAPPA)</div>
+      <div class="exp-subtitle">Wells 2015 Table 4.2 — Purana Qila ceramic vessels H-372 / H-371 / H-370.</div>
+      <p class="exp-claim">Sibling metrology to the binary weight system. V_I=40.4L derived from grand mean of 3 vessel volumes.</p>
+      <table class="exp-table" id="vol-table"></table>
+    </div>
+
+    <div class="exp-panel">
+      <div class="exp-title">PROTO-DRAVIDIAN NUMERALS</div>
+      <div class="exp-subtitle">McAlpin 1981:40-1 reproduced via Wells 2015 Table 6.1.</div>
+      <p class="exp-claim">Compounding bases stop at 8 (DED 678). Several numerals share morphology with non-numeric roots — the polyvalence mechanism.</p>
+      <div class="exp-scroll"><table class="exp-table" id="drav-table"></table></div>
+    </div>
+
+    <div class="exp-panel wide">
+      <div class="exp-title">10 ICIT INSCRIPTIONS — WELLS-NUMBERED TEXT CODES</div>
+      <div class="exp-subtitle">From Fuls 2019 ICIT help PDF (pages 8 + 20). Only Wells-numbered data outside unreachable caddy.igg.tu-berlin.de.</div>
+      <p class="exp-claim">Sign 033+705 in 8 of 10. Sign 803 right-most pre-+ in 7 of 10 — unclassified TMK candidate.</p>
+      <div class="exp-scroll"><table class="exp-table" id="icit-table"></table></div>
+    </div>
+
+    <div class="exp-panel wide">
+      <div class="exp-title">SIGN ROLES</div>
+      <div class="exp-subtitle">97 documented assignments across 21 function codes. Per-row evidence cites the source page or figure.</div>
+      <p class="exp-claim">Constrains codebook expansion: a sign classified TMK cannot be a commodity logogram. A sign classified NUM cannot be a route terminal.</p>
+      <div class="exp-scroll" style="max-height:340px"><table class="exp-table" id="role-table"></table></div>
+    </div>
+
+    <div class="exp-panel">
+      <div class="exp-title">SIGN PAIR FREQUENCIES</div>
+      <div class="exp-subtitle">27 documented adjacencies: TMK-TMK 12 + sign 700 × NUM 11 + Wells 2015 Table 5.3 4.</div>
+      <p class="exp-claim">Closure-rich signature predicted by structured-record format.</p>
+      <div class="exp-scroll"><table class="exp-table" id="pair-table"></table></div>
+    </div>
+
+    <div class="exp-panel">
+      <div class="exp-title">SIGN CLUSTERS</div>
+      <div class="exp-subtitle">4 documented paradigmatic clusters from Fuls 2019 page 16.</div>
+      <p class="exp-claim">400-740-176 occurs 42× on TAB:B/I from Harappa exclusively. Implausible as a phonetic word.</p>
+      <table class="exp-table" id="clu-table"></table>
+    </div>
+
+    <div class="exp-panel">
+      <div class="exp-title">CISI VOL.1 OCR COVERAGE</div>
+      <div class="exp-subtitle">Joshi-Parpola 1987 Vol.1 — 862-page scanned PDF, OCR'd 2026-05-02.</div>
+      <p class="exp-claim">1399 unique artefact IDs across 6 site prefixes. 91% recall vs documented 1537 artefacts.</p>
+      <table class="exp-table" id="cisi-table"></table>
+    </div>
+
+    <div class="exp-panel">
+      <div class="exp-title">READING DIRECTIONS</div>
+      <div class="exp-subtitle">Fuls 2022 Table 2.5 — full ICIT corpus.</div>
+      <p class="exp-claim">87% RTL anchors the seal-impression-mirror convention.</p>
+      <table class="exp-table" id="rd-table"></table>
+    </div>
+
+    <div class="exp-panel wide">
+      <div class="exp-title">BIBLIOGRAPHY</div>
+      <div class="exp-subtitle">14 references across three ingest sources. Click a row to copy the citation key.</div>
+      <p class="exp-claim">From Wells 1999 (MA thesis) through Fuls 2022 (current methodology volume).</p>
+      <div class="exp-scroll"><table class="exp-table" id="bib-table"></table></div>
+    </div>
+
   </div>
 </div>
 
@@ -726,6 +834,174 @@ function renderDating(db) {
         container.innerHTML = '<span style="font-family:JetBrains Mono;font-size:9px;color:var(--dim)">No radiometric data</span>';
     }
 }
+// === EXTENDED DATA PANELS (Wells 2015 / Fuls 2019 / Fuls 2022 / CISI ingests) ===
+
+/** Try to query a table; return [] if it doesn't exist (older db, partial ingest). */
+function tryQuery(db, sql) {
+    try { return queryRows(db, sql); } catch (e) { return []; }
+}
+
+/** Render an HTML table from rows. headerCells = ['col 1','col 2',...]. mapper(row) -> array of <td>-content strings or {html, cls}. */
+function renderTable(elId, headerCells, rows, mapper, emptyMsg) {
+    const t = document.getElementById(elId);
+    if (!t) return;
+    if (rows.length === 0) {
+        t.innerHTML = `<tr><td style="color:var(--dim);font-style:italic">${emptyMsg || 'no rows in this database'}</td></tr>`;
+        return;
+    }
+    const head = '<tr>' + headerCells.map(h => `<th>${h}</th>`).join('') + '</tr>';
+    const body = rows.map(r => {
+        const cells = mapper(r);
+        return '<tr>' + cells.map(c => {
+            if (c && typeof c === 'object') return `<td class="${c.cls || ''}">${c.html}</td>`;
+            return `<td>${c == null ? '' : c}</td>`;
+        }).join('') + '</tr>';
+    }).join('');
+    t.innerHTML = head + body;
+}
+
+function renderSourcesPanel(db) {
+    const rows = tryQuery(db, "SELECT code, year, COALESCE(name,'') FROM source ORDER BY year, code");
+    renderTable('src-table',
+        ['source_code', 'year', 'name'],
+        rows,
+        r => [{ html: r[0], cls: 'code' }, { html: r[1], cls: 'num' }, (r[2] || '').slice(0, 70)]
+    );
+}
+
+function renderSignFunctionsPanel(db) {
+    const rows = tryQuery(db, "SELECT function_code, source_code, label FROM sign_function ORDER BY function_code, source_code");
+    renderTable('signfn-table',
+        ['code', 'source', 'label'],
+        rows,
+        r => [{ html: r[0], cls: 'code' }, r[1], r[2]],
+        'sign_function table not in this db (run icit_help_to_sqlite.fsx + wells2015_to_sqlite.fsx)'
+    );
+}
+
+function renderVolumetricPanel(db) {
+    const rows = tryQuery(db, "SELECT symbol, liters, COALESCE(notes,'') FROM volumetric_unit ORDER BY liters");
+    renderTable('vol-table',
+        ['symbol', 'litres', 'notes'],
+        rows,
+        r => [{ html: 'V<sub>' + r[0].replace(/^V/, '') + '</sub>', cls: 'code' },
+              { html: Number(r[1]).toFixed(1) + ' L', cls: 'num' },
+              (r[2] || '').slice(0, 50)],
+        'volumetric_unit table not in this db (run wells2015_to_sqlite.fsx)'
+    );
+}
+
+function renderDravidianPanel(db) {
+    const rows = tryQuery(db, "SELECT number, COALESCE(compounding_base,'—'), COALESCE(variant,'—'), COALESCE(noun_human,'—'), COALESCE(noun_neuter,'—') FROM dravidian_numeral ORDER BY number");
+    renderTable('drav-table',
+        ['n', 'compound', 'variant', 'noun-human', 'noun-neuter'],
+        rows,
+        r => [{ html: r[0], cls: 'num' }, r[1], r[2], r[3], r[4]],
+        'dravidian_numeral table not in this db (run wells2015_tables_to_sqlite.fsx)'
+    );
+}
+
+function renderIcitInscriptionsPanel(db) {
+    const rows = tryQuery(db, "SELECT icit_id, site, artefact_type, COALESCE(text_class,''), excavation_idno, text_code FROM icit_inscription ORDER BY icit_id");
+    renderTable('icit-table',
+        ['icit_id', 'site', 'type', 'class', 'excavation', 'wells text code'],
+        rows,
+        r => [{ html: r[0], cls: 'num' }, r[1], { html: r[2], cls: 'code' }, r[3], r[4], { html: r[5], cls: 'code' }],
+        'icit_inscription table not in this db (run icit_help_to_sqlite.fsx)'
+    );
+}
+
+function renderSignRolePanel(db) {
+    const rows = tryQuery(db, "SELECT sign_id, function_code, source_code, COALESCE(evidence,'') FROM sign_role ORDER BY function_code, sign_id");
+    renderTable('role-table',
+        ['sign', 'function', 'source', 'evidence'],
+        rows,
+        r => [{ html: String(r[0]).padStart(3, '0'), cls: 'num' },
+              { html: r[1], cls: 'code' },
+              r[2],
+              (r[3] || '').slice(0, 90)],
+        'sign_role table not in this db (run icit_help_to_sqlite.fsx + wells2015_to_sqlite.fsx)'
+    );
+}
+
+function renderSignPairPanel(db) {
+    const rows = tryQuery(db, "SELECT sign_left, sign_right, frequency, COALESCE(context,''), source_code FROM sign_pair_frequency ORDER BY frequency DESC, sign_left, sign_right");
+    renderTable('pair-table',
+        ['L', 'R', 'freq', 'context', 'source'],
+        rows,
+        r => [{ html: String(r[0]).padStart(3, '0'), cls: 'code' },
+              { html: String(r[1]).padStart(3, '0'), cls: 'code' },
+              { html: r[2], cls: 'num' },
+              (r[3] || '').slice(0, 50),
+              r[4]],
+        'sign_pair_frequency table not in this db (run icit_help_to_sqlite.fsx + wells2015_to_sqlite.fsx)'
+    );
+}
+
+function renderSignClusterPanel(db) {
+    const rows = tryQuery(db, "SELECT signs, frequency, COALESCE(contexts,''), COALESCE(evidence,'') FROM sign_cluster ORDER BY frequency DESC");
+    renderTable('clu-table',
+        ['cluster', 'freq', 'contexts'],
+        rows,
+        r => [{ html: r[0], cls: 'code' }, { html: r[1], cls: 'num' }, (r[2] || '').slice(0, 50)],
+        'sign_cluster table not in this db (run icit_help_to_sqlite.fsx)'
+    );
+}
+
+function renderCisiCoveragePanel(db) {
+    const rows = tryQuery(db, "SELECT substr(artefact_id,1,1) prefix, COUNT(DISTINCT artefact_id) ids, COUNT(*) rows_total FROM cisi_artefact WHERE source_code='CISI_JP1987' AND COALESCE(is_phantom,0)=0 GROUP BY 1 ORDER BY 2 DESC");
+    const prefixName = { 'M': 'Mohenjo-daro', 'H': 'Harappa', 'L': 'Lothal', 'K': 'Kalibangan', 'C': 'Chanhujo-daro', 'B': 'Banawali' };
+    renderTable('cisi-table',
+        ['prefix', 'site', 'unique IDs', 'rows'],
+        rows,
+        r => [{ html: r[0], cls: 'code' }, prefixName[r[0]] || r[0], { html: r[1], cls: 'num' }, { html: r[2], cls: 'num' }],
+        'cisi_artefact table not in this db (run cisi_ocr_to_sqlite.fsx + cisi_ocr_cleanup_to_sqlite.fsx)'
+    );
+}
+
+function renderReadingDirPanel(db) {
+    const rows = tryQuery(db, "SELECT direction, n_texts, n_legible_signs FROM reading_direction_stat WHERE source_code='FULS2022' ORDER BY n_texts DESC");
+    renderTable('rd-table',
+        ['direction', 'texts', 'legible signs'],
+        rows,
+        r => [{ html: r[0], cls: r[0] === 'TOTAL' ? 'code' : '' }, { html: r[1], cls: 'num' }, { html: r[2], cls: 'num' }],
+        'reading_direction_stat table not in this db (run indus_fuls2022_to_sqlite.fsx)'
+    );
+}
+
+function renderBibliographyPanel(db) {
+    const rows = tryQuery(db, "SELECT citation_key, author, year, title, COALESCE(venue,'') FROM bibliography_reference ORDER BY year, citation_key");
+    renderTable('bib-table',
+        ['key', 'author', 'year', 'title', 'venue'],
+        rows,
+        r => [{ html: r[0], cls: 'code' }, r[1], { html: r[2], cls: 'num' }, r[3], (r[4] || '').slice(0, 60)],
+        'bibliography_reference table not in this db (run wells2015_to_sqlite.fsx + icit_help_to_sqlite.fsx)'
+    );
+    // Click-to-copy citation key
+    document.querySelectorAll('#bib-table tr').forEach(tr => {
+        tr.addEventListener('click', () => {
+            const key = tr.querySelector('td.code')?.textContent;
+            if (key) navigator.clipboard?.writeText(key).catch(() => { });
+        });
+    });
+}
+
+function renderExtendedData(db) {
+    document.getElementById('ext-divider').style.display = 'block';
+    document.getElementById('expanded-data').style.display = 'block';
+    renderSourcesPanel(db);
+    renderSignFunctionsPanel(db);
+    renderVolumetricPanel(db);
+    renderDravidianPanel(db);
+    renderIcitInscriptionsPanel(db);
+    renderSignRolePanel(db);
+    renderSignPairPanel(db);
+    renderSignClusterPanel(db);
+    renderCisiCoveragePanel(db);
+    renderReadingDirPanel(db);
+    renderBibliographyPanel(db);
+}
+
 // === MAIN ====================================================================
 function renderDashboard(db) {
     // Map needs the container visible and sized before init
@@ -745,6 +1021,7 @@ function renderDashboard(db) {
     renderWeightBars();
     renderCommTable();
     renderDating(db);
+    renderExtendedData(db);
 }
 // === DROP ZONE ===============================================================
 /** Load a dropped .db file via sql.js WASM, fade out landing, render dashboard. */
